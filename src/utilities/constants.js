@@ -1,7 +1,7 @@
 const applicationDetails = {
-  name: "Chakra Template",
-  shortName: "ChakraTemplate",
-  description: "Open mystery packs or battles others!",
+  name: "Lake Country Games",
+  shortName: "Lake Country Games",
+  description: "A custom template by LCG!",
   links: {
     discord: "https://discord.gg/FZ5qF2dnrV",
     twitter: "https://x.com/ChadMasterr",
@@ -18,6 +18,8 @@ const API = {
   },
   paths: {
     getUser: "/api/user/getuser",
+    getAllUsers: "/api/user/getallusers",
+    updateUser: "/api/user/updateuser",
     updateUsername: "/api/user/updateusername",
   },
 };

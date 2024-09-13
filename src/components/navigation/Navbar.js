@@ -217,7 +217,7 @@ export default function Navbar({ websiteContent }) {
                     <MenuItem>Security</MenuItem>
                   </Link>
                   <MenuDivider />
-                  <Link to={"/packs"} onClick={() => onLogoutUser()}>
+                  <Link to={"/"} onClick={() => onLogoutUser()}>
                     <MenuItem sx={{ fontWeight: "bold" }}>Sign Out</MenuItem>
                   </Link>
                 </MenuList>

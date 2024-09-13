@@ -27,6 +27,9 @@ import Error from "./pages/auth/Error";
 import Home from "./pages/games/Dashboard";
 import Dashboard from "./pages/games/Dashboard";
 import { getfirebaseUser } from "./services/UserManagement.service";
+import AdminPanel from "./pages/account/admin/AdminPanel";
+import AdminViewUsers from "./pages/account/admin/AdminViewUsers";
+import ExecutivePanel from "./pages/account/admin/ExecutivePanel";
 
 function App() {
   const dispatch = useDispatch();
@@ -50,16 +53,16 @@ function App() {
       console.log("MTS RESPONSE!!");
     } else {
       // when the user has data in the DB use that as the main override
-      const savedUserData = userData.data;
-      console.log(savedUserData);
-
       dispatch(
         loginUser({
-          uid: savedUserData?.uid,
-          username: savedUserData?.username,
-          email: savedUserData?.email,
-          photoURL: savedUserData?.photoURL,
-          balance: savedUserData?.balance,
+          uid: userData?.uid,
+          username: userData?.username,
+          email: userData?.email,
+          photoURL: userData?.photoURL,
+          balance: userData?.balance,
+          isStaff: userData?.isStaff,
+          isHighStaff: userData?.isHighStaff,
+          title: userData?.title,
         })
       );
       dispatch(setLoading(false));
@@ -142,6 +145,39 @@ function App() {
                   />
                 }
               />
+              {user?.isHighStaff && (
+                <Route
+                  path={"/account/highadminpanel"}
+                  element={
+                    <Account
+                      accountElement={<ExecutivePanel />}
+                      currentPage={"highadminpanel"}
+                    />
+                  }
+                />
+              )}
+              {user?.isStaff && (
+                <Route
+                  path={"/account/adminpanel"}
+                  element={
+                    <Account
+                      accountElement={<AdminPanel />}
+                      currentPage={"adminpanel"}
+                    />
+                  }
+                />
+              )}
+              {user?.isStaff && (
+                <Route
+                  path={"/account/adminusers"}
+                  element={
+                    <Account
+                      accountElement={<AdminViewUsers />}
+                      currentPage={"adminusers"}
+                    />
+                  }
+                />
+              )}
               <Route
                 path={"/account/fairness"}
                 element={
