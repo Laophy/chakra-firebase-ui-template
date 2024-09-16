@@ -9,6 +9,7 @@ import {
   MenuItemOption,
   MenuOptionGroup,
   Stack,
+  Tag,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -22,15 +23,23 @@ export default function Account({ accountElement, currentPage }) {
       <Container as={Stack} maxW={"5xl"}>
         <Stack>
           <SimpleGrid templateColumns={{ sm: "1fr 5fr", md: "0fr 5fr" }}>
-            <Stack width="220px" mr={2}>
+            <Stack width="250px" mr={2}>
               <Menu>
                 <MenuItem minH="48px">
                   <Flex alignItems={"center"} justifyContent={"space-between"}>
                     <Avatar size={"sm"} mr="12px" src={user?.photoURL} />
+                    {user?.title.title && (
+                      <Tag
+                        size={"sm"}
+                        key={"sm"}
+                        variant="solid"
+                        colorScheme={user?.title.color}
+                        m={1}
+                      >
+                        {user?.title.title}
+                      </Tag>
+                    )}
                     <Text noOfLines={1} fontSize="lg">
-                      <span
-                        style={{ color: user?.title.color }}
-                      >{`${user?.title.title} `}</span>
                       {user?.username ? user?.username : "User"}
                     </Text>
                   </Flex>

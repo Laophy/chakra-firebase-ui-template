@@ -15,14 +15,23 @@ import {
   useColorMode,
   Stack,
   useToast,
+  ButtonGroup,
 } from "@chakra-ui/react";
-import { HamburgerIcon, CloseIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
+import {
+  HamburgerIcon,
+  CloseIcon,
+  MoonIcon,
+  SunIcon,
+  AddIcon,
+} from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
 import { loginUser } from "../../redux/userSlice";
-import { applicationDetails, constants } from "../../utilities/constants";
+import { applicationDetails } from "../../utilities/constants";
+import DepositFundsModal from "../modal/DepositFundsModal";
+import CartModal from "../modal/CartModal";
 
 export default function Navbar({ websiteContent }) {
   // Grabbing a user from global storage via redux
@@ -32,6 +41,16 @@ export default function Navbar({ websiteContent }) {
 
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isDepositOpen,
+    onOpen: onDepositOpen,
+    onClose: onDepsoitClose,
+  } = useDisclosure();
+  const {
+    isOpen: isCartOpen,
+    onOpen: onCartOpen,
+    onClose: onCartClose,
+  } = useDisclosure();
 
   const onLogoutUser = () => {
     dispatch(loginUser());
@@ -122,17 +141,27 @@ export default function Navbar({ websiteContent }) {
             <Button variant={"ghost"} onClick={toggleColorMode} mr={4}>
               {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
             </Button>
+            <Button
+              variant={"solid"}
+              colorScheme={"gray"}
+              size={"sm"}
+              mr={2}
+              onClick={() => onCartOpen()}
+            >
+              Cart
+            </Button>
             {user ? (
-              <Box>
-                <Button
-                  variant={"solid"}
-                  colorScheme={"teal"}
-                  size={"sm"}
-                  mr={4}
-                >
-                  ${user?.balance ? user?.balance.toFixed(2) : "0.00"}
+              <ButtonGroup m={2} size="sm" isAttached variant="outline">
+                <Button colorScheme={"teal"} size={"sm"}>
+                  $ {user?.balance ? user?.balance.toFixed(2) : "0.00"}
                 </Button>
-              </Box>
+                <IconButton
+                  onClick={onDepositOpen}
+                  colorScheme={"teal"}
+                  aria-label="Add money"
+                  icon={<AddIcon />}
+                />
+              </ButtonGroup>
             ) : (
               <Flex
                 h={16}
@@ -170,7 +199,7 @@ export default function Navbar({ websiteContent }) {
                   cursor={"pointer"}
                   minW={0}
                 >
-                  <Avatar size={"sm"} src={user?.photoURL} />
+                  <Avatar size={"sm"} src={user?.photoURL} ml={2} />
                 </MenuButton>
                 <MenuList>
                   <Link to={"/account/profile"}>
@@ -245,6 +274,16 @@ export default function Navbar({ websiteContent }) {
           {websiteContent}
         </Box>
       )}
+      <DepositFundsModal
+        isDepositOpen={isDepositOpen}
+        onDepositOpen={onDepositOpen}
+        onDepsoitClose={onDepsoitClose}
+      />
+      <CartModal
+        isCartOpen={isCartOpen}
+        onCartOpen={onCartOpen}
+        onCartClose={onCartClose}
+      />
     </>
   );
 }

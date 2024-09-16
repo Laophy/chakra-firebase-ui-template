@@ -1,4 +1,4 @@
-import { Search2Icon } from "@chakra-ui/icons";
+import { Search2Icon, SettingsIcon } from "@chakra-ui/icons";
 import {
   Text,
   Divider,
@@ -15,7 +15,6 @@ import {
   Input,
   CardFooter,
   CircularProgress,
-  Image,
   SimpleGrid,
   PopoverBody,
   Center,
@@ -26,47 +25,55 @@ import {
   PopoverTrigger,
   useToast,
   Popover,
-  Th,
-  Tr,
-  Tfoot,
-  Td,
-  Tbody,
-  Thead,
-  Table,
-  TableContainer,
+  Tag,
+  IconButton,
+  CardHeader,
+  VStack,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUserData,
+  onDemoteStaffToPlayer,
+  onPromoteUserToStaff,
   updateUser,
 } from "../../../services/UserManagement.service";
+import {
+  setBalance,
+  setProfilePicture,
+  setUsername,
+} from "../../../redux/userSlice";
 
 export default function AdminViewUsers() {
   // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
 
+  const { colorMode, toggleColorMode } = useColorMode();
   const toast = useToast();
+  const dispatch = useDispatch();
 
   const [search, setSearch] = useState("");
   const [userList, setUserList] = useState([]);
   const [editUser, setEditUser] = useState(null);
 
   const [newUsername, setNewUsername] = useState(null);
-  const [photoURL, setPhotoURL] = useState(null);
+  const [newPhotoURL, setNewPhotoURL] = useState(null);
   const [newEmail, setNewEmail] = useState(null);
+  const [newReferralCode, setNewReferralCode] = useState(null);
+  const [newAffiliateCode, setNewAffiliateCode] = useState(null);
   const [newBalance, setNewBalance] = useState(null);
   const [newTitle, setNewTitle] = useState(null);
 
-  const [color, setColor] = useState("yellow");
+  const [color, setColor] = useState("purple");
 
   const colors = [
     "gray",
     "red",
-    "gray",
+    "black",
     "green",
     "blue",
-    "blue",
+    "teal",
     "yellow",
     "orange",
     "purple",
@@ -85,12 +92,66 @@ export default function AdminViewUsers() {
     }
   };
 
+  const demoteToPlayer = async () => {
+    try {
+      const [res, mtsRes] = await onDemoteStaffToPlayer(user, editUser.uid);
+      if (res) {
+        toast({
+          title: "Success",
+          description: "You have successfuly demoted this staff to user.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "Staff not demoted to player. Error: " + e.message,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const promoteToStaff = async () => {
+    try {
+      const [res, mtsRes] = await onPromoteUserToStaff(user, editUser.uid);
+      if (res) {
+        toast({
+          title: "Success",
+          description: "You have successfuly promted this user to staff.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "User not promoted to staff. Error: " + e.message,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
+
   const onUpdateProfile = async () => {
+    const copyAffiliate = {
+      code: newAffiliateCode,
+      lastChanged: new Date(),
+    };
+
     const userUpdate = {
+      uid: editUser?.uid,
       username: newUsername,
-      photoURL: photoURL,
+      photoURL: newPhotoURL,
       email: newEmail,
       title: { title: newTitle, color: color },
+      referralCode: newReferralCode,
+      affiliate: copyAffiliate,
       balance: newBalance,
     };
 
@@ -114,16 +175,58 @@ export default function AdminViewUsers() {
         isClosable: true,
       });
     }
+
+    // Modified your own user update the ui
+    if (editUser?.uid === user?.uid) {
+      dispatch(setUsername(newUsername));
+      dispatch(setProfilePicture(newPhotoURL));
+      dispatch(setBalance(Number(newBalance)));
+    }
   };
 
   const search_parameters = Object.keys(Object.assign({}, ...userList));
 
   const searchUsers = (userList) => {
-    return userList.filter((data) => {
-      return search_parameters.some((parameter) =>
-        data[parameter].toString().toLowerCase().includes(search)
+    return userList
+      .filter((data) => {
+        return search_parameters.some((parameter) =>
+          data[parameter]?.toString()?.toLowerCase()?.includes(search)
+        );
+      })
+      .sort((a, b) => {
+        return Number(b?.isStaff) - Number(a.isStaff);
+      })
+      .sort((a, b) => {
+        return Number(b?.isHighStaff) - Number(a.isHighStaff);
+      });
+  };
+
+  const determinStaffTags = (user) => {
+    if (user?.isHighStaff) {
+      return (
+        <Tag size={"sm"} key={"sm"} variant="solid" colorScheme={"red"} m={1}>
+          High Staff
+        </Tag>
       );
-    });
+    } else if (user?.isStaff) {
+      return (
+        <Tag
+          size={"sm"}
+          key={"sm"}
+          variant="solid"
+          colorScheme={"purple"}
+          m={1}
+        >
+          Staff
+        </Tag>
+      );
+    } else {
+      return (
+        <Tag size={"sm"} key={"sm"} variant="solid" colorScheme={"gray"} m={1}>
+          Player
+        </Tag>
+      );
+    }
   };
 
   const determinUsers = () => {
@@ -137,65 +240,67 @@ export default function AdminViewUsers() {
     } else {
       return searchUsers(userList).map((user) => {
         return (
-          <Card>
+          <Card key={user?.uid}>
             <CardBody>
               <HStack alignItems={"center"} justifyContent={"space-between"}>
                 <Flex alignItems={"center"} justifyContent={"space-between"}>
-                  <Avatar size={"sm"} mr="12px" src={user?.photoURL} />
-                  <Text noOfLines={1} fontSize="lg">
-                    <span
-                      style={{ color: user?.title.color }}
-                    >{`${user?.title.title} `}</span>
-                    {user?.username ? user?.username : "User"}
-                  </Text>
+                  <VStack
+                    alignItems={"center"}
+                    justifyContent={"center"}
+                    w={20}
+                  >
+                    <Avatar size={"sm"} src={user?.photoURL} />
+                    {determinStaffTags(user)}
+                  </VStack>
+                  <HStack>
+                    {user?.title?.title && (
+                      <Tag
+                        size={"sm"}
+                        key={"sm"}
+                        variant="solid"
+                        colorScheme={user?.title?.color}
+                        m={1}
+                      >
+                        {user?.title?.title}
+                      </Tag>
+                    )}
+                    <Text noOfLines={1} fontSize="lg">
+                      {user?.username ? user?.username : "User"}
+                    </Text>
+                  </HStack>
                 </Flex>
-                <Text>{user.email}</Text>
-                <Text>${user.balance}</Text>
-                <Button
-                  variant="outline"
-                  colorScheme={"teal"}
-                  size={"sm"}
-                  onClick={() => setupEditedUser(user)}
-                >
-                  Edit
-                </Button>
+                <HStack alignItems={"center"} justifyContent={"space-between"}>
+                  <Text>{user.email}</Text>
+                  <Text>
+                    <span style={{ color: "green" }}>${user.balance}</span>
+                  </Text>
+                  <IconButton
+                    size={"md"}
+                    icon={<SettingsIcon />}
+                    aria-label={"Open Menu"}
+                    variant={"ghost"}
+                    onClick={() => setupEditedUser(user)}
+                  />
+                </HStack>
               </HStack>
             </CardBody>
           </Card>
         );
       });
-      // return (
-      //   <TableContainer>
-      //     <Table size="sm">
-      //       <Thead>
-      //         <Tr>
-      //           <Th>Username</Th>
-      //           <Th>Email</Th>
-      //           <Th isNumeric>Balance</Th>
-      //         </Tr>
-      //       </Thead>
-      //       <Tbody>
-      //         <Tr>
-      //           <Td>{userList[0]?.username}</Td>
-      //           <Td>{userList[0]?.email}</Td>
-      //           <Td isNumeric>{userList[0]?.balance}</Td>
-      //         </Tr>
-      //       </Tbody>
-      //     </Table>
-      //   </TableContainer>
-      // );
     }
   };
 
   const setupEditedUser = (user) => {
     setEditUser(user);
     setSearch("");
-    setColor(user?.title?.color);
+    setColor(user?.title?.color ? user?.title?.color : "purple");
     setNewUsername(user?.username);
-    setPhotoURL(user?.photoURL);
+    setNewPhotoURL(user?.photoURL);
     setNewEmail(user?.email);
     setNewBalance(user?.balance);
     setNewTitle(user?.title?.title);
+    setNewReferralCode(user?.referralCode);
+    setNewAffiliateCode(user?.affiliate?.code);
   };
 
   const determinSearch = () => {
@@ -227,19 +332,44 @@ export default function AdminViewUsers() {
         </Button>
         <Stack mt={4}>
           <Card direction={{ base: "column" }} variant="outline">
+            <CardHeader>{determinStaffTags(editUser)}</CardHeader>
             <Stack>
               {editUser.photoURL ? (
-                <Image
-                  objectFit="contain"
-                  maxW={{ base: "100%" }}
-                  m={5}
-                  p={2}
-                  mr={"auto"}
-                  ml={"auto"}
-                  borderRadius={25}
-                  src={editUser?.photoURL}
-                  alt={editUser?.username}
-                />
+                <HStack alignItems={"center"} justifyContent={"space-evenly"}>
+                  <Avatar
+                    size="md"
+                    name={editUser?.newUsername}
+                    objectFit="contain"
+                    maxW={{ base: "100%" }}
+                    mt={2}
+                    p={2}
+                    borderRadius={25}
+                    src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                    alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                  />
+                  <Avatar
+                    size="xl"
+                    name={editUser?.newUsername}
+                    objectFit="contain"
+                    maxW={{ base: "100%" }}
+                    mt={2}
+                    p={2}
+                    borderRadius={25}
+                    src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                    alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                  />
+                  <Avatar
+                    size="2xl"
+                    name={editUser?.newUsername}
+                    objectFit="contain"
+                    maxW={{ base: "100%" }}
+                    mt={2}
+                    p={2}
+                    borderRadius={25}
+                    src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                    alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                  />
+                </HStack>
               ) : (
                 <CircularProgress
                   isIndeterminate
@@ -252,7 +382,6 @@ export default function AdminViewUsers() {
                   ml={"auto"}
                 />
               )}
-
               <CardBody>
                 <Heading size="md" mb={4}>
                   Profile Picture
@@ -267,8 +396,8 @@ export default function AdminViewUsers() {
                 <Stack mt={5}>
                   <Text mb="8px">Photo URL</Text>
                   <Input
-                    value={photoURL}
-                    onChange={(event) => setPhotoURL(event.target.value)}
+                    value={newPhotoURL}
+                    onChange={(event) => setNewPhotoURL(event.target.value)}
                     placeholder="Profile Image URL"
                     size="lg"
                   />
@@ -292,77 +421,116 @@ export default function AdminViewUsers() {
                   />
                 </Stack>
                 <Stack mt={5}>
+                  <Text mb="8px">Referral Code</Text>
+                  <Input
+                    value={newReferralCode}
+                    onChange={(event) => setNewReferralCode(event.target.value)}
+                    placeholder="Referral Code"
+                    size="lg"
+                  />
+                </Stack>
+                <Stack mt={5}>
+                  <Text mb="8px">Affiliate Code</Text>
+                  <Input
+                    value={newAffiliateCode}
+                    onChange={(event) =>
+                      setNewAffiliateCode(event.target.value)
+                    }
+                    placeholder="Affilate Code"
+                    size="lg"
+                  />
+                </Stack>
+                <Stack mt={5}>
                   {user?.isHighStaff && (
-                    <HStack
-                      alignItems={"center"}
-                      justifyContent={"space-between"}
-                    >
-                      <Text mb="8px">Title</Text>
-                      <Input
-                        value={newTitle}
-                        onChange={(event) => setNewTitle(event.target.value)}
-                        placeholder="Title"
-                        size="lg"
-                      />
-                      <Center>
-                        <Popover variant="picker">
-                          <PopoverTrigger>
-                            <Button
-                              aria-label={color}
-                              background={color}
-                              height="22px"
-                              width="22px"
-                              padding={0}
-                              minWidth="unset"
-                              borderRadius={3}
-                            ></Button>
-                          </PopoverTrigger>
-                          <PopoverContent width="170px">
-                            <PopoverArrow bg={color} />
-                            <PopoverCloseButton color="white" />
-                            <PopoverHeader
-                              height="100px"
-                              backgroundColor={color}
-                              borderTopLeftRadius={5}
-                              borderTopRightRadius={5}
-                              color="white"
+                    <>
+                      <Heading size="md">Custom User Title</Heading>
+                      <VStack>
+                        <Flex
+                          alignItems={"center"}
+                          justifyContent={"space-between"}
+                        >
+                          <Avatar size={"md"} src={editUser?.photoURL} />
+                          {newTitle && (
+                            <Tag
+                              size={"md"}
+                              key={"sm"}
+                              variant="solid"
+                              colorScheme={color}
+                              m={1}
                             >
-                              <Center height="100%">{color}</Center>
-                            </PopoverHeader>
-                            <PopoverBody height="120px">
-                              <SimpleGrid columns={5} spacing={2}>
-                                {colors.map((c) => (
-                                  <Button
-                                    key={c}
-                                    aria-label={c}
-                                    background={c}
-                                    height="22px"
-                                    width="22px"
-                                    padding={0}
-                                    minWidth="unset"
-                                    borderRadius={3}
-                                    _hover={{ background: c }}
-                                    onClick={() => {
-                                      setColor(c);
-                                    }}
-                                  ></Button>
-                                ))}
-                              </SimpleGrid>
-                              <Input
+                              {newTitle}
+                            </Tag>
+                          )}
+                          <Text noOfLines={1} fontSize="lg" ml={1}>
+                            {editUser?.username ? editUser?.username : "User"}
+                          </Text>
+                        </Flex>
+                        <Input
+                          value={newTitle}
+                          onChange={(event) => setNewTitle(event.target.value)}
+                          placeholder="Give this user a title."
+                          size="md"
+                        />
+                        <Center>
+                          <Popover variant="picker">
+                            <PopoverTrigger>
+                              <Button
+                                aria-label={color}
+                                background={color}
+                                height="32px"
+                                width="32px"
+                                padding={0}
+                                minWidth="unset"
                                 borderRadius={3}
-                                marginTop={3}
-                                placeholder="red.100"
-                                size="sm"
-                                value={color}
-                                onChange={(e) => {
-                                  setColor(e.target.value);
-                                }}
-                              />
-                            </PopoverBody>
-                          </PopoverContent>
-                        </Popover>
-                      </Center>
-                    </HStack>
+                              ></Button>
+                            </PopoverTrigger>
+                            <PopoverContent width="170px">
+                              <PopoverArrow bg={color} />
+                              <PopoverCloseButton color="white" />
+                              <PopoverHeader
+                                height="100px"
+                                backgroundColor={color}
+                                borderTopLeftRadius={5}
+                                borderTopRightRadius={5}
+                                color="white"
+                              >
+                                <Center height="100%">{color}</Center>
+                              </PopoverHeader>
+                              <PopoverBody height="120px">
+                                <SimpleGrid columns={5} spacing={2}>
+                                  {colors.map((c) => (
+                                    <Button
+                                      key={c}
+                                      aria-label={c}
+                                      background={c}
+                                      height="22px"
+                                      width="22px"
+                                      padding={0}
+                                      minWidth="unset"
+                                      borderRadius={3}
+                                      _hover={{ background: c }}
+                                      onClick={() => {
+                                        setColor(c);
+                                      }}
+                                    ></Button>
+                                  ))}
+                                </SimpleGrid>
+                                <Input
+                                  borderRadius={3}
+                                  marginTop={3}
+                                  placeholder="purple"
+                                  size="sm"
+                                  value={color}
+                                  onChange={(e) => {
+                                    setColor(e.target.value);
+                                  }}
+                                />
+                              </PopoverBody>
+                            </PopoverContent>
+                          </Popover>
+                        </Center>
+                      </VStack>
+                    </>
                   )}
                 </Stack>
                 {user?.isHighStaff && (
@@ -376,28 +544,63 @@ export default function AdminViewUsers() {
                     />
                   </Stack>
                 )}
-              </CardBody>
-              <CardFooter>
-                <HStack alignItems={"center"} justifyContent={"space-between"}>
-                  <Button
-                    variant="solid"
-                    colorScheme="teal"
-                    onClick={() => onUpdateProfile()}
-                  >
-                    Save
-                  </Button>
-                  {user?.isHighStaff && (
-                    <>
-                      <Button variant="outline" colorScheme="yellow">
-                        Ban User
+                <HStack
+                  mt={5}
+                  alignItems={"center"}
+                  justifyContent={"space-between"}
+                >
+                  <div>
+                    <Button
+                      variant="solid"
+                      colorScheme="teal"
+                      onClick={() => onUpdateProfile()}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                  <div>
+                    {!user?.isHighStaff && editUser?.isStaff ? (
+                      <></>
+                    ) : user?.isStaff && editUser?.banned?.isBanned ? (
+                      <Button variant="ghost" colorScheme="green">
+                        Unban
                       </Button>
-                      <Button variant="outline" colorScheme="red">
-                        Delete User
+                    ) : (
+                      <Button variant="ghost" colorScheme="purple">
+                        Ban
                       </Button>
-                    </>
-                  )}
+                    )}
+                    {user?.isHighStaff && (
+                      <>
+                        {editUser?.isStaff ? (
+                          !editUser?.isHighStaff && (
+                            <Button
+                              variant="outline"
+                              colorScheme="red"
+                              ml={2}
+                              onClick={() => demoteToPlayer(editUser)}
+                            >
+                              Demote To Player
+                            </Button>
+                          )
+                        ) : (
+                          <Button
+                            variant="outline"
+                            colorScheme="yellow"
+                            ml={2}
+                            onClick={() => promoteToStaff(editUser)}
+                          >
+                            Promote To Staff
+                          </Button>
+                        )}
+                        <Button variant="ghost" colorScheme="red" ml={2}>
+                          Delete User
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </HStack>
-              </CardFooter>
+              </CardBody>
             </Stack>
           </Card>
         </Stack>
@@ -408,13 +611,24 @@ export default function AdminViewUsers() {
   return (
     <Stack>
       {editUser ? (
-        <Text fontSize="3xl" noOfLines={1}>
-          Editing{" "}
-          <span
-            style={{ color: editUser?.title.color }}
-          >{`${editUser?.title.title} `}</span>
-          {editUser?.username ? editUser?.username : "User"}
-        </Text>
+        <HStack>
+          <Text fontSize="3xl" noOfLines={1}>
+            Editing
+          </Text>
+          {editUser?.title?.title && (
+            <Tag
+              size={"sm"}
+              key={"sm"}
+              variant="solid"
+              colorScheme={editUser?.title?.color}
+            >
+              {editUser?.title?.title}
+            </Tag>
+          )}
+          <Text fontSize="2xl" noOfLines={1}>
+            {editUser?.username ? editUser?.username : "User"}
+          </Text>
+        </HStack>
       ) : (
         <Text fontSize="3xl">Manage Users</Text>
       )}

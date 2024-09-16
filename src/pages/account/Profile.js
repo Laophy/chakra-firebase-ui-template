@@ -11,13 +11,18 @@ import {
   CardFooter,
   useToast,
   CircularProgress,
+  Avatar,
+  HStack,
 } from "@chakra-ui/react";
 import { updateProfile } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { auth } from "../../firebase";
 import { setUsername, setProfilePicture } from "../../redux/userSlice";
-import { updateUsername } from "../../services/UserManagement.service";
+import {
+  updateUser,
+  updateUsername,
+} from "../../services/UserManagement.service";
 
 export default function Profile() {
   // Grabbing a user from global storage via redux
@@ -33,36 +38,29 @@ export default function Profile() {
     console.log(user);
   }, []);
 
-  const onUpdateProfile = () => {
+  const onUpdateProfile = async () => {
+    const userUpdate = {
+      username: newUsername,
+      photoURL: photoURL,
+    };
+
     try {
-      updateProfile(auth.currentUser, {
-        displayName: newUsername,
-        photoURL: photoURL,
-      })
-        .then(async () => {
-          const [res, mtsRes] = await updateUsername(
-            auth.currentUser,
-            newUsername
-          );
-          if (!mtsRes) {
-            console.log(res);
-          }
-        })
-        .then(dispatch(setUsername(newUsername)))
-        .then(dispatch(setProfilePicture(photoURL)))
-        .then(
-          toast({
-            title: "Success",
-            description: "You have successfuly updated your profile.",
-            status: "success",
-            duration: 2000,
-            isClosable: true,
-          })
-        );
+      const [res, mtsRes] = await updateUsername(user, userUpdate);
+      if (res) {
+        toast({
+          title: "Success",
+          description: "You have successfuly updated your profile.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        dispatch(setUsername(newUsername));
+        dispatch(setProfilePicture(photoURL));
+      }
     } catch (e) {
       toast({
         title: "Error",
-        description: "Profile not updated. Error: " + e.message,
+        description: "Profile not updated.",
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -78,17 +76,41 @@ export default function Profile() {
         <Card direction={{ base: "column" }} variant="outline">
           <Stack>
             {user.photoURL ? (
-              <Image
-                objectFit="contain"
-                maxW={{ base: "100%" }}
-                m={5}
-                p={2}
-                mr={"auto"}
-                ml={"auto"}
-                borderRadius={25}
-                src={user?.photoURL}
-                alt={user?.username}
-              />
+              <HStack alignItems={"center"} justifyContent={"space-evenly"}>
+                <Avatar
+                  size="md"
+                  name={user?.username}
+                  objectFit="contain"
+                  maxW={{ base: "100%" }}
+                  mt={2}
+                  p={2}
+                  borderRadius={25}
+                  src={photoURL ? photoURL : user?.photoURL}
+                  alt={photoURL ? photoURL : user?.photoURL}
+                />
+                <Avatar
+                  size="xl"
+                  name={user?.username}
+                  objectFit="contain"
+                  maxW={{ base: "100%" }}
+                  mt={2}
+                  p={2}
+                  borderRadius={25}
+                  src={photoURL ? photoURL : user?.photoURL}
+                  alt={photoURL ? photoURL : user?.photoURL}
+                />
+                <Avatar
+                  size="2xl"
+                  name={user?.username}
+                  objectFit="contain"
+                  maxW={{ base: "100%" }}
+                  mt={2}
+                  p={2}
+                  borderRadius={25}
+                  src={photoURL ? photoURL : user?.photoURL}
+                  alt={photoURL ? photoURL : user?.photoURL}
+                />
+              </HStack>
             ) : (
               <CircularProgress
                 isIndeterminate

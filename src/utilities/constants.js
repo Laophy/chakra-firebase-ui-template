@@ -16,11 +16,16 @@ const API = {
   capabilites: {
     userManagement: process.env.REACT_APP_API_ENDPOINT,
   },
-  paths: {
-    getUser: "/api/user/getuser",
-    getAllUsers: "/api/user/getallusers",
-    updateUser: "/api/user/updateuser",
-    updateUsername: "/api/user/updateusername",
+  routes: {
+    user: "/api/user",
+  },
+  endpoints: {
+    getUser: "/user.getUser",
+    getAllUsers: "/user.getAllUsers",
+    updateUser: "/user.updateUser",
+    updateUsername: "/user.updateUsername",
+    promoteUser: "/user.promoteUser",
+    demoteUser: "/user.demoteUser",
   },
 };
 

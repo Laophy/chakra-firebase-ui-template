@@ -16,7 +16,7 @@ export async function getfirebaseUser(user) {
   const refId = ReferenceId();
   try {
     let response = await axios.post(
-      API.capabilites.userManagement + API.paths.getUser,
+      API.capabilites.userManagement + API.routes.user + API.endpoints.getUser,
       {
         headers: {
           [CONTENT_TYPE]: APP_JSON,
@@ -40,7 +40,9 @@ export async function getAllUserData() {
   const refId = ReferenceId();
   try {
     let response = await axios.post(
-      API.capabilites.userManagement + API.paths.getAllUsers,
+      API.capabilites.userManagement +
+        API.routes.user +
+        API.endpoints.getAllUsers,
       {
         headers: {
           [CONTENT_TYPE]: APP_JSON,
@@ -63,7 +65,9 @@ export async function updateUsername(user, username) {
   const refId = ReferenceId();
   try {
     let response = await axios.post(
-      API.capabilites.userManagement + API.paths.updateUsername,
+      API.capabilites.userManagement +
+        API.routes.user +
+        API.endpoints.updateUsername,
       {
         headers: {
           [CONTENT_TYPE]: APP_JSON,
@@ -83,11 +87,65 @@ export async function updateUsername(user, username) {
   }
 }
 
+export async function onPromoteUserToStaff(user, uid) {
+  const refId = ReferenceId();
+  try {
+    let response = await axios.post(
+      API.capabilites.userManagement +
+        API.routes.user +
+        API.endpoints.promoteUser,
+      {
+        headers: {
+          [CONTENT_TYPE]: APP_JSON,
+          [AUTH_HEADER]: AUTH_HEADER,
+          [X_AMZ_TRACE_ID_HEADER]: refId,
+          [X_B3_SPANID_ID_HEADER]: refId,
+          [X_B3_TRACEID_HEADER]: refId,
+        },
+        params: { user, uid },
+      }
+    );
+
+    return await handleResponse(response, AUTH_HEADER, refId);
+  } catch (e) {
+    console.log("request failed??: ", e.response);
+    return await handleResponse(e.response, AUTH_HEADER, refId);
+  }
+}
+
+export async function onDemoteStaffToPlayer(user, uid) {
+  const refId = ReferenceId();
+  try {
+    let response = await axios.post(
+      API.capabilites.userManagement +
+        API.routes.user +
+        API.endpoints.demoteUser,
+      {
+        headers: {
+          [CONTENT_TYPE]: APP_JSON,
+          [AUTH_HEADER]: AUTH_HEADER,
+          [X_AMZ_TRACE_ID_HEADER]: refId,
+          [X_B3_SPANID_ID_HEADER]: refId,
+          [X_B3_TRACEID_HEADER]: refId,
+        },
+        params: { user, uid },
+      }
+    );
+
+    return await handleResponse(response, AUTH_HEADER, refId);
+  } catch (e) {
+    console.log("request failed??: ", e.response);
+    return await handleResponse(e.response, AUTH_HEADER, refId);
+  }
+}
+
 export async function updateUser(uid, newUserData) {
   const refId = ReferenceId();
   try {
     let response = await axios.post(
-      API.capabilites.userManagement + API.paths.updateUser,
+      API.capabilites.userManagement +
+        API.routes.user +
+        API.endpoints.updateUser,
       {
         headers: {
           [CONTENT_TYPE]: APP_JSON,

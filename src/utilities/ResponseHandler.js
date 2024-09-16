@@ -13,7 +13,9 @@ export async function handleResponse(response, authHeader, refId) {
 
     // Return a response or some sort of valid alert we can display via 2nd param [null, errorResponse]
 
-    const parsedResponse = _get(response, "data", {});
+    console.log(response);
+    const parsedResponse = _get(response, "data.result.data.json", {});
+    console.log(parsedResponse);
 
     return [parsedResponse, null];
   } catch (e) {
