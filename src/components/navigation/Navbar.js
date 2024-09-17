@@ -42,6 +42,14 @@ import {
   FaShoppingCart,
   FaGift,
 } from "react-icons/fa";
+import {
+  GrArticle,
+  GrCart,
+  GrConnect,
+  GrGift,
+  GrInstall,
+  GrMoney,
+} from "react-icons/gr";
 
 export default function Navbar({ websiteContent }) {
   // Grabbing a user from global storage via redux
@@ -83,12 +91,12 @@ export default function Navbar({ websiteContent }) {
     {
       to: "Dashboard",
       path: "dashboard",
-      icon: FaTachometerAlt,
-      color: "white",
+      icon: GrArticle,
+      color: "gray",
     },
-    { to: "Battles", path: "battles", icon: FaBattleNet, color: "yellow" },
-    { to: "Cart", path: "cart", icon: FaShoppingCart, color: "white" },
-    { to: "Rewards", path: "rewards", icon: FaGift, color: "white" },
+    { to: "Battles", path: "battles", icon: GrConnect, color: "gold" },
+    // { to: "Cart", path: "cart", icon: GrCart, color: "gray" },
+    { to: "Rewards", path: "rewards", icon: GrInstall, color: "orange" },
   ];
 
   const NavLink = (props) => {
@@ -162,24 +170,28 @@ export default function Navbar({ websiteContent }) {
               {/* <Button variant={"ghost"} onClick={toggleColorMode} mr={4}>
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button> */}
-              <Button
-                variant={"ghost"}
-                colorScheme={"gray"}
-                size={"sm"}
-                mr={2}
-                onClick={() => onCartOpen()}
-              >
-                Cart
-              </Button>
+
               {user ? (
-                <ButtonGroup m={2} size="sm" isAttached variant="outline">
-                  <Button size={"sm"}>{formatMoney(user?.balance)}</Button>
-                  <IconButton
-                    onClick={onDepositOpen}
-                    aria-label="Add money"
-                    icon={<AddIcon />}
-                  />
-                </ButtonGroup>
+                <>
+                  <Button
+                    variant={"ghost"}
+                    colorScheme={"gray"}
+                    size={"sm"}
+                    mr={2}
+                    leftIcon={<GrCart />}
+                    onClick={() => onCartOpen()}
+                  >
+                    Cart
+                  </Button>
+                  <ButtonGroup m={2} size="sm" isAttached variant="outline">
+                    <Button size={"sm"}>{formatMoney(user?.balance)}</Button>
+                    <IconButton
+                      onClick={onDepositOpen}
+                      aria-label="Add money"
+                      icon={<AddIcon />}
+                    />
+                  </ButtonGroup>
+                </>
               ) : (
                 <Flex
                   h={16}
@@ -280,7 +292,7 @@ export default function Navbar({ websiteContent }) {
         ""
       ) : (
         <Box>
-          <Container as={Stack} minHeight={"70vh"} maxW={"6xl"} py={8}>
+          <Container as={Stack} minHeight={"75vh"} maxW={"7xl"} py={2}>
             {websiteContent}
           </Container>
         </Box>
