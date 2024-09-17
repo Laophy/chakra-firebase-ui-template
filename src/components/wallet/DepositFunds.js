@@ -15,6 +15,7 @@ import {
   ButtonGroup,
   IconButton,
   Divider,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import moment from "moment";
 import { useState } from "react";
@@ -29,6 +30,7 @@ export default function DepositFunds() {
   );
   const [walletType, setWalletType] = useState(null);
   const { colorMode, toggleColorMode } = useColorMode();
+  const bg = useColorModeValue("gray.100", "gray.600");
 
   const onSetReferralCode = () => {
     // Update user referral code (the users uid)
@@ -85,7 +87,7 @@ export default function DepositFunds() {
         </Text>
         <Grid templateColumns="repeat(3, 1fr)" gap={2}>
           <GridItem w="100%" onClick={() => setWalletType("BTC")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -98,7 +100,7 @@ export default function DepositFunds() {
             </Card>
           </GridItem>
           <GridItem w="100%" onClick={() => setWalletType("ETH")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -111,7 +113,7 @@ export default function DepositFunds() {
             </Card>
           </GridItem>
           <GridItem w="100%" onClick={() => setWalletType("LTC")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -125,7 +127,7 @@ export default function DepositFunds() {
           </GridItem>
 
           <GridItem w="100%" onClick={() => setWalletType("SOL")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -138,7 +140,7 @@ export default function DepositFunds() {
             </Card>
           </GridItem>
           <GridItem w="100%" onClick={() => setWalletType("XRP")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -151,7 +153,7 @@ export default function DepositFunds() {
             </Card>
           </GridItem>
           <GridItem w="100%" onClick={() => setWalletType("DOGE")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -165,7 +167,7 @@ export default function DepositFunds() {
           </GridItem>
 
           <GridItem w="100%" onClick={() => setWalletType("USDT")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -178,7 +180,7 @@ export default function DepositFunds() {
             </Card>
           </GridItem>
           <GridItem w="100%" onClick={() => setWalletType("SHIB")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -191,7 +193,7 @@ export default function DepositFunds() {
             </Card>
           </GridItem>
           <GridItem w="100%" onClick={() => setWalletType("USDC")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -209,7 +211,7 @@ export default function DepositFunds() {
         </Text>
         <Grid templateColumns="repeat(1, 1fr)">
           <GridItem w="100%" onClick={() => setWalletType("CC")}>
-            <Card bg={colorMode === "light" ? "gray.200" : "gray.800"}>
+            <Card bg={bg}>
               <CardBody>
                 <VStack>
                   <Avatar
@@ -272,7 +274,8 @@ export default function DepositFunds() {
           />
           <Button
             size="md"
-            colorScheme="teal"
+            variant={"solid"}
+            colorScheme={"teal"}
             onClick={() => onSetReferralCode()}
           >
             Submit

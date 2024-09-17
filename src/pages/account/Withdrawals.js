@@ -1,4 +1,4 @@
-import { HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
+import { SettingsIcon } from "@chakra-ui/icons";
 import {
   Text,
   Divider,
@@ -10,14 +10,13 @@ import {
   Th,
   Tbody,
   Td,
-  Button,
   IconButton,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import moment from "moment/moment";
+import moment from "moment";
 import { useSelector } from "react-redux";
 
-export default function Deposits() {
+export default function Withdrawals() {
   // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
 
@@ -29,8 +28,8 @@ export default function Deposits() {
       created: moment("Thu Aug 25 2024 17:30:03 GMT+0300").fromNow(),
       updated: moment("Thu Aug 27 2024 17:30:03 GMT+0300").fromNow(),
       provider: "Checkout",
-      type: "Withdrawl",
-      status: "Faliure",
+      type: "Withdrawal",
+      status: "Complete",
       amount: "$150.00",
     },
     {
@@ -38,8 +37,8 @@ export default function Deposits() {
       created: moment("Thu Aug 25 2024 17:30:03 GMT+0300").fromNow(),
       updated: moment("Thu Aug 27 2024 17:30:03 GMT+0300").fromNow(),
       provider: "Checkout",
-      type: "Withdrawl",
-      status: "Faliure",
+      type: "Withdrawal",
+      status: "Complete",
       amount: "$150.00",
     },
     {
@@ -47,22 +46,22 @@ export default function Deposits() {
       created: moment("Thu Aug 25 2024 17:30:03 GMT+0300").fromNow(),
       updated: moment("Thu Aug 27 2024 17:30:03 GMT+0300").fromNow(),
       provider: "Checkout",
-      type: "Withdrawl",
-      status: "Faliure",
+      type: "Withdrawal",
+      status: "Complete",
       amount: "$150.00",
     },
   ];
 
   return (
     <Stack>
-      {!isMobile && <Text fontSize="3xl">Deposits</Text>}
+      {!isMobile && <Text fontSize="3xl">Withdrawals</Text>}
       <Divider />
       <Stack alignItems={"center"} justifyContent={"center"} mt={10}>
-        <Text fontSize="3xl">Deposits</Text>
-        <Text color={"gray.400"}>(Deposit History Will Be Shown)</Text>
+        <Text fontSize="3xl">Withdrawal History</Text>
+        <Text color={"gray.400"}>(Withdrawal History Will Appear Here)</Text>
       </Stack>
       {/* <TableContainer mt={10}>
-        <Table size="sm" variant="striped">
+        <Table size="sm" variant={"striped"}>
           <Thead>
             <Tr>
               <Th>Transaction ID</Th>
@@ -96,7 +95,7 @@ export default function Deposits() {
                     <span style={{ color: "green" }}>{transaction.type}</span>
                   </Td>
                   <Td>
-                    <span style={{ color: "red" }}>{transaction.status}</span>
+                    <span style={{ color: "green" }}>{transaction.status}</span>
                   </Td>
                   <Td isNumeric>{transaction.amount}</Td>
                   <Td>

@@ -144,11 +144,7 @@ export default function Login() {
                 <Text color={"blue.400"}>Forgot password?</Text>
               </Stack>
               <Button
-                bg={"blue.400"}
                 color={"white"}
-                _hover={{
-                  bg: "blue.500",
-                }}
                 onClick={() => {
                   onLoginUser();
                 }}

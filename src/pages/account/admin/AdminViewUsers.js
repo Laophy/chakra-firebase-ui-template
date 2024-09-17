@@ -1,4 +1,4 @@
-import { Search2Icon, SettingsIcon } from "@chakra-ui/icons";
+import { ChevronLeftIcon, Search2Icon, SettingsIcon } from "@chakra-ui/icons";
 import {
   Text,
   Divider,
@@ -30,6 +30,8 @@ import {
   CardHeader,
   VStack,
   useColorMode,
+  AvatarBadge,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,11 +46,10 @@ import {
   setProfilePicture,
   setUsername,
 } from "../../../redux/userSlice";
+import { formatMoney } from "../../../utilities/Formatter";
 
 export default function AdminViewUsers() {
-  // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
-
   const { colorMode, toggleColorMode } = useColorMode();
   const toast = useToast();
   const dispatch = useDispatch();
@@ -66,6 +67,7 @@ export default function AdminViewUsers() {
   const [newTitle, setNewTitle] = useState(null);
 
   const [color, setColor] = useState("purple");
+  const bg = useColorModeValue("gray.100", "gray.700");
 
   const colors = [
     "gray",
@@ -81,12 +83,11 @@ export default function AdminViewUsers() {
   ];
 
   useEffect(() => {
-    // Get users (will need to reduce this at some point when there are tons of users)
     initAllUserData();
   }, [editUser]);
 
   const initAllUserData = async () => {
-    const [allUsers, mtsRes] = await getAllUserData();
+    const [allUsers] = await getAllUserData();
     if (allUsers) {
       setUserList(allUsers);
     }
@@ -94,11 +95,11 @@ export default function AdminViewUsers() {
 
   const demoteToPlayer = async () => {
     try {
-      const [res, mtsRes] = await onDemoteStaffToPlayer(user, editUser.uid);
+      const [res] = await onDemoteStaffToPlayer(user, editUser.uid);
       if (res) {
         toast({
           title: "Success",
-          description: "You have successfuly demoted this staff to user.",
+          description: "You have successfully demoted this staff to user.",
           status: "success",
           duration: 2000,
           isClosable: true,
@@ -107,7 +108,7 @@ export default function AdminViewUsers() {
     } catch (e) {
       toast({
         title: "Error",
-        description: "Staff not demoted to player. Error: " + e.message,
+        description: `Staff not demoted to player. Error: ${e.message}`,
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -117,11 +118,11 @@ export default function AdminViewUsers() {
 
   const promoteToStaff = async () => {
     try {
-      const [res, mtsRes] = await onPromoteUserToStaff(user, editUser.uid);
+      const [res] = await onPromoteUserToStaff(user, editUser.uid);
       if (res) {
         toast({
           title: "Success",
-          description: "You have successfuly promted this user to staff.",
+          description: "You have successfully promoted this user to staff.",
           status: "success",
           duration: 2000,
           isClosable: true,
@@ -130,7 +131,7 @@ export default function AdminViewUsers() {
     } catch (e) {
       toast({
         title: "Error",
-        description: "User not promoted to staff. Error: " + e.message,
+        description: `User not promoted to staff. Error: ${e.message}`,
         status: "error",
         duration: 2000,
         isClosable: true,
@@ -156,11 +157,11 @@ export default function AdminViewUsers() {
     };
 
     try {
-      const [res, mtsRes] = await updateUser(editUser.uid, userUpdate);
+      const [res] = await updateUser(editUser.uid, userUpdate);
       if (res) {
         toast({
           title: "Success",
-          description: "You have successfuly updated the profile.",
+          description: "You have successfully updated the profile.",
           status: "success",
           duration: 2000,
           isClosable: true,
@@ -169,14 +170,13 @@ export default function AdminViewUsers() {
     } catch (e) {
       toast({
         title: "Error",
-        description: "Profile not updated. Error: " + e.message,
+        description: `Profile not updated. Error: ${e.message}`,
         status: "error",
         duration: 2000,
         isClosable: true,
       });
     }
 
-    // Modified your own user update the ui
     if (editUser?.uid === user?.uid) {
       dispatch(setUsername(newUsername));
       dispatch(setProfilePicture(newPhotoURL));
@@ -193,12 +193,8 @@ export default function AdminViewUsers() {
           data[parameter]?.toString()?.toLowerCase()?.includes(search)
         );
       })
-      .sort((a, b) => {
-        return Number(b?.isStaff) - Number(a.isStaff);
-      })
-      .sort((a, b) => {
-        return Number(b?.isHighStaff) - Number(a.isHighStaff);
-      });
+      .sort((a, b) => Number(b?.isStaff) - Number(a.isStaff))
+      .sort((a, b) => Number(b?.isHighStaff) - Number(a.isHighStaff));
   };
 
   const determinStaffTags = (user) => {
@@ -238,55 +234,56 @@ export default function AdminViewUsers() {
         </div>
       );
     } else {
-      return searchUsers(userList).map((user) => {
-        return (
-          <Card key={user?.uid}>
-            <CardBody>
-              <HStack alignItems={"center"} justifyContent={"space-between"}>
-                <Flex alignItems={"center"} justifyContent={"space-between"}>
-                  <VStack
-                    alignItems={"center"}
-                    justifyContent={"center"}
-                    w={20}
-                  >
-                    <Avatar size={"sm"} src={user?.photoURL} />
-                    {determinStaffTags(user)}
-                  </VStack>
-                  <HStack>
-                    {user?.title?.title && (
-                      <Tag
-                        size={"sm"}
-                        key={"sm"}
-                        variant="solid"
-                        colorScheme={user?.title?.color}
-                        m={1}
-                      >
-                        {user?.title?.title}
-                      </Tag>
+      return searchUsers(userList).map((user) => (
+        <Card key={user?.uid} variant="solid" bg={bg} dropShadow={"lg"}>
+          <CardBody>
+            <HStack alignItems={"center"} justifyContent={"space-between"}>
+              <Flex alignItems={"center"} justifyContent={"space-between"}>
+                <VStack alignItems={"center"} justifyContent={"center"} w={20}>
+                  <Avatar size={"sm"} src={user?.photoURL}>
+                    {user?.isOnline ? (
+                      <AvatarBadge boxSize="1.25em" bg="green.500" />
+                    ) : (
+                      <AvatarBadge boxSize="1.25em" bg="red.500" />
                     )}
-                    <Text noOfLines={1} fontSize="lg">
-                      {user?.username ? user?.username : "User"}
-                    </Text>
-                  </HStack>
-                </Flex>
-                <HStack alignItems={"center"} justifyContent={"space-between"}>
-                  <Text>{user.email}</Text>
-                  <Text>
-                    <span style={{ color: "green" }}>${user.balance}</span>
+                  </Avatar>
+                  {determinStaffTags(user)}
+                </VStack>
+                <HStack>
+                  {user?.title?.title && (
+                    <Tag
+                      size={"sm"}
+                      key={"sm"}
+                      variant="solid"
+                      colorScheme={user?.title?.color}
+                      m={1}
+                    >
+                      {user?.title?.title}
+                    </Tag>
+                  )}
+                  <Text noOfLines={1} fontSize="lg">
+                    {user?.username ? user?.username : "User"}
                   </Text>
-                  <IconButton
-                    size={"md"}
-                    icon={<SettingsIcon />}
-                    aria-label={"Open Menu"}
-                    variant={"ghost"}
-                    onClick={() => setupEditedUser(user)}
-                  />
                 </HStack>
+              </Flex>
+              <HStack alignItems={"center"} justifyContent={"space-between"}>
+                <Text>
+                  <span style={{ color: "green" }}>
+                    {formatMoney(user?.balance)}
+                  </span>
+                </Text>
+                <IconButton
+                  size={"md"}
+                  icon={<SettingsIcon />}
+                  aria-label={"Open Menu"}
+                  variant={"ghost"}
+                  onClick={() => setupEditedUser(user)}
+                />
               </HStack>
-            </CardBody>
-          </Card>
-        );
-      });
+            </HStack>
+          </CardBody>
+        </Card>
+      ));
     }
   };
 
@@ -303,310 +300,298 @@ export default function AdminViewUsers() {
     setNewAffiliateCode(user?.affiliate?.code);
   };
 
-  const determinSearch = () => {
-    return (
-      <InputGroup>
-        <InputLeftElement pointerEvents="none">
-          <Search2Icon color="gray.300" />
-        </InputLeftElement>
-        <Input
-          type="text"
-          placeholder="Search"
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </InputGroup>
-    );
-  };
+  const determinSearch = () => (
+    <InputGroup>
+      <InputLeftElement pointerEvents="none">
+        <Search2Icon color="gray.300" />
+      </InputLeftElement>
+      <Input
+        type="text"
+        placeholder="Search"
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </InputGroup>
+  );
 
-  const determinEditUserScreen = () => {
-    return (
-      <div>
-        <Button
-          variant={"outline"}
-          colorScheme={"teal"}
-          size={"md"}
-          mb={4}
-          onClick={() => setEditUser(null)}
-        >
-          Back
-        </Button>
-        <Stack mt={4}>
-          <Card direction={{ base: "column" }} variant="outline">
-            <CardHeader>{determinStaffTags(editUser)}</CardHeader>
-            <Stack>
-              {editUser.photoURL ? (
-                <HStack alignItems={"center"} justifyContent={"space-evenly"}>
-                  <Avatar
-                    size="md"
-                    name={editUser?.newUsername}
-                    objectFit="contain"
-                    maxW={{ base: "100%" }}
-                    mt={2}
-                    p={2}
-                    borderRadius={25}
-                    src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
-                    alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
-                  />
-                  <Avatar
-                    size="xl"
-                    name={editUser?.newUsername}
-                    objectFit="contain"
-                    maxW={{ base: "100%" }}
-                    mt={2}
-                    p={2}
-                    borderRadius={25}
-                    src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
-                    alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
-                  />
-                  <Avatar
-                    size="2xl"
-                    name={editUser?.newUsername}
-                    objectFit="contain"
-                    maxW={{ base: "100%" }}
-                    mt={2}
-                    p={2}
-                    borderRadius={25}
-                    src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
-                    alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
-                  />
-                </HStack>
-              ) : (
-                <CircularProgress
-                  isIndeterminate
-                  color="teal.300"
+  const determinEditUserScreen = () => (
+    <div>
+      <Button
+        variant={"solid"}
+        colorScheme={"teal"}
+        size={"md"}
+        mb={4}
+        onClick={() => setEditUser(null)}
+        leftIcon={<ChevronLeftIcon />}
+      >
+        Back
+      </Button>
+      <Stack mt={4}>
+        <Card direction={{ base: "column" }} variant="outline">
+          <CardHeader>{determinStaffTags(editUser)}</CardHeader>
+          <Stack>
+            {editUser.photoURL ? (
+              <HStack alignItems={"center"} justifyContent={"space-evenly"}>
+                <Avatar
+                  size="md"
+                  name={editUser?.newUsername}
                   objectFit="contain"
                   maxW={{ base: "100%" }}
-                  m={5}
+                  mt={2}
                   p={2}
-                  mr={"auto"}
-                  ml={"auto"}
+                  borderRadius={25}
+                  src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                  alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
                 />
+                <Avatar
+                  size="xl"
+                  name={editUser?.newUsername}
+                  objectFit="contain"
+                  maxW={{ base: "100%" }}
+                  mt={2}
+                  p={2}
+                  borderRadius={25}
+                  src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                  alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                />
+                <Avatar
+                  size="2xl"
+                  name={editUser?.newUsername}
+                  objectFit="contain"
+                  maxW={{ base: "100%" }}
+                  mt={2}
+                  p={2}
+                  borderRadius={25}
+                  src={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                  alt={newPhotoURL ? newPhotoURL : editUser?.photoURL}
+                />
+              </HStack>
+            ) : (
+              <CircularProgress
+                isIndeterminate
+                objectFit="contain"
+                maxW={{ base: "100%" }}
+                m={5}
+                p={2}
+                mr={"auto"}
+                ml={"auto"}
+              />
+            )}
+            <CardBody>
+              <Heading size="md" mb={4}>
+                Profile Picture
+              </Heading>
+              <Button variant="outline">Upload Image</Button>
+              <Text py="2" w={"60%"}>
+                The maximum upload size is 200 KB. Accepted formats are jpg,
+                png, and gif.
+              </Text>
+              <Stack mt={5}>
+                <Text mb="8px">Photo URL</Text>
+                <Input
+                  value={newPhotoURL}
+                  onChange={(event) => setNewPhotoURL(event.target.value)}
+                  placeholder="Profile Image URL"
+                  size="lg"
+                />
+              </Stack>
+              <Stack mt={5}>
+                <Text mb="8px">Username</Text>
+                <Input
+                  value={newUsername}
+                  onChange={(event) => setNewUsername(event.target.value)}
+                  placeholder="Username"
+                  size="lg"
+                />
+              </Stack>
+              <Stack mt={5}>
+                <Text mb="8px">Email</Text>
+                <Input
+                  value={newEmail}
+                  onChange={(event) => setNewEmail(event.target.value)}
+                  placeholder="Email"
+                  size="lg"
+                />
+              </Stack>
+              <Stack mt={5}>
+                <Text mb="8px">Referral Code</Text>
+                <Input
+                  value={newReferralCode}
+                  onChange={(event) => setNewReferralCode(event.target.value)}
+                  placeholder="Referral Code"
+                  size="lg"
+                />
+              </Stack>
+              <Stack mt={5}>
+                <Text mb="8px">Affiliate Code</Text>
+                <Input
+                  value={newAffiliateCode}
+                  onChange={(event) => setNewAffiliateCode(event.target.value)}
+                  placeholder="Affiliate Code"
+                  size="lg"
+                />
+              </Stack>
+              <Stack mt={5}>
+                {user?.isHighStaff && (
+                  <>
+                    <Heading size="md">Custom User Title</Heading>
+                    <VStack>
+                      <Flex
+                        alignItems={"center"}
+                        justifyContent={"space-between"}
+                      >
+                        <Avatar size={"md"} src={editUser?.photoURL} />
+                        {newTitle && (
+                          <Tag
+                            size={"md"}
+                            key={"sm"}
+                            variant="solid"
+                            colorScheme={color}
+                            m={1}
+                          >
+                            {newTitle}
+                          </Tag>
+                        )}
+                        <Text noOfLines={1} fontSize="lg" ml={1}>
+                          {editUser?.username ? editUser?.username : "User"}
+                        </Text>
+                      </Flex>
+                      <Input
+                        value={newTitle}
+                        onChange={(event) => setNewTitle(event.target.value)}
+                        placeholder="Give this user a title."
+                        size="md"
+                      />
+                      <Center>
+                        <Popover variant="picker">
+                          <PopoverTrigger>
+                            <Button
+                              aria-label={color}
+                              background={color}
+                              height="32px"
+                              width="32px"
+                              padding={0}
+                              minWidth="unset"
+                              borderRadius={3}
+                            ></Button>
+                          </PopoverTrigger>
+                          <PopoverContent width="170px">
+                            <PopoverArrow bg={color} />
+                            <PopoverCloseButton color="white" />
+                            <PopoverHeader
+                              height="100px"
+                              backgroundColor={color}
+                              borderTopLeftRadius={5}
+                              borderTopRightRadius={5}
+                              color="white"
+                            >
+                              <Center height="100%">{color}</Center>
+                            </PopoverHeader>
+                            <PopoverBody height="120px">
+                              <SimpleGrid columns={5} spacing={2}>
+                                {colors.map((c) => (
+                                  <Button
+                                    key={c}
+                                    aria-label={c}
+                                    background={c}
+                                    height="22px"
+                                    width="22px"
+                                    padding={0}
+                                    minWidth="unset"
+                                    borderRadius={3}
+                                    _hover={{ background: c }}
+                                    onClick={() => setColor(c)}
+                                  ></Button>
+                                ))}
+                              </SimpleGrid>
+                              <Input
+                                borderRadius={3}
+                                marginTop={3}
+                                placeholder="purple"
+                                size="sm"
+                                value={color}
+                                onChange={(e) => setColor(e.target.value)}
+                              />
+                            </PopoverBody>
+                          </PopoverContent>
+                        </Popover>
+                      </Center>
+                    </VStack>
+                  </>
+                )}
+              </Stack>
+              {user?.isHighStaff && (
+                <Stack mt={5}>
+                  <Text mb="8px">Balance</Text>
+                  <Input
+                    value={newBalance}
+                    onChange={(event) => setNewBalance(event.target.value)}
+                    placeholder="Balance"
+                    size="lg"
+                  />
+                </Stack>
               )}
-              <CardBody>
-                <Heading size="md" mb={4}>
-                  Profile Picture
-                </Heading>
-                <Button variant="outline" colorScheme="teal">
-                  Upload Image
-                </Button>
-                <Text py="2" w={"60%"}>
-                  The maxiumum upload size is 200 KB. Accepted formats are jpg,
-                  png, and gif.
-                </Text>
-                <Stack mt={5}>
-                  <Text mb="8px">Photo URL</Text>
-                  <Input
-                    value={newPhotoURL}
-                    onChange={(event) => setNewPhotoURL(event.target.value)}
-                    placeholder="Profile Image URL"
-                    size="lg"
-                  />
-                </Stack>
-                <Stack mt={5}>
-                  <Text mb="8px">Username</Text>
-                  <Input
-                    value={newUsername}
-                    onChange={(event) => setNewUsername(event.target.value)}
-                    placeholder="Username"
-                    size="lg"
-                  />
-                </Stack>
-                <Stack mt={5}>
-                  <Text mb="8px">Email</Text>
-                  <Input
-                    value={newEmail}
-                    onChange={(event) => setNewEmail(event.target.value)}
-                    placeholder="Email"
-                    size="lg"
-                  />
-                </Stack>
-                <Stack mt={5}>
-                  <Text mb="8px">Referral Code</Text>
-                  <Input
-                    value={newReferralCode}
-                    onChange={(event) => setNewReferralCode(event.target.value)}
-                    placeholder="Referral Code"
-                    size="lg"
-                  />
-                </Stack>
-                <Stack mt={5}>
-                  <Text mb="8px">Affiliate Code</Text>
-                  <Input
-                    value={newAffiliateCode}
-                    onChange={(event) =>
-                      setNewAffiliateCode(event.target.value)
-                    }
-                    placeholder="Affilate Code"
-                    size="lg"
-                  />
-                </Stack>
-                <Stack mt={5}>
+              <HStack
+                mt={5}
+                alignItems={"center"}
+                justifyContent={"space-between"}
+              >
+                <div>
+                  <Button
+                    variant="solid"
+                    colorScheme="teal"
+                    onClick={() => onUpdateProfile()}
+                  >
+                    Save
+                  </Button>
+                </div>
+                <div>
+                  {!user?.isHighStaff && editUser?.isStaff ? (
+                    <></>
+                  ) : user?.isStaff && editUser?.banned?.isBanned ? (
+                    <Button variant="outline" colorScheme="red">
+                      Unban
+                    </Button>
+                  ) : (
+                    <Button variant="outline" colorScheme="red">
+                      Ban
+                    </Button>
+                  )}
                   {user?.isHighStaff && (
                     <>
-                      <Heading size="md">Custom User Title</Heading>
-                      <VStack>
-                        <Flex
-                          alignItems={"center"}
-                          justifyContent={"space-between"}
-                        >
-                          <Avatar size={"md"} src={editUser?.photoURL} />
-                          {newTitle && (
-                            <Tag
-                              size={"md"}
-                              key={"sm"}
-                              variant="solid"
-                              colorScheme={color}
-                              m={1}
-                            >
-                              {newTitle}
-                            </Tag>
-                          )}
-                          <Text noOfLines={1} fontSize="lg" ml={1}>
-                            {editUser?.username ? editUser?.username : "User"}
-                          </Text>
-                        </Flex>
-                        <Input
-                          value={newTitle}
-                          onChange={(event) => setNewTitle(event.target.value)}
-                          placeholder="Give this user a title."
-                          size="md"
-                        />
-                        <Center>
-                          <Popover variant="picker">
-                            <PopoverTrigger>
-                              <Button
-                                aria-label={color}
-                                background={color}
-                                height="32px"
-                                width="32px"
-                                padding={0}
-                                minWidth="unset"
-                                borderRadius={3}
-                              ></Button>
-                            </PopoverTrigger>
-                            <PopoverContent width="170px">
-                              <PopoverArrow bg={color} />
-                              <PopoverCloseButton color="white" />
-                              <PopoverHeader
-                                height="100px"
-                                backgroundColor={color}
-                                borderTopLeftRadius={5}
-                                borderTopRightRadius={5}
-                                color="white"
-                              >
-                                <Center height="100%">{color}</Center>
-                              </PopoverHeader>
-                              <PopoverBody height="120px">
-                                <SimpleGrid columns={5} spacing={2}>
-                                  {colors.map((c) => (
-                                    <Button
-                                      key={c}
-                                      aria-label={c}
-                                      background={c}
-                                      height="22px"
-                                      width="22px"
-                                      padding={0}
-                                      minWidth="unset"
-                                      borderRadius={3}
-                                      _hover={{ background: c }}
-                                      onClick={() => {
-                                        setColor(c);
-                                      }}
-                                    ></Button>
-                                  ))}
-                                </SimpleGrid>
-                                <Input
-                                  borderRadius={3}
-                                  marginTop={3}
-                                  placeholder="purple"
-                                  size="sm"
-                                  value={color}
-                                  onChange={(e) => {
-                                    setColor(e.target.value);
-                                  }}
-                                />
-                              </PopoverBody>
-                            </PopoverContent>
-                          </Popover>
-                        </Center>
-                      </VStack>
-                    </>
-                  )}
-                </Stack>
-                {user?.isHighStaff && (
-                  <Stack mt={5}>
-                    <Text mb="8px">Balance</Text>
-                    <Input
-                      value={newBalance}
-                      onChange={(event) => setNewBalance(event.target.value)}
-                      placeholder="Balance"
-                      size="lg"
-                    />
-                  </Stack>
-                )}
-                <HStack
-                  mt={5}
-                  alignItems={"center"}
-                  justifyContent={"space-between"}
-                >
-                  <div>
-                    <Button
-                      variant="solid"
-                      colorScheme="teal"
-                      onClick={() => onUpdateProfile()}
-                    >
-                      Save
-                    </Button>
-                  </div>
-                  <div>
-                    {!user?.isHighStaff && editUser?.isStaff ? (
-                      <></>
-                    ) : user?.isStaff && editUser?.banned?.isBanned ? (
-                      <Button variant="ghost" colorScheme="green">
-                        Unban
-                      </Button>
-                    ) : (
-                      <Button variant="ghost" colorScheme="purple">
-                        Ban
-                      </Button>
-                    )}
-                    {user?.isHighStaff && (
-                      <>
-                        {editUser?.isStaff ? (
-                          !editUser?.isHighStaff && (
-                            <Button
-                              variant="outline"
-                              colorScheme="red"
-                              ml={2}
-                              onClick={() => demoteToPlayer(editUser)}
-                            >
-                              Demote To Player
-                            </Button>
-                          )
-                        ) : (
+                      {editUser?.isStaff ? (
+                        !editUser?.isHighStaff && (
                           <Button
                             variant="outline"
-                            colorScheme="yellow"
+                            colorScheme="red"
                             ml={2}
-                            onClick={() => promoteToStaff(editUser)}
+                            onClick={() => demoteToPlayer(editUser)}
                           >
-                            Promote To Staff
+                            Demote To Player
                           </Button>
-                        )}
-                        <Button variant="ghost" colorScheme="red" ml={2}>
-                          Delete User
+                        )
+                      ) : (
+                        <Button
+                          variant="outline"
+                          colorScheme="yellow"
+                          ml={2}
+                          onClick={() => promoteToStaff(editUser)}
+                        >
+                          Promote To Staff
                         </Button>
-                      </>
-                    )}
-                  </div>
-                </HStack>
-              </CardBody>
-            </Stack>
-          </Card>
-        </Stack>
-      </div>
-    );
-  };
+                      )}
+                      <Button variant="ghost" colorScheme="red" ml={2}>
+                        Delete User
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </HStack>
+            </CardBody>
+          </Stack>
+        </Card>
+      </Stack>
+    </div>
+  );
 
   return (
     <Stack>

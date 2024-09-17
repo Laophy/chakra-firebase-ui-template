@@ -1,6 +1,6 @@
 const applicationDetails = {
   name: "Lake Country Games",
-  shortName: "Lake Country Games",
+  shortName: "LCG",
   description: "A custom template by LCG!",
   links: {
     discord: "https://discord.gg/FZ5qF2dnrV",

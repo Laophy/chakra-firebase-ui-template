@@ -25,12 +25,15 @@ import {
   HStack,
   Button,
   IconButton,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
 export default function Affiliate() {
   // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const { colorMode, toggleColorMode } = useColorMode();
 
@@ -151,7 +154,7 @@ export default function Affiliate() {
         </HStack>
       </HStack>
       <TableContainer>
-        <Table size="sm">
+        <Table size="sm" colorScheme={"black"}>
           <Thead>
             <Tr>
               <Th>User</Th>

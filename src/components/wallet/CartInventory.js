@@ -15,6 +15,7 @@ import {
   ButtonGroup,
   IconButton,
   Divider,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import moment from "moment";
 import { useState } from "react";
@@ -25,10 +26,11 @@ export default function CartInventory() {
   const user = useSelector((state) => state.data.user.user);
 
   const { colorMode, toggleColorMode } = useColorMode();
+  const bg = useColorModeValue("gray.100", "gray.600");
 
   return (
     <Stack>
-      <Card bg={colorMode === "light" ? "gray.200" : "gray.900"} m={2}>
+      <Card bg={bg} m={2}>
         <CardBody>
           <VStack>
             <Text fontSize={"md"} as={"b"}>

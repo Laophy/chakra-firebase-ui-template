@@ -17,13 +17,13 @@ import theme from "./theme.js";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-	<ChakraProvider theme={theme}>
-		<Provider store={store}>
-			<BrowserRouter>
-				<App />
-			</BrowserRouter>
-		</Provider>
-	</ChakraProvider>
+  <ChakraProvider theme={theme}>
+    <Provider store={store}>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </Provider>
+  </ChakraProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

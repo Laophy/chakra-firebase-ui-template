@@ -1,16 +1,16 @@
 import { Flex, Container, SimpleGrid, Stack, Heading } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 
-export default function Battles() {
+export default function Rewards() {
   // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
 
   return (
-    <Container as={Stack} maxW={"5xl"}>
+    <Container as={Stack} maxW={"6xl"}>
       <Stack alignItems={"center"} justifyContent={"space-between"}>
         <Flex>
           <Heading as="h3" size="lg">
-            Battles
+            Rewards
           </Heading>
         </Flex>
       </Stack>

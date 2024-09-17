@@ -13,6 +13,8 @@ import {
   CircularProgress,
   Avatar,
   HStack,
+  useBreakpointValue,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { updateProfile } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -28,6 +30,8 @@ export default function Profile() {
   // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const bg = useColorModeValue("gray.100", "gray.700");
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -70,10 +74,10 @@ export default function Profile() {
 
   return (
     <Stack>
-      <Text fontSize="3xl">Profile</Text>
+      {!isMobile && <Text fontSize="3xl">Profile</Text>}
       <Divider />
       <Stack mt={4}>
-        <Card direction={{ base: "column" }} variant="outline">
+        <Card direction={{ base: "column" }} variant="solid">
           <Stack>
             {user.photoURL ? (
               <HStack alignItems={"center"} justifyContent={"space-evenly"}>
@@ -114,7 +118,6 @@ export default function Profile() {
             ) : (
               <CircularProgress
                 isIndeterminate
-                color="teal.300"
                 objectFit="contain"
                 maxW={{ base: "100%" }}
                 m={5}
@@ -128,9 +131,7 @@ export default function Profile() {
               <Heading size="md" mb={4}>
                 Profile Picture
               </Heading>
-              <Button variant="outline" colorScheme="teal">
-                Upload Image
-              </Button>
+              <Button variant="outline">Upload Image</Button>
               <Text py="2" w={"60%"}>
                 The maxiumum upload size is 200 KB. Accepted formats are jpg,
                 png, and gif.

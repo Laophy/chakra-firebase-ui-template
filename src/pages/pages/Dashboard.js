@@ -18,7 +18,7 @@ export default function Dashboard() {
   const user = useSelector((state) => state.data.user.user);
 
   return (
-    <Container as={Stack} maxW={"5xl"}>
+    <Container as={Stack} maxW={"6xl"}>
       <Stack
         alignItems={"center"}
         justifyContent={"space-between"}
@@ -38,7 +38,7 @@ export default function Dashboard() {
             <Input type="text" placeholder="Search" />
           </InputGroup>
           <Link to={"/cart"}>
-            <Button variant={"solid"} colorScheme={"teal"} size={"md"} ml={4}>
+            <Button variant={"solid"} size={"md"} ml={4}>
               +
             </Button>
           </Link>

@@ -11,21 +11,21 @@ import Profile from "./pages/account/Profile";
 
 import Account from "./layouts/Account";
 import Deposits from "./pages/account/Deposits";
-import Withdrawls from "./pages/account/Withdrawls";
+import Withdrawals from "./pages/account/Withdrawals";
 import Claims from "./pages/account/Claims";
 import Sales from "./pages/account/Sales";
 import Affiliate from "./pages/account/Affiliate";
 import History from "./pages/account/History";
 import Fairness from "./pages/account/Fairness";
 import Security from "./pages/account/Security";
-import Battles from "./pages/games/Battles";
-import Rewards from "./pages/games/Rewards";
+import Battles from "./pages/pages/Battles";
+import Rewards from "./pages/pages/Rewards";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import Cart from "./pages/games/Cart";
+import Cart from "./pages/pages/Cart";
 import Error from "./pages/auth/Error";
-import Home from "./pages/games/Dashboard";
-import Dashboard from "./pages/games/Dashboard";
+import Home from "./pages/pages/Dashboard";
+import Dashboard from "./pages/pages/Dashboard";
 import { getfirebaseUser } from "./services/UserManagement.service";
 import AdminPanel from "./pages/account/admin/AdminPanel";
 import AdminViewUsers from "./pages/account/admin/AdminViewUsers";
@@ -94,56 +94,50 @@ function App() {
               <Route
                 path={"/account/profile"}
                 element={
-                  <Account
-                    accountElement={<Profile />}
-                    currentPage={"profile"}
-                  />
+                  <Account pageElement={<Profile />} currentPage={"profile"} />
                 }
               />
               <Route
                 path={"/account/deposits"}
                 element={
                   <Account
-                    accountElement={<Deposits />}
+                    pageElement={<Deposits />}
                     currentPage={"deposits"}
                   />
                 }
               />
               <Route
-                path={"/account/withdrawls"}
+                path={"/account/withdrawals"} // Fixed typo: "withdrawls" to "withdrawals"
                 element={
                   <Account
-                    accountElement={<Withdrawls />}
-                    currentPage={"withdrawls"}
+                    pageElement={<Withdrawals />} // Fixed typo: "Withdrawls" to "Withdrawals"
+                    currentPage={"withdrawals"} // Fixed typo: "withdrawls" to "withdrawals"
                   />
                 }
               />
               <Route
                 path={"/account/claims"}
                 element={
-                  <Account accountElement={<Claims />} currentPage={"claims"} />
+                  <Account pageElement={<Claims />} currentPage={"claims"} />
                 }
               />
               <Route
                 path={"/account/sales"}
                 element={
-                  <Account accountElement={<Sales />} currentPage={"sales"} />
+                  <Account pageElement={<Sales />} currentPage={"sales"} />
                 }
               />
               <Route
                 path={"/account/history"}
                 element={
-                  <Account
-                    accountElement={<History />}
-                    currentPage={"history"}
-                  />
+                  <Account pageElement={<History />} currentPage={"history"} />
                 }
               />
               <Route
                 path={"/account/affiliate"}
                 element={
                   <Account
-                    accountElement={<Affiliate />}
+                    pageElement={<Affiliate />}
                     currentPage={"affiliate"}
                   />
                 }
@@ -153,8 +147,8 @@ function App() {
                   path={"/account/highadminpanel"}
                   element={
                     <Account
-                      accountElement={<ExecutivePanel />}
-                      currentPage={"highadminpanel"}
+                      pageElement={<ExecutivePanel />}
+                      currentPage={"Executive Panel"}
                     />
                   }
                 />
@@ -164,7 +158,7 @@ function App() {
                   path={"/account/adminpanel"}
                   element={
                     <Account
-                      accountElement={<AdminPanel />}
+                      pageElement={<AdminPanel />}
                       currentPage={"adminpanel"}
                     />
                   }
@@ -175,8 +169,8 @@ function App() {
                   path={"/account/adminusers"}
                   element={
                     <Account
-                      accountElement={<AdminViewUsers />}
-                      currentPage={"adminusers"}
+                      pageElement={<AdminViewUsers />}
+                      currentPage={"Manage Users"}
                     />
                   }
                 />
@@ -185,7 +179,7 @@ function App() {
                 path={"/account/fairness"}
                 element={
                   <Account
-                    accountElement={<Fairness />}
+                    pageElement={<Fairness />}
                     currentPage={"fairness"}
                   />
                 }
@@ -194,7 +188,7 @@ function App() {
                 path={"/account/security"}
                 element={
                   <Account
-                    accountElement={<Security />}
+                    pageElement={<Security />}
                     currentPage={"security"}
                   />
                 }
