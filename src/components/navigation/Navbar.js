@@ -62,12 +62,39 @@ import {
   GiOpenChest,
 } from "react-icons/gi";
 import { useState, useEffect, useRef, Fragment } from "react";
+import {
+  getMessageHistory,
+  sendMessage,
+} from "../../services/UserManagement.service";
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
+  getDocs,
+} from "firebase/firestore";
+import { firestore } from "../../firebase";
+import { useCollectionData } from "react-firebase-hooks/firestore";
 
 export default function Navbar({ websiteContent }) {
   // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
   const toast = useToast();
   const dispatch = useDispatch();
+
+  const messagesRef = collection(firestore, "messages"); // Reference to the messages collection
+  const q = query(messagesRef, orderBy("createdAt")); // Create a Firestore query
+  const [messages] = useCollectionData(q, { idField: "id" });
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+
+  const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
+
+  const [messageText, setMessageText] = useState("");
 
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -154,13 +181,6 @@ export default function Navbar({ websiteContent }) {
     bottom: "0px",
   };
 
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-
-  const messagesEndRef = useRef(null);
-  const chatContainerRef = useRef(null);
-
   const scrollToBottom = () => {
     chatContainerRef.current?.scrollTo({
       top: chatContainerRef.current.scrollHeight,
@@ -170,7 +190,7 @@ export default function Navbar({ websiteContent }) {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messageText]);
 
   useEffect(() => {
     if (isChatOpen) {
@@ -182,19 +202,37 @@ export default function Navbar({ websiteContent }) {
     setIsChatOpen(!isChatOpen);
   };
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() === "") return;
-
-    const message = {
-      text: newMessage,
-      photoURL: user?.photoURL,
-      title: user?.title,
-      username: user?.username,
-    };
-
-    setMessages([...messages, message]);
-    setNewMessage("");
+  const handleSendMessage = async (e) => {
+    const { uid, photoURL } = user; // Get user info
+    if (messageText.trim()) {
+      await addDoc(messagesRef, {
+        title: user?.title?.title,
+        color: user?.title?.color,
+        content: messageText,
+        username: user?.username,
+        createdAt: serverTimestamp(),
+        uid,
+        photoURL,
+      });
+      setMessageText("");
+    }
   };
+
+  // const handleSendMessage = async (e) => {
+  //   if (newMessage.trim() === "") return;
+
+  //   const message = {
+  //     content: newMessage,
+  //     photoURL: user?.photoURL,
+  //     title: user?.title,
+  //     username: user?.username,
+  //   };
+
+  //   const [res, mtsRes] = await sendMessage(newMessage, user);
+
+  //   setMessages([...messages, message]);
+  //   setNewMessage("");
+  // };
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -390,42 +428,45 @@ export default function Navbar({ websiteContent }) {
                     "scrollbar-width": "none",
                   }}
                 >
-                  {messages.map((message, index) => (
-                    <Flex key={index} align="center" mb={2} m={3}>
-                      <Avatar size="sm" src={message.photoURL} mr={2} />
-                      <Box>
-                        <HStack>
-                          <Tag
-                            size={"sm"}
-                            key={"sm"}
-                            variant="solid"
-                            colorScheme={message?.title?.color}
-                            m={0.5}
+                  {messages &&
+                    messages.map((message, index) => (
+                      <Flex key={index} align="center" mb={2} m={3}>
+                        <Avatar size="sm" src={message.photoURL} mr={2} />
+                        <Box>
+                          <HStack>
+                            {message?.title && (
+                              <Tag
+                                size={"sm"}
+                                key={"sm"}
+                                variant="solid"
+                                colorScheme={message?.color}
+                                m={0.5}
+                              >
+                                {message?.title}
+                              </Tag>
+                            )}
+                            <Text noOfLines={1} fontSize="md">
+                              {message?.username ? message?.username : "User"}
+                            </Text>
+                          </HStack>
+                          <Box
+                            bg={bgReverse}
+                            p={2}
+                            borderRadius="md"
+                            maxW={"250px"}
                           >
-                            {message?.title?.title}
-                          </Tag>
-                          <Text noOfLines={1} fontSize="md">
-                            {message?.username ? message?.username : "User"}
-                          </Text>
-                        </HStack>
-                        <Box
-                          bg={bgReverse}
-                          p={2}
-                          borderRadius="md"
-                          maxW={"250px"}
-                        >
-                          <Text fontSize={"sm"}>{message.text}</Text>
+                            <Text fontSize={"sm"}>{message.content}</Text>
+                          </Box>
                         </Box>
-                      </Box>
-                    </Flex>
-                  ))}
+                      </Flex>
+                    ))}
                   <div ref={messagesEndRef} />
                 </Box>
                 <Box w="100%" display="flex" p={2}>
                   <Input
                     placeholder="Type your message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
                     onKeyPress={(e) => {
                       if (e.key === "Enter") handleSendMessage();
                     }}
