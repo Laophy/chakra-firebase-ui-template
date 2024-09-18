@@ -8,10 +8,18 @@ import {
 // Custom Chakra UI theme
 const theme = extendTheme(
   {
+    config: {
+      initialColorMode: "dark",
+      useSystemColorMode: false,
+    },
+    palette: {
+      mode: "dark",
+    },
     colors: {
       brand: baseTheme.colors.gray,
     },
     fonts: {
+      text: "Urbanist, sans-serif",
       body: "Urbanist, sans-serif",
       heading: "Urbanist, sans-serif",
       mono: "Urbanist, sans-serif",

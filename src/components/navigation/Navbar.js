@@ -19,6 +19,11 @@ import {
   useBreakpointValue,
   useColorModeValue,
   Container,
+  VStack,
+  Input,
+  Divider,
+  Center,
+  Tag,
 } from "@chakra-ui/react";
 import {
   HamburgerIcon,
@@ -26,6 +31,7 @@ import {
   MoonIcon,
   SunIcon,
   AddIcon,
+  ChatIcon,
 } from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -50,6 +56,12 @@ import {
   GrInstall,
   GrMoney,
 } from "react-icons/gr";
+import {
+  GiCrossedSwords,
+  GiDiceSixFacesSix,
+  GiOpenChest,
+} from "react-icons/gi";
+import { useState, useEffect, useRef, Fragment } from "react";
 
 export default function Navbar({ websiteContent }) {
   // Grabbing a user from global storage via redux
@@ -91,13 +103,16 @@ export default function Navbar({ websiteContent }) {
     {
       to: "Dashboard",
       path: "dashboard",
-      icon: GrArticle,
-      color: "gray",
+      icon: GiDiceSixFacesSix,
+      color: "white",
     },
-    { to: "Battles", path: "battles", icon: GrConnect, color: "gold" },
+    { to: "Battles", path: "battles", icon: GiCrossedSwords, color: "yellow" },
     // { to: "Cart", path: "cart", icon: GrCart, color: "gray" },
-    { to: "Rewards", path: "rewards", icon: GrInstall, color: "orange" },
+    { to: "Rewards", path: "rewards", icon: GiOpenChest, color: "white" },
   ];
+
+  const bg = useColorModeValue("gray.100", "gray.700");
+  const bgReverse = useColorModeValue("gray.300", "gray.500");
 
   const NavLink = (props) => {
     const { children } = props;
@@ -139,6 +154,50 @@ export default function Navbar({ websiteContent }) {
     bottom: "0px",
   };
 
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+
+  const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    chatContainerRef.current?.scrollTo({
+      top: chatContainerRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    if (isChatOpen) {
+      scrollToBottom();
+    }
+  }, [isChatOpen]);
+
+  const toggleChat = () => {
+    setIsChatOpen(!isChatOpen);
+  };
+
+  const handleSendMessage = () => {
+    if (newMessage.trim() === "") return;
+
+    const message = {
+      text: newMessage,
+      photoURL: user?.photoURL,
+      title: user?.title,
+      username: user?.username,
+    };
+
+    setMessages([...messages, message]);
+    setNewMessage("");
+  };
+
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   return (
     <>
       <Box color={useColorModeValue("gray.700", "gray.200")}>
@@ -167,12 +226,22 @@ export default function Navbar({ websiteContent }) {
               </HStack>
             </HStack>
             <Flex alignItems={"center"}>
-              {/* <Button variant={"ghost"} onClick={toggleColorMode} mr={4}>
+              <Button variant={"ghost"} onClick={toggleColorMode} mr={4}>
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              </Button> */}
+              </Button>
 
               {user ? (
                 <>
+                  <Button
+                    onClick={toggleChat}
+                    variant={"ghost"}
+                    colorScheme={isChatOpen ? "red" : "teal"}
+                    size={"sm"}
+                    mr={2}
+                    aria-label="Toggle Chat"
+                  >
+                    {isChatOpen ? <CloseIcon /> : <ChatIcon />}
+                  </Button>
                   <Button
                     variant={"ghost"}
                     colorScheme={"gray"}
@@ -291,11 +360,84 @@ export default function Navbar({ websiteContent }) {
       {isOpen ? (
         ""
       ) : (
-        <Box>
-          <Container as={Stack} minHeight={"75vh"} maxW={"7xl"} py={2}>
-            {websiteContent}
-          </Container>
-        </Box>
+        <Flex>
+          {isChatOpen && isMobile ? (
+            ""
+          ) : (
+            <Container as={Stack} minHeight={"75vh"} maxW={"7xl"} py={2}>
+              {websiteContent}
+            </Container>
+          )}
+          {isChatOpen && (
+            <Container
+              as={Stack}
+              minHeight={"75vh"}
+              maxW={isMobile ? "100%" : "sm"}
+              py={2}
+            >
+              <VStack display={{ base: "flex", md: "flex" }} h={"75vh"}>
+                <Box
+                  ref={chatContainerRef}
+                  flex="1"
+                  overflowY="auto"
+                  w={"100%"}
+                  maxH={"70vh"}
+                  bg={bg}
+                  borderRadius="md"
+                  css={{
+                    "&::-webkit-scrollbar": { display: "none" },
+                    "-ms-overflow-style": "none",
+                    "scrollbar-width": "none",
+                  }}
+                >
+                  {messages.map((message, index) => (
+                    <Flex key={index} align="center" mb={2} m={3}>
+                      <Avatar size="sm" src={message.photoURL} mr={2} />
+                      <Box>
+                        <HStack>
+                          <Tag
+                            size={"sm"}
+                            key={"sm"}
+                            variant="solid"
+                            colorScheme={message?.title?.color}
+                            m={0.5}
+                          >
+                            {message?.title?.title}
+                          </Tag>
+                          <Text noOfLines={1} fontSize="md">
+                            {message?.username ? message?.username : "User"}
+                          </Text>
+                        </HStack>
+                        <Box
+                          bg={bgReverse}
+                          p={2}
+                          borderRadius="md"
+                          maxW={"250px"}
+                        >
+                          <Text fontSize={"sm"}>{message.text}</Text>
+                        </Box>
+                      </Box>
+                    </Flex>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </Box>
+                <Box w="100%" display="flex" p={2}>
+                  <Input
+                    placeholder="Type your message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") handleSendMessage();
+                    }}
+                  />
+                  <Button onClick={handleSendMessage} ml={2}>
+                    Send
+                  </Button>
+                </Box>
+              </VStack>
+            </Container>
+          )}
+        </Flex>
       )}
       <DepositFundsModal
         isDepositOpen={isDepositOpen}
