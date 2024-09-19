@@ -135,7 +135,7 @@ export default function UserProfile() {
             <Text fontWeight={600} color={"gray.500"}>
               @{profile?.username}
             </Text>
-            {profile?.title && (
+            {profile?.title?.title && (
               <Tag
                 size={"md"}
                 key={"sm"}
