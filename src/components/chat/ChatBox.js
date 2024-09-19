@@ -177,15 +177,17 @@ const ChatBox = ({ user }) => {
       position="relative"
     >
       <Box position="absolute" top={2} right={2} zIndex={1}>
-        <Badge
+        <Tag
           colorScheme="green"
-          variant="solid"
+          variant="outline"
           borderRadius="full"
           px={2}
           py={1}
+          m={2}
         >
-          Online Users: {onlineUsers}
-        </Badge>
+          <CheckCircleIcon mr={1} />
+          {onlineUsers} online
+        </Tag>
       </Box>
       <VStack h={"75vh"}>
         <Box
