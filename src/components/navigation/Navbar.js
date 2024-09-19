@@ -123,6 +123,19 @@ export default function Navbar({ websiteContent }) {
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
+  const fullscreenbanner = {
+    justifyContent: "center",
+    alignItems: "center",
+    background: "var(--chakra-colors-chakra-body-bg)",
+    display: "flex",
+    zIndex: "100",
+    position: "fixed",
+    top: "var(--chakra-space-16)",
+    left: "0px",
+    right: "0px",
+    bottom: "0px",
+  };
+
   return (
     <>
       <Box color={useColorModeValue("gray.700", "gray.200")}>
@@ -260,7 +273,7 @@ export default function Navbar({ websiteContent }) {
 
           {isOpen && (
             <Box pb={4} display={{ md: "none" }} sx={{ textAlign: "center" }}>
-              <Stack as={"nav"} spacing={4}>
+              <Stack as={"nav"} spacing={4} sx={fullscreenbanner}>
                 {Links.map((link) => (
                   <NavLinkMobile key={link.to}>{link}</NavLinkMobile>
                 ))}
