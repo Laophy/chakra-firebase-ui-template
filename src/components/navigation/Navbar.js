@@ -38,13 +38,12 @@ import { applicationDetails } from "../../utilities/constants";
 import DepositFundsModal from "../modal/DepositFundsModal";
 import CartModal from "../modal/CartModal";
 import { formatMoney } from "../../utilities/Formatter";
-import {
-  GiCrossedSwords,
-  GiDiceSixFacesSix,
-  GiOpenChest,
-} from "react-icons/gi";
+import { LuBox } from "react-icons/lu";
+import { MdOutlineInventory2 } from "react-icons/md";
+import { PiHouseBold } from "react-icons/pi";
 import { useState } from "react";
 import ChatBox from "../chat/ChatBox";
+import { FaHouse, FaShieldAlt } from "react-icons/fa";
 
 export default function Navbar({ websiteContent }) {
   const user = useSelector((state) => state.data.user.user);
@@ -87,13 +86,29 @@ export default function Navbar({ websiteContent }) {
 
   const Links = [
     {
-      to: "Dashboard",
+      to: "Home",
       path: "dashboard",
-      icon: GiDiceSixFacesSix,
+      icon: PiHouseBold,
       color: "white",
     },
-    { to: "Battles", path: "battles", icon: GiCrossedSwords, color: "yellow" },
-    { to: "Cart", path: "cart", icon: GiOpenChest, color: "gray" },
+    {
+      to: "Boxes",
+      path: "battles",
+      icon: LuBox,
+      color: "white",
+    },
+    {
+      to: "Box Battles",
+      path: "battles",
+      icon: FaShieldAlt,
+      color: "white",
+    },
+    {
+      to: "Inventory",
+      path: "cart",
+      icon: MdOutlineInventory2,
+      color: "white",
+    },
   ];
 
   const NavLink = ({ children }) => (

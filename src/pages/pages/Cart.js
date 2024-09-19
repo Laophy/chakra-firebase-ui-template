@@ -27,7 +27,7 @@ export default function Cart() {
       >
         <Flex>
           <Heading as="h3" size="lg">
-            Cart
+            Inventory
           </Heading>
         </Flex>
         <Flex>
@@ -45,8 +45,8 @@ export default function Cart() {
         </Flex>
       </Stack>
       <Stack alignItems={"center"} justifyContent={"center"} mt={10}>
-        <Text fontSize="4xl">Cart Items</Text>
-        <Text color={"gray.400"}>(Your cart is empty)</Text>
+        <Text fontSize="4xl">Inventory Items</Text>
+        <Text color={"gray.400"}>(Your Inventory is empty)</Text>
       </Stack>
     </Container>
   );
