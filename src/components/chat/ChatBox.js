@@ -83,8 +83,15 @@ const ChatBox = ({ user }) => {
         setOnlineUsers(snapshot.size);
       });
 
+      const handleBeforeUnload = async () => {
+        await deleteDoc(userDoc);
+      };
+
+      window.addEventListener("beforeunload", handleBeforeUnload);
+
       return () => {
         deleteDoc(userDoc);
+        window.removeEventListener("beforeunload", handleBeforeUnload);
         unsubscribe();
       };
     }
@@ -170,17 +177,15 @@ const ChatBox = ({ user }) => {
       position="relative"
     >
       <Box position="absolute" top={2} right={2} zIndex={1}>
-        <Tag
+        <Badge
           colorScheme="green"
-          variant="outline"
+          variant="solid"
           borderRadius="full"
           px={2}
           py={1}
-          m={2}
         >
-          <CheckCircleIcon mr={1} />
-          {onlineUsers} online
-        </Tag>
+          Online Users: {onlineUsers}
+        </Badge>
       </Box>
       <VStack h={"75vh"}>
         <Box
