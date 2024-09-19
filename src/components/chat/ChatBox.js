@@ -176,7 +176,7 @@ const ChatBox = ({ user }) => {
       py={2}
       position="relative"
     >
-      <Box position="absolute" top={2} right={2} zIndex={1}>
+      <Box position="absolute" top={2} right={2}>
         <Tag
           colorScheme="green"
           variant="outline"
