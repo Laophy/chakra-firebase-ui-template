@@ -15,12 +15,7 @@ import {
   Tooltip,
   useToast,
 } from "@chakra-ui/react";
-import { ViewIcon, WarningIcon, CloseIcon } from "@chakra-ui/icons";
-import {
-  RiDeleteBack2Fill,
-  RiDeleteBack2Line,
-  RiVolumeMuteLine,
-} from "react-icons/ri";
+import { RiDeleteBack2Line, RiVolumeMuteLine } from "react-icons/ri";
 import { useState, useEffect, useRef } from "react";
 import {
   collection,
@@ -71,16 +66,20 @@ const ChatBox = ({ user }) => {
   }, [messages]);
 
   const handleSendMessage = async () => {
-    const { uid, photoURL } = user;
+    const { uid, photoURL, title } = user;
     if (messageText.trim()) {
       await addDoc(messagesRef, {
-        title: user?.title?.title,
-        color: user?.title?.color,
+        title: title?.title ? title?.title : "",
+        color: title?.color ? title?.color : "",
         content: messageText,
-        username: user?.username,
+        username: user?.username
+          ? user?.username
+          : user?.displayName
+          ? user?.displayName
+          : "User",
         createdAt: serverTimestamp(),
         uid,
-        photoURL,
+        photoURL: photoURL ? photoURL : "",
       });
       setMessageText("");
     }
