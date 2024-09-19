@@ -14,6 +14,7 @@ import {
   IconButton,
   Tooltip,
   useToast,
+  Badge,
 } from "@chakra-ui/react";
 import { RiDeleteBack2Line, RiVolumeMuteLine } from "react-icons/ri";
 import { useState, useEffect, useRef } from "react";
@@ -28,17 +29,22 @@ import {
   doc,
   getDocs,
   where,
+  onSnapshot,
+  setDoc,
 } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { firestore } from "../../firebase";
 import { Link } from "react-router-dom";
 import { FaBan } from "react-icons/fa";
 import moment from "moment";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 
 const ChatBox = ({ user }) => {
   const toast = useToast();
+  const [onlineUsers, setOnlineUsers] = useState(0);
 
   const messagesRef = collection(firestore, "messages");
+  const onlineUsersRef = collection(firestore, "onlineUsers");
   const q = query(messagesRef, orderBy("createdAt", "desc"), limit(35));
   const [messages] = useCollectionData(q, { idField: "id" });
 
@@ -64,6 +70,25 @@ const ChatBox = ({ user }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    if (user) {
+      const userDoc = doc(onlineUsersRef, user.uid);
+      setDoc(userDoc, {
+        uid: user.uid,
+        username: user.username || user.displayName || "User",
+      });
+
+      const unsubscribe = onSnapshot(onlineUsersRef, (snapshot) => {
+        setOnlineUsers(snapshot.size);
+      });
+
+      return () => {
+        deleteDoc(userDoc);
+        unsubscribe();
+      };
+    }
+  }, [user]);
 
   const handleSendMessage = async () => {
     const { uid, photoURL, title } = user;
@@ -137,7 +162,26 @@ const ChatBox = ({ user }) => {
   };
 
   return (
-    <Container as={Stack} minHeight={"75vh"} maxW={"sm"} py={2}>
+    <Container
+      as={Stack}
+      minHeight={"75vh"}
+      maxW={"sm"}
+      py={2}
+      position="relative"
+    >
+      <Box position="absolute" top={2} right={2} zIndex={1}>
+        <Tag
+          colorScheme="green"
+          variant="outline"
+          borderRadius="full"
+          px={2}
+          py={1}
+          m={2}
+        >
+          <CheckCircleIcon mr={1} />
+          {onlineUsers} online
+        </Tag>
+      </Box>
       <VStack h={"75vh"}>
         <Box
           ref={chatContainerRef}
