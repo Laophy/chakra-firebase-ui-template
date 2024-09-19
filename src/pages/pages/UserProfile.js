@@ -83,6 +83,52 @@ export default function UserProfile() {
     loadCurrentUser();
   }, [uid]);
 
+  const attemptMute = async () => {
+    // Simulate a save operation
+    try {
+      toast({
+        title: "Success",
+        description: "Profile muted successfully",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "Failed to mute",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const attemptBan = async () => {
+    // Simulate a save operation
+    try {
+      toast({
+        title: "Success",
+        description: "Profile banned successfully",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "Failed to ban",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    loadCurrentUser();
+  }, [uid]);
+
   const loadCurrentUser = async () => {
     const [userData, mtsResponse] = await getfirebaseUser({ uid });
     if (mtsResponse || !userData) {
@@ -365,6 +411,46 @@ export default function UserProfile() {
                   >
                     Update User
                   </Button>
+                  <HStack w={"full"}>
+                    <Button
+                      onClick={attemptMute}
+                      w={"50%"}
+                      fontSize={"sm"}
+                      rounded={"full"}
+                      bg={"purple.400"}
+                      color={"white"}
+                      boxShadow={
+                        "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
+                      }
+                      _hover={{
+                        bg: "purple.500",
+                      }}
+                      _focus={{
+                        bg: "purple.500",
+                      }}
+                    >
+                      Mute
+                    </Button>
+                    <Button
+                      onClick={attemptBan}
+                      w={"50%"}
+                      fontSize={"sm"}
+                      rounded={"full"}
+                      bg={"red.400"}
+                      color={"white"}
+                      boxShadow={
+                        "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
+                      }
+                      _hover={{
+                        bg: "red.500",
+                      }}
+                      _focus={{
+                        bg: "red.500",
+                      }}
+                    >
+                      Ban
+                    </Button>
+                  </HStack>
                 </VStack>
               </Box>
             )}
