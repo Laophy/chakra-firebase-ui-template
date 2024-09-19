@@ -15,16 +15,14 @@ import {
   HStack,
   useBreakpointValue,
   useColorModeValue,
+  IconButton,
 } from "@chakra-ui/react";
-import { updateProfile } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { auth } from "../../firebase";
 import { setUsername, setProfilePicture } from "../../redux/userSlice";
-import {
-  updateUser,
-  updateUsername,
-} from "../../services/UserManagement.service";
+import { updateUsername } from "../../services/UserManagement.service";
+import { CopyIcon } from "@chakra-ui/icons";
+import { useClipboard } from "@chakra-ui/react"; // Add this import
 
 export default function Profile() {
   // Grabbing a user from global storage via redux
@@ -34,6 +32,7 @@ export default function Profile() {
   const bg = useColorModeValue("gray.100", "gray.700");
   const dispatch = useDispatch();
   const toast = useToast();
+  const { onCopy } = useClipboard(user?.uid); // Add this line
 
   const [newUsername, setNewUsername] = useState(user.username);
   const [photoURL, setPhotoURL] = useState(user.photoURL);
@@ -74,7 +73,30 @@ export default function Profile() {
 
   return (
     <Stack>
-      {!isMobile && <Text fontSize="3xl">Profile</Text>}
+      {!isMobile && (
+        <HStack justifyContent={"space-between"} alignItems={"center"}>
+          <Text fontSize="3xl">Profile</Text>
+          <HStack>
+            <Text fontSize="sm" as={"b"} color={"gray.400"}>
+              {user.uid}
+            </Text>
+            <IconButton
+              icon={<CopyIcon />}
+              variant={"ghost"}
+              onClick={() => {
+                onCopy();
+                toast({
+                  title: "Copied",
+                  description: "Coped your user ID to clipboard.",
+                  status: "success",
+                  duration: 2000,
+                  isClosable: true,
+                });
+              }}
+            />
+          </HStack>
+        </HStack>
+      )}
       <Divider />
       <Stack mt={4}>
         <Card direction={{ base: "column" }} variant="solid">

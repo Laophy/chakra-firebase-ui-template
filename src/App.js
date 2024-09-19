@@ -30,6 +30,7 @@ import { getfirebaseUser } from "./services/UserManagement.service";
 import AdminPanel from "./pages/account/admin/AdminPanel";
 import AdminViewUsers from "./pages/account/admin/AdminViewUsers";
 import ExecutivePanel from "./pages/account/admin/ExecutivePanel";
+import UserProfile from "./pages/pages/UserProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -85,6 +86,7 @@ function App() {
               <Route path={"/"} element={<Dashboard />} />
               <Route path={"/account/login"} element={<Login />} />
               <Route path={"/account/register"} element={<Register />} />
+              <Route path={"/user/profile/:uid"} element={<UserProfile />} />
 
               <Route path={"/dashboard"} element={<Dashboard />} />
               <Route path={"/battles"} element={<Battles />} />
@@ -200,6 +202,7 @@ function App() {
               <Route path={"/"} element={<Home />} />
               <Route path={"/account/login"} element={<Login />} />
               <Route path={"/account/register"} element={<Register />} />
+              <Route path={"/user/profile/:uid"} element={<UserProfile />} />
 
               <Route path={"/dashboard"} element={<Dashboard />} />
 

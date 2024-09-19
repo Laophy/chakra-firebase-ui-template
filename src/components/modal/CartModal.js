@@ -7,7 +7,6 @@ import {
   ModalOverlay,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
-import DepositFunds from "../wallet/DepositFunds";
 import CartInventory from "../wallet/CartInventory";
 
 export default function CartModal({ isCartOpen, onCartOpen, onCartClose }) {

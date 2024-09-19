@@ -267,11 +267,7 @@ export default function AdminViewUsers() {
                 </HStack>
               </Flex>
               <HStack alignItems={"center"} justifyContent={"space-between"}>
-                <Text>
-                  <span style={{ color: "green" }}>
-                    {formatMoney(user?.balance)}
-                  </span>
-                </Text>
+                {formatMoney(user?.balance)}
                 <IconButton
                   size={"md"}
                   icon={<SettingsIcon />}

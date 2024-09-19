@@ -11,7 +11,6 @@ import {
   useColorModeValue,
   Container,
   Stack,
-  Divider, // Add this line
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -24,6 +23,7 @@ import {
 } from "firebase/firestore";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { firestore } from "../../firebase";
+import { Link } from "react-router-dom";
 
 const ChatBox = ({ user }) => {
   const messagesRef = collection(firestore, "messages");
@@ -90,7 +90,9 @@ const ChatBox = ({ user }) => {
               .reverse()
               .map((message, index) => (
                 <Flex key={index} align="center" m={3}>
-                  <Avatar size="lg" src={message.photoURL} m={1} />
+                  <Link to={`/user/profile/${message.uid}`}>
+                    <Avatar size="lg" src={message.photoURL} m={1} />
+                  </Link>
                   <Box>
                     <HStack>
                       {message?.title && (

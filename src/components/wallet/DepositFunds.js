@@ -16,6 +16,7 @@ import {
   IconButton,
   Divider,
   useColorModeValue,
+  Image,
 } from "@chakra-ui/react";
 import moment from "moment";
 import { useState } from "react";
@@ -90,7 +91,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="BTC"
                     src="https://static-00.iconduck.com/assets.00/bitcoin-icon-2048x2048-t8gwld81.png"
                   />
@@ -103,7 +104,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="ETH"
                     src="https://www.iconarchive.com/download/i109534/cjdowner/cryptocurrency-flat/Ethereum-ETH.1024.png"
                   />
@@ -116,7 +117,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="LTC"
                     src="https://cryptologos.cc/logos/litecoin-ltc-logo.png"
                   />
@@ -126,11 +127,11 @@ export default function DepositFunds() {
             </Card>
           </GridItem>
 
-          <GridItem w="100%" onClick={() => setWalletType("SOL")}>
+          {/* <GridItem w="100%" onClick={() => setWalletType("SOL")}>
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="SOL"
                     src="https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png"
                   />
@@ -143,7 +144,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="XRP"
                     src="https://static-00.iconduck.com/assets.00/xrp-cryptocurrency-icon-2048x2048-2a0bicgj.png"
                   />
@@ -156,7 +157,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="DOGE"
                     src="https://static-00.iconduck.com/assets.00/dogecoin-cryptocurrency-icon-2048x2048-6zhekr7g.png"
                   />
@@ -170,7 +171,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="USDT"
                     src="https://static-00.iconduck.com/assets.00/tether-cryptocurrency-icon-2048x2048-dp13oydi.png"
                   />
@@ -183,7 +184,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="SHIB"
                     src="https://upload.wikimedia.org/wikipedia/en/5/53/Shiba_Inu_coin_logo.png"
                   />
@@ -196,7 +197,7 @@ export default function DepositFunds() {
             <Card bg={bg}>
               <CardBody>
                 <VStack>
-                  <Avatar
+                  <Image
                     name="USDC"
                     src="https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
                   />
@@ -204,7 +205,7 @@ export default function DepositFunds() {
                 </VStack>
               </CardBody>
             </Card>
-          </GridItem>
+          </GridItem> */}
         </Grid>
         <Text fontSize="sm" as={"b"} mt={2}>
           Card

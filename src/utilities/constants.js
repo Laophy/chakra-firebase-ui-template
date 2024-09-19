@@ -24,8 +24,6 @@ const API = {
     getAllUsers: "/user.getAllUsers",
     updateUser: "/user.updateUser",
     updateUsername: "/user.updateUsername",
-    sendMessage: "/user.sendMessage",
-    getMessageHistory: "/user.getMessageHistory",
     promoteUser: "/user.promoteUser",
     demoteUser: "/user.demoteUser",
   },
