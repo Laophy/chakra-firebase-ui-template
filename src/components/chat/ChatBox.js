@@ -10,7 +10,8 @@ import {
   Tag,
   useColorModeValue,
   Container,
-  Stack, // Add this line
+  Stack,
+  Divider, // Add this line
 } from "@chakra-ui/react";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -88,27 +89,26 @@ const ChatBox = ({ user }) => {
               .slice(0)
               .reverse()
               .map((message, index) => (
-                <Flex key={index} align="center" mb={2} m={3}>
-                  <Avatar size="sm" src={message.photoURL} mr={2} />
+                <Flex key={index} align="center" m={3}>
+                  <Avatar size="lg" src={message.photoURL} m={1} />
                   <Box>
                     <HStack>
                       {message?.title && (
                         <Tag
-                          size={"sm"}
+                          size={"md"}
                           key={"sm"}
                           variant="solid"
                           colorScheme={message?.color}
-                          m={0.5}
                         >
                           {message?.title}
                         </Tag>
                       )}
-                      <Text noOfLines={1} fontSize="md">
+                      <Text noOfLines={1} fontSize="lg" as={"b"}>
                         {message?.username ? message?.username : "User"}
                       </Text>
                     </HStack>
-                    <Box bg={bgReverse} p={2} borderRadius="md" maxW={"250px"}>
-                      <Text fontSize={"sm"}>{message.content}</Text>
+                    <Box bg={bgReverse} p={1.5} borderRadius="xl">
+                      <Text fontSize={"md"}>{message.content}</Text>
                     </Box>
                   </Box>
                 </Flex>
