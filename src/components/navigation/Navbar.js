@@ -74,6 +74,7 @@ import {
   addDoc,
   serverTimestamp,
   getDocs,
+  limit,
 } from "firebase/firestore";
 import { firestore } from "../../firebase";
 import { useCollectionData } from "react-firebase-hooks/firestore";
@@ -85,7 +86,7 @@ export default function Navbar({ websiteContent }) {
   const dispatch = useDispatch();
 
   const messagesRef = collection(firestore, "messages"); // Reference to the messages collection
-  const q = query(messagesRef, orderBy("createdAt")); // Create a Firestore query
+  const q = query(messagesRef, orderBy("createdAt", "desc"), limit(35));
   const [messages] = useCollectionData(q, { idField: "id" });
 
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -110,7 +111,9 @@ export default function Navbar({ websiteContent }) {
   } = useDisclosure();
 
   const displayName = useBreakpointValue({
-    base: applicationDetails.shortName,
+    base: "",
+    sm: applicationDetails.shortName,
+    md: applicationDetails.shortName,
     lg: applicationDetails.name,
   });
 
@@ -134,7 +137,7 @@ export default function Navbar({ websiteContent }) {
       color: "white",
     },
     { to: "Battles", path: "battles", icon: GiCrossedSwords, color: "yellow" },
-    // { to: "Cart", path: "cart", icon: GrCart, color: "gray" },
+    { to: "Cart", path: "cart", icon: GrCart, color: "gray" },
     { to: "Rewards", path: "rewards", icon: GiOpenChest, color: "white" },
   ];
 
@@ -218,22 +221,6 @@ export default function Navbar({ websiteContent }) {
     }
   };
 
-  // const handleSendMessage = async (e) => {
-  //   if (newMessage.trim() === "") return;
-
-  //   const message = {
-  //     content: newMessage,
-  //     photoURL: user?.photoURL,
-  //     title: user?.title,
-  //     username: user?.username,
-  //   };
-
-  //   const [res, mtsRes] = await sendMessage(newMessage, user);
-
-  //   setMessages([...messages, message]);
-  //   setNewMessage("");
-  // };
-
   const isMobile = useBreakpointValue({ base: true, md: false });
 
   return (
@@ -268,19 +255,19 @@ export default function Navbar({ websiteContent }) {
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button>
 
+              <Button
+                onClick={toggleChat}
+                variant={"ghost"}
+                colorScheme={isChatOpen ? "red" : "teal"}
+                size={"sm"}
+                mr={2}
+                aria-label="Toggle Chat"
+              >
+                {isChatOpen ? <CloseIcon /> : <ChatIcon />}
+              </Button>
               {user ? (
                 <>
-                  <Button
-                    onClick={toggleChat}
-                    variant={"ghost"}
-                    colorScheme={isChatOpen ? "red" : "teal"}
-                    size={"sm"}
-                    mr={2}
-                    aria-label="Toggle Chat"
-                  >
-                    {isChatOpen ? <CloseIcon /> : <ChatIcon />}
-                  </Button>
-                  <Button
+                  {/* <Button
                     variant={"ghost"}
                     colorScheme={"gray"}
                     size={"sm"}
@@ -289,7 +276,7 @@ export default function Navbar({ websiteContent }) {
                     onClick={() => onCartOpen()}
                   >
                     Cart
-                  </Button>
+                  </Button> */}
                   <ButtonGroup m={2} size="sm" isAttached variant="outline">
                     <Button size={"sm"}>{formatMoney(user?.balance)}</Button>
                     <IconButton
@@ -429,52 +416,67 @@ export default function Navbar({ websiteContent }) {
                   }}
                 >
                   {messages &&
-                    messages.map((message, index) => (
-                      <Flex key={index} align="center" mb={2} m={3}>
-                        <Avatar size="sm" src={message.photoURL} mr={2} />
-                        <Box>
-                          <HStack>
-                            {message?.title && (
-                              <Tag
-                                size={"sm"}
-                                key={"sm"}
-                                variant="solid"
-                                colorScheme={message?.color}
-                                m={0.5}
-                              >
-                                {message?.title}
-                              </Tag>
-                            )}
-                            <Text noOfLines={1} fontSize="md">
-                              {message?.username ? message?.username : "User"}
-                            </Text>
-                          </HStack>
-                          <Box
-                            bg={bgReverse}
-                            p={2}
-                            borderRadius="md"
-                            maxW={"250px"}
-                          >
-                            <Text fontSize={"sm"}>{message.content}</Text>
+                    messages
+                      .slice(0)
+                      .reverse()
+                      .map((message, index) => (
+                        <Flex key={index} align="center" mb={2} m={3}>
+                          <Avatar size="sm" src={message.photoURL} mr={2} />
+                          <Box>
+                            <HStack>
+                              {message?.title && (
+                                <Tag
+                                  size={"sm"}
+                                  key={"sm"}
+                                  variant="solid"
+                                  colorScheme={message?.color}
+                                  m={0.5}
+                                >
+                                  {message?.title}
+                                </Tag>
+                              )}
+                              <Text noOfLines={1} fontSize="md">
+                                {message?.username ? message?.username : "User"}
+                              </Text>
+                            </HStack>
+                            <Box
+                              bg={bgReverse}
+                              p={2}
+                              borderRadius="md"
+                              maxW={"250px"}
+                            >
+                              <Text fontSize={"sm"}>{message.content}</Text>
+                            </Box>
                           </Box>
-                        </Box>
-                      </Flex>
-                    ))}
+                        </Flex>
+                      ))}
                   <div ref={messagesEndRef} />
                 </Box>
-                <Box w="100%" display="flex" p={2}>
-                  <Input
-                    placeholder="Type your message..."
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === "Enter") handleSendMessage();
-                    }}
-                  />
-                  <Button onClick={handleSendMessage} ml={2}>
-                    Send
-                  </Button>
-                </Box>
+                {user ? (
+                  <Box w="100%" display="flex" p={2}>
+                    <Input
+                      placeholder="Type your message..."
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") handleSendMessage();
+                      }}
+                    />
+                    <Button onClick={handleSendMessage} ml={2}>
+                      Send
+                    </Button>
+                  </Box>
+                ) : (
+                  <Box
+                    w="100%"
+                    display="flex"
+                    p={2}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                  >
+                    <Text>Sign in to Chat</Text>
+                  </Box>
+                )}
               </VStack>
             </Container>
           )}
