@@ -13,13 +13,15 @@ import {
   Tag,
   TagLeftIcon,
   TagLabel,
+  useClipboard,
+  useToast,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { getfirebaseUser } from "../../services/UserManagement.service";
 import { useEffect, useState } from "react";
 import { formatMoney } from "../../utilities/Formatter";
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, CopyIcon } from "@chakra-ui/icons";
 import moment from "moment";
 
 export default function UserProfile() {
@@ -29,6 +31,20 @@ export default function UserProfile() {
   const { uid } = useParams();
 
   const [profile, setProfile] = useState(null);
+
+  const { hasCopied, onCopy } = useClipboard(profile?.uid || "");
+  const toast = useToast();
+
+  const handleCopy = () => {
+    onCopy();
+    toast({
+      title: "Copied",
+      description: "User ID copied to clipboard",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
+  };
 
   useEffect(() => {
     loadCurrentUser();
@@ -72,6 +88,18 @@ export default function UserProfile() {
             textAlign={"center"}
             position="relative"
           >
+            {user?.isStaff && (
+              <Button
+                position="absolute"
+                top={4}
+                right={4}
+                size="sm"
+                onClick={handleCopy}
+                leftIcon={<CopyIcon />}
+              >
+                Copy ID
+              </Button>
+            )}
             {profile?.isStaff && (
               <Tag
                 position="absolute"
