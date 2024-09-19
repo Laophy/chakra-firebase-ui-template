@@ -19,11 +19,7 @@ import {
   useBreakpointValue,
   useColorModeValue,
   Container,
-  VStack,
-  Input,
-  Divider,
-  Center,
-  Tag,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import {
   HamburgerIcon,
@@ -43,59 +39,19 @@ import DepositFundsModal from "../modal/DepositFundsModal";
 import CartModal from "../modal/CartModal";
 import { formatMoney } from "../../utilities/Formatter";
 import {
-  FaTachometerAlt,
-  FaBattleNet,
-  FaShoppingCart,
-  FaGift,
-} from "react-icons/fa";
-import {
-  GrArticle,
-  GrCart,
-  GrConnect,
-  GrGift,
-  GrInstall,
-  GrMoney,
-} from "react-icons/gr";
-import {
   GiCrossedSwords,
   GiDiceSixFacesSix,
   GiOpenChest,
 } from "react-icons/gi";
-import { useState, useEffect, useRef, Fragment } from "react";
-import {
-  getMessageHistory,
-  sendMessage,
-} from "../../services/UserManagement.service";
-import {
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-  limit,
-} from "firebase/firestore";
-import { firestore } from "../../firebase";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import { useState } from "react";
+import ChatBox from "../chat/ChatBox";
 
 export default function Navbar({ websiteContent }) {
-  // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
   const toast = useToast();
   const dispatch = useDispatch();
 
-  const messagesRef = collection(firestore, "messages"); // Reference to the messages collection
-  const q = query(messagesRef, orderBy("createdAt", "desc"), limit(35));
-  const [messages] = useCollectionData(q, { idField: "id" });
-
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [newMessage, setNewMessage] = useState("");
-
-  const messagesEndRef = useRef(null);
-  const chatContainerRef = useRef(null);
-
-  const [messageText, setMessageText] = useState("");
 
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -122,7 +78,7 @@ export default function Navbar({ websiteContent }) {
     signOut(auth);
     toast({
       title: "Success",
-      description: "You have successfuly signed out.",
+      description: "You have successfully signed out.",
       status: "success",
       duration: 2000,
       isClosable: true,
@@ -137,88 +93,32 @@ export default function Navbar({ websiteContent }) {
       color: "white",
     },
     { to: "Battles", path: "battles", icon: GiCrossedSwords, color: "yellow" },
-    { to: "Cart", path: "cart", icon: GrCart, color: "gray" },
-    { to: "Rewards", path: "rewards", icon: GiOpenChest, color: "white" },
+    { to: "Cart", path: "cart", icon: GiOpenChest, color: "gray" },
   ];
 
-  const bg = useColorModeValue("gray.100", "gray.700");
-  const bgReverse = useColorModeValue("gray.300", "gray.500");
+  const NavLink = ({ children }) => (
+    <Link to={children.path}>
+      <Button
+        variant={"ghost"}
+        size={"sm"}
+        mr={1}
+        leftIcon={<children.icon color={children.color} />}
+      >
+        {children.to}
+      </Button>
+    </Link>
+  );
 
-  const NavLink = (props) => {
-    const { children } = props;
-    return (
-      <Link to={children.path}>
-        <Button
-          variant={"ghost"}
-          size={"sm"}
-          mr={1}
-          leftIcon={<children.icon color={children.color} />}
-        >
-          {children.to}
-        </Button>
-      </Link>
-    );
-  };
-
-  const NavLinkMobile = (props) => {
-    const { children } = props;
-    return (
-      <Link to={children.path}>
-        <Button variant={"ghost"} size={"lg"} onClick={() => onClose()}>
-          {children.to}
-        </Button>
-      </Link>
-    );
-  };
-
-  const fullscreenbanner = {
-    justifyContent: "center",
-    alignItems: "center",
-    background: "var(--chakra-colors-chakra-body-bg)",
-    display: "flex",
-    zIndex: "100",
-    position: "fixed",
-    top: "var(--chakra-space-16)",
-    left: "0px",
-    right: "0px",
-    bottom: "0px",
-  };
-
-  const scrollToBottom = () => {
-    chatContainerRef.current?.scrollTo({
-      top: chatContainerRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messageText]);
-
-  useEffect(() => {
-    if (isChatOpen) {
-      scrollToBottom();
-    }
-  }, [isChatOpen]);
+  const NavLinkMobile = ({ children }) => (
+    <Link to={children.path}>
+      <Button variant={"ghost"} size={"lg"} onClick={() => onClose()}>
+        {children.to}
+      </Button>
+    </Link>
+  );
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
-  };
-
-  const handleSendMessage = async (e) => {
-    const { uid, photoURL } = user; // Get user info
-    if (messageText.trim()) {
-      await addDoc(messagesRef, {
-        title: user?.title?.title,
-        color: user?.title?.color,
-        content: messageText,
-        username: user?.username,
-        createdAt: serverTimestamp(),
-        uid,
-        photoURL,
-      });
-      setMessageText("");
-    }
   };
 
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -254,7 +154,6 @@ export default function Navbar({ websiteContent }) {
               <Button variant={"ghost"} onClick={toggleColorMode} mr={4}>
                 {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               </Button>
-
               <Button
                 onClick={toggleChat}
                 variant={"ghost"}
@@ -267,16 +166,6 @@ export default function Navbar({ websiteContent }) {
               </Button>
               {user ? (
                 <>
-                  {/* <Button
-                    variant={"ghost"}
-                    colorScheme={"gray"}
-                    size={"sm"}
-                    mr={2}
-                    leftIcon={<GrCart />}
-                    onClick={() => onCartOpen()}
-                  >
-                    Cart
-                  </Button> */}
                   <ButtonGroup m={2} size="sm" isAttached variant="outline">
                     <Button size={"sm"}>{formatMoney(user?.balance)}</Button>
                     <IconButton
@@ -304,7 +193,7 @@ export default function Navbar({ websiteContent }) {
                   </Link>
                 </Flex>
               )}
-              {user ? (
+              {user && (
                 <Menu>
                   <MenuButton
                     as={Button}
@@ -365,123 +254,42 @@ export default function Navbar({ websiteContent }) {
                     </Link>
                   </MenuList>
                 </Menu>
-              ) : (
-                <></>
               )}
             </Flex>
           </Flex>
 
-          {isOpen ? (
+          {isOpen && (
             <Box pb={4} display={{ md: "none" }} sx={{ textAlign: "center" }}>
-              <Stack as={"nav"} spacing={4} style={fullscreenbanner}>
+              <Stack as={"nav"} spacing={4}>
                 {Links.map((link) => (
                   <NavLinkMobile key={link.to}>{link}</NavLinkMobile>
                 ))}
               </Stack>
             </Box>
-          ) : null}
+          )}
         </Container>
       </Box>
-      {isOpen ? (
-        ""
-      ) : (
-        <Flex>
-          {isChatOpen && isMobile ? (
-            ""
-          ) : (
-            <Container as={Stack} minHeight={"75vh"} maxW={"7xl"} py={2}>
+      <Container maxW={"7xl"} alignItems={"center"} justifyContent={"center"}>
+        <SimpleGrid
+          templateColumns={{ base: "4fr", md: isChatOpen ? "4fr 1fr" : "1fr" }}
+        >
+          {isChatOpen && isMobile ? null : (
+            <Container
+              as={Stack}
+              minHeight={"75vh"}
+              maxW={isChatOpen ? "3xl" : "7xl"}
+              py={2}
+            >
               {websiteContent}
             </Container>
           )}
           {isChatOpen && (
-            <Container
-              as={Stack}
-              minHeight={"75vh"}
-              maxW={isMobile ? "100%" : "sm"}
-              py={2}
-            >
-              <VStack display={{ base: "flex", md: "flex" }} h={"75vh"}>
-                <Box
-                  ref={chatContainerRef}
-                  flex="1"
-                  overflowY="auto"
-                  w={"100%"}
-                  maxH={"70vh"}
-                  bg={bg}
-                  borderRadius="md"
-                  css={{
-                    "&::-webkit-scrollbar": { display: "none" },
-                    "-ms-overflow-style": "none",
-                    "scrollbar-width": "none",
-                  }}
-                >
-                  {messages &&
-                    messages
-                      .slice(0)
-                      .reverse()
-                      .map((message, index) => (
-                        <Flex key={index} align="center" mb={2} m={3}>
-                          <Avatar size="sm" src={message.photoURL} mr={2} />
-                          <Box>
-                            <HStack>
-                              {message?.title && (
-                                <Tag
-                                  size={"sm"}
-                                  key={"sm"}
-                                  variant="solid"
-                                  colorScheme={message?.color}
-                                  m={0.5}
-                                >
-                                  {message?.title}
-                                </Tag>
-                              )}
-                              <Text noOfLines={1} fontSize="md">
-                                {message?.username ? message?.username : "User"}
-                              </Text>
-                            </HStack>
-                            <Box
-                              bg={bgReverse}
-                              p={2}
-                              borderRadius="md"
-                              maxW={"250px"}
-                            >
-                              <Text fontSize={"sm"}>{message.content}</Text>
-                            </Box>
-                          </Box>
-                        </Flex>
-                      ))}
-                  <div ref={messagesEndRef} />
-                </Box>
-                {user ? (
-                  <Box w="100%" display="flex" p={2}>
-                    <Input
-                      placeholder="Type your message..."
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === "Enter") handleSendMessage();
-                      }}
-                    />
-                    <Button onClick={handleSendMessage} ml={2}>
-                      Send
-                    </Button>
-                  </Box>
-                ) : (
-                  <Box
-                    w="100%"
-                    display="flex"
-                    p={2}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                  >
-                    <Text>Sign in to Chat</Text>
-                  </Box>
-                )}
-              </VStack>
+            <Container as={Stack} minHeight={"75vh"} maxW={"md"} py={2}>
+              <ChatBox user={user} />
             </Container>
           )}
-        </Flex>
-      )}
+        </SimpleGrid>
+      </Container>
       <DepositFundsModal
         isDepositOpen={isDepositOpen}
         onDepositOpen={onDepositOpen}

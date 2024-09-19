@@ -153,7 +153,7 @@ export default function Affiliate() {
           </Button>
         </HStack>
       </HStack>
-      <TableContainer>
+      {/* <TableContainer>
         <Table size="sm" colorScheme={"black"}>
           <Thead>
             <Tr>
@@ -174,7 +174,7 @@ export default function Affiliate() {
             </Tr>
           </Tbody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
     </Stack>
   );
 }
