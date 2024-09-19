@@ -17,7 +17,11 @@ export async function handleResponse(response, authHeader, refId) {
     const parsedResponse = _get(response, "data.result.data.json", {});
     console.log(parsedResponse);
 
-    return [parsedResponse, null];
+    if (response.data.request.status === 400) {
+      return [null, parsedResponse];
+    } else {
+      return [parsedResponse, null];
+    }
   } catch (e) {
     console.warn(e);
   }
