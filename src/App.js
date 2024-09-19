@@ -61,6 +61,7 @@ function App() {
           email: userData?.email,
           photoURL: userData?.photoURL,
           balance: userData?.balance,
+          bio: userData?.bio,
           banned: userData?.banned,
           referralCode: userData?.referralCode,
           affiliate: userData?.affiliate,
