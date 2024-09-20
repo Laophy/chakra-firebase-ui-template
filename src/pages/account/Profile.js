@@ -48,8 +48,16 @@ export default function Profile() {
     };
 
     try {
-      const [res, mtsRes] = await updateUsername(user, userUpdate);
-      if (res) {
+      const [res, mtsResponse] = await updateUsername(user, userUpdate);
+      if (mtsResponse) {
+        toast({
+          title: "Error",
+          description: mtsResponse.message,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
         toast({
           title: "Success",
           description: "You have successfuly updated your profile.",

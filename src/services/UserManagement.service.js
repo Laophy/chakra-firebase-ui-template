@@ -139,7 +139,7 @@ export async function onDemoteStaffToPlayer(user, uid) {
   }
 }
 
-export async function updateUser(uid, newUserData) {
+export async function updateUser(user, uid, newUserData) {
   const refId = ReferenceId();
   try {
     let response = await axios.post(
@@ -154,7 +154,7 @@ export async function updateUser(uid, newUserData) {
           [X_B3_SPANID_ID_HEADER]: refId,
           [X_B3_TRACEID_HEADER]: refId,
         },
-        params: { uid, newUserData },
+        params: { user, uid, newUserData },
       }
     );
 

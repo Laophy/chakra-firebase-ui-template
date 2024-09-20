@@ -37,6 +37,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUserData,
+  getfirebaseUser,
   onDemoteStaffToPlayer,
   onPromoteUserToStaff,
   updateUser,
@@ -57,6 +58,10 @@ export default function AdminViewUsers() {
   const [search, setSearch] = useState("");
   const [userList, setUserList] = useState([]);
   const [editUser, setEditUser] = useState(null);
+
+  const [isLoadingDemote, setIsLoadingDemote] = useState(false);
+  const [isLoadingPromote, setIsLoadingPromote] = useState(false);
+  const [isLoadingSave, setIsLoadingSave] = useState(false);
 
   const [newUsername, setNewUsername] = useState(null);
   const [newPhotoURL, setNewPhotoURL] = useState(null);
@@ -94,32 +99,21 @@ export default function AdminViewUsers() {
   };
 
   const demoteToPlayer = async () => {
+    setIsLoadingDemote(true);
     try {
-      const [res] = await onDemoteStaffToPlayer(user, editUser.uid);
-      if (res) {
+      const [res, mtsResponse] = await onDemoteStaffToPlayer(
+        user,
+        editUser.uid
+      );
+      if (mtsResponse) {
         toast({
-          title: "Success",
-          description: "You have successfully demoted this staff to user.",
-          status: "success",
+          title: "Error",
+          description: mtsResponse.message || "Something went wrong.",
+          status: "error",
           duration: 2000,
           isClosable: true,
         });
-      }
-    } catch (e) {
-      toast({
-        title: "Error",
-        description: `Staff not demoted to player. Error: ${e.message}`,
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
-    }
-  };
-
-  const promoteToStaff = async () => {
-    try {
-      const [res] = await onPromoteUserToStaff(user, editUser.uid);
-      if (res) {
+      } else {
         toast({
           title: "Success",
           description: "You have successfully promoted this user to staff.",
@@ -127,19 +121,63 @@ export default function AdminViewUsers() {
           duration: 2000,
           isClosable: true,
         });
+        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser); // Fetch updated user data
+        console.log(updatedUser);
+        setEditUser(updatedUser); // Update editUser with the latest data
       }
     } catch (e) {
       toast({
         title: "Error",
-        description: `User not promoted to staff. Error: ${e.message}`,
+        description: `Something went wrong.`,
         status: "error",
         duration: 2000,
         isClosable: true,
       });
+    } finally {
+      setIsLoadingDemote(false);
+    }
+  };
+
+  const promoteToStaff = async () => {
+    setIsLoadingPromote(true);
+    try {
+      const [res, mtsResponse] = await onPromoteUserToStaff(user, editUser.uid);
+      if (mtsResponse) {
+        console.log(mtsResponse);
+        toast({
+          title: "Error",
+          description: mtsResponse.message || "Something went wrong.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "You have successfully promoted this user to staff.",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser); // Fetch updated user data
+        console.log(updatedUser);
+        setEditUser(updatedUser); // Update editUser with the latest data
+      }
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: `Something went wrong.`,
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoadingPromote(false);
     }
   };
 
   const onUpdateProfile = async () => {
+    setIsLoadingSave(true);
     const copyAffiliate = {
       code: newAffiliateCode,
       lastChanged: new Date(),
@@ -157,8 +195,20 @@ export default function AdminViewUsers() {
     };
 
     try {
-      const [res] = await updateUser(editUser.uid, userUpdate);
-      if (res) {
+      const [res, mtsResponse] = await updateUser(
+        user,
+        editUser.uid,
+        userUpdate
+      );
+      if (mtsResponse) {
+        toast({
+          title: "Error",
+          description: mtsResponse.message || "Something went wrong.",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
         toast({
           title: "Success",
           description: "You have successfully updated the profile.",
@@ -166,6 +216,9 @@ export default function AdminViewUsers() {
           duration: 2000,
           isClosable: true,
         });
+        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser); // Fetch updated user data
+        console.log(updatedUser);
+        setEditUser(updatedUser); // Update editUser with the latest data
       }
     } catch (e) {
       toast({
@@ -175,6 +228,8 @@ export default function AdminViewUsers() {
         duration: 2000,
         isClosable: true,
       });
+    } finally {
+      setIsLoadingSave(false);
     }
 
     if (editUser?.uid === user?.uid) {
@@ -536,6 +591,8 @@ export default function AdminViewUsers() {
                     variant="solid"
                     colorScheme="teal"
                     onClick={() => onUpdateProfile()}
+                    isLoading={isLoadingSave}
+                    isDisabled={isLoadingSave}
                   >
                     Save
                   </Button>
@@ -561,6 +618,8 @@ export default function AdminViewUsers() {
                             colorScheme="red"
                             ml={2}
                             onClick={() => demoteToPlayer(editUser)}
+                            isLoading={isLoadingDemote}
+                            isDisabled={isLoadingDemote}
                           >
                             Demote To Player
                           </Button>
@@ -571,6 +630,8 @@ export default function AdminViewUsers() {
                           colorScheme="yellow"
                           ml={2}
                           onClick={() => promoteToStaff(editUser)}
+                          isLoading={isLoadingPromote}
+                          isDisabled={isLoadingPromote}
                         >
                           Promote To Staff
                         </Button>
