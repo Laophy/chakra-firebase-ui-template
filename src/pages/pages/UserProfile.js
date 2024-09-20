@@ -30,6 +30,7 @@ export default function UserProfile() {
 
   const loadCurrentUser = async () => {
     const [userData, mtsResponse] = await getfirebaseUser({ uid });
+    console.log(userData);
     if (mtsResponse || !userData) {
       setProfile(null);
     } else {
@@ -59,8 +60,10 @@ export default function UserProfile() {
         setProfile(updatedProfile);
         showToast("Success", "Profile changes saved successfully", "success");
       }
+      return true;
     } catch (e) {
       showToast("Error", "Failed to save profile changes", "error");
+      return false;
     }
   };
 

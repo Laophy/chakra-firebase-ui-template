@@ -15,12 +15,11 @@ import {
   HStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function EditProfileModal({
   profile,
   user,
-  isMobile,
   attemptSaveChanges,
   attemptMute,
   attemptBan,
@@ -28,8 +27,12 @@ export default function EditProfileModal({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [updatedProfile, setUpdatedProfile] = useState(profile);
 
-  const handleSaveChanges = () => {
-    attemptSaveChanges(updatedProfile);
+  useEffect(() => {
+    setUpdatedProfile(profile);
+  }, [profile]);
+
+  const handleSaveChanges = async () => {
+    await attemptSaveChanges(updatedProfile);
     onClose();
   };
 
