@@ -44,84 +44,45 @@ export default function UserProfile() {
   const { hasCopied, onCopy } = useClipboard(profile?.uid || "");
   const toast = useToast();
 
-  const handleCopy = () => {
-    onCopy();
+  const showToast = (title, description, status) => {
     toast({
-      title: "Copied",
-      description: "User ID copied to clipboard",
-      status: "success",
+      title,
+      description,
+      status,
       duration: 2000,
       isClosable: true,
     });
   };
 
+  const handleCopy = () => {
+    onCopy();
+    showToast("Copied", "User ID copied to clipboard", "success");
+  };
+
   const attemptSaveChanges = async () => {
-    // Simulate a save operation
     try {
-      const [res] = await updateUser(profile.uid, profile);
+      const [res] = await updateUser(user, profile.uid, profile);
       if (res) {
-        toast({
-          title: "Success",
-          description: "Profile changes saved successfully",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
+        showToast("Success", "Profile changes saved successfully", "success");
       }
     } catch (e) {
-      toast({
-        title: "Error",
-        description: "Failed to save profile changes",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Error", "Failed to save profile changes", "error");
     }
   };
 
-  useEffect(() => {
-    loadCurrentUser();
-  }, [uid]);
-
   const attemptMute = async () => {
-    // Simulate a save operation
     try {
-      toast({
-        title: "Success",
-        description: "Profile muted successfully",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Success", "Profile muted successfully", "success");
     } catch (e) {
-      toast({
-        title: "Error",
-        description: "Failed to mute",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Error", "Failed to mute", "error");
     }
   };
 
   const attemptBan = async () => {
-    // Simulate a save operation
     try {
-      toast({
-        title: "Success",
-        description: "Profile banned successfully",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Success", "Profile banned successfully", "success");
     } catch (e) {
-      toast({
-        title: "Error",
-        description: "Failed to ban",
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Error", "Failed to ban", "error");
     }
   };
 

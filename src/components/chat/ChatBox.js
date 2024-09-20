@@ -37,7 +37,7 @@ import { firestore } from "../../firebase";
 import { Link } from "react-router-dom";
 import { FaBan } from "react-icons/fa";
 import moment from "moment";
-import { CheckCircleIcon } from "@chakra-ui/icons";
+import { ChatIcon, CheckCircleIcon } from "@chakra-ui/icons";
 
 const ChatBox = ({ user }) => {
   const toast = useToast();
@@ -83,15 +83,8 @@ const ChatBox = ({ user }) => {
         setOnlineUsers(snapshot.size);
       });
 
-      const handleBeforeUnload = async () => {
-        await deleteDoc(userDoc);
-      };
-
-      window.addEventListener("beforeunload", handleBeforeUnload);
-
       return () => {
         deleteDoc(userDoc);
-        window.removeEventListener("beforeunload", handleBeforeUnload);
         unsubscribe();
       };
     }
@@ -168,6 +161,14 @@ const ChatBox = ({ user }) => {
     });
   };
 
+  const handleFocus = () => {
+    document.body.classList.add("no-scroll");
+  };
+
+  const handleBlur = () => {
+    document.body.classList.remove("no-scroll");
+  };
+
   return (
     <Container
       as={Stack}
@@ -178,15 +179,15 @@ const ChatBox = ({ user }) => {
     >
       <Box position="absolute" top={2} right={2}>
         <Tag
-          colorScheme="green"
+          colorScheme="blue"
           variant="outline"
           borderRadius="full"
           px={2}
           py={1}
           m={2}
         >
-          <CheckCircleIcon mr={1} />
-          {onlineUsers} online
+          <ChatIcon mr={1} />
+          {onlineUsers}
         </Tag>
       </Box>
       <VStack h={"75vh"}>
@@ -292,6 +293,7 @@ const ChatBox = ({ user }) => {
               ))}
           <div ref={messagesEndRef} />
         </Box>
+
         {user ? (
           <HStack w={"sm"}>
             <Input
@@ -301,6 +303,8 @@ const ChatBox = ({ user }) => {
               onKeyPress={(e) => {
                 if (e.key === "Enter") handleSendMessage();
               }}
+              onFocus={handleFocus} // Add this line
+              onBlur={handleBlur} // Add this line
             />
             <Button onClick={handleSendMessage} ml={2}>
               Send

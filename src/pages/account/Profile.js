@@ -36,12 +36,14 @@ export default function Profile() {
 
   const [newUsername, setNewUsername] = useState(user.username);
   const [photoURL, setPhotoURL] = useState(user.photoURL);
+  const [isLoading, setIsLoading] = useState(false); // Add this line
 
   useEffect(() => {
     console.log(user);
   }, []);
 
   const onUpdateProfile = async () => {
+    setIsLoading(true); // Add this line
     const userUpdate = {
       username: newUsername,
       photoURL: photoURL,
@@ -76,6 +78,8 @@ export default function Profile() {
         duration: 2000,
         isClosable: true,
       });
+    } finally {
+      setIsLoading(false); // Add this line
     }
   };
 
@@ -190,6 +194,8 @@ export default function Profile() {
                 variant="solid"
                 colorScheme="teal"
                 onClick={() => onUpdateProfile()}
+                isLoading={isLoading} // Add this line
+                isDisabled={isLoading} // Add this line
               >
                 Update
               </Button>

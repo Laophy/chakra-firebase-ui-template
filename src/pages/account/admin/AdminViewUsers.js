@@ -98,6 +98,16 @@ export default function AdminViewUsers() {
     }
   };
 
+  const showToast = (title, description, status) => {
+    toast({
+      title,
+      description,
+      status,
+      duration: 2000,
+      isClosable: true,
+    });
+  };
+
   const demoteToPlayer = async () => {
     setIsLoadingDemote(true);
     try {
@@ -106,33 +116,23 @@ export default function AdminViewUsers() {
         editUser.uid
       );
       if (mtsResponse) {
-        toast({
-          title: "Error",
-          description: mtsResponse.message || "Something went wrong.",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
+        showToast(
+          "Error",
+          mtsResponse.message || "Something went wrong.",
+          "error"
+        );
       } else {
-        toast({
-          title: "Success",
-          description: "You have successfully promoted this user to staff.",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
-        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser); // Fetch updated user data
+        showToast(
+          "Success",
+          "You have successfully demoted this user to player.",
+          "success"
+        );
+        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser);
         console.log(updatedUser);
-        setEditUser(updatedUser); // Update editUser with the latest data
+        setEditUser(updatedUser);
       }
     } catch (e) {
-      toast({
-        title: "Error",
-        description: `Something went wrong.`,
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Error", "Something went wrong.", "error");
     } finally {
       setIsLoadingDemote(false);
     }
@@ -144,33 +144,23 @@ export default function AdminViewUsers() {
       const [res, mtsResponse] = await onPromoteUserToStaff(user, editUser.uid);
       if (mtsResponse) {
         console.log(mtsResponse);
-        toast({
-          title: "Error",
-          description: mtsResponse.message || "Something went wrong.",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
+        showToast(
+          "Error",
+          mtsResponse.message || "Something went wrong.",
+          "error"
+        );
       } else {
-        toast({
-          title: "Success",
-          description: "You have successfully promoted this user to staff.",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
-        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser); // Fetch updated user data
+        showToast(
+          "Success",
+          "You have successfully promoted this user to staff.",
+          "success"
+        );
+        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser);
         console.log(updatedUser);
-        setEditUser(updatedUser); // Update editUser with the latest data
+        setEditUser(updatedUser);
       }
     } catch (e) {
-      toast({
-        title: "Error",
-        description: `Something went wrong.`,
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Error", "Something went wrong.", "error");
     } finally {
       setIsLoadingPromote(false);
     }
@@ -201,33 +191,22 @@ export default function AdminViewUsers() {
         userUpdate
       );
       if (mtsResponse) {
-        toast({
-          title: "Error",
-          description: mtsResponse.message || "Something went wrong.",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
+        showToast(
+          "Error",
+          mtsResponse.message || "Something went wrong.",
+          "error"
+        );
       } else {
-        toast({
-          title: "Success",
-          description: "You have successfully updated the profile.",
-          status: "success",
-          duration: 2000,
-          isClosable: true,
-        });
-        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser); // Fetch updated user data
-        console.log(updatedUser);
-        setEditUser(updatedUser); // Update editUser with the latest data
+        showToast(
+          "Success",
+          "You have successfully updated the profile.",
+          "success"
+        );
+        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser);
+        setEditUser(updatedUser);
       }
     } catch (e) {
-      toast({
-        title: "Error",
-        description: `Profile not updated. Error: ${e.message}`,
-        status: "error",
-        duration: 2000,
-        isClosable: true,
-      });
+      showToast("Error", `Profile not updated. Error: ${e.message}`, "error");
     } finally {
       setIsLoadingSave(false);
     }
