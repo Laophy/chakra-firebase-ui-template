@@ -35,11 +35,11 @@ export async function handleResponse(response, authHeader, refId) {
 
     const decryptedData = JSON.parse(decrypt(response.data.data));
 
-    console.log(decryptedData);
+    //console.log(decryptedData);
 
     const parsedResponse = _get(decryptedData, "result.data.json", {});
 
-    console.log(parsedResponse);
+    //console.log(parsedResponse);
 
     if (decryptedData.request.status === 400) {
       return [

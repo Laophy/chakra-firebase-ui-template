@@ -46,8 +46,8 @@ function App() {
   }, []);
 
   const loadCurrentUser = async (authUser) => {
-    console.log("AUTH STATE CHANGED!!");
-    console.log("CURRENT AUTH USER: ", authUser);
+    //console.log("AUTH STATE CHANGED!!");
+    //console.log("CURRENT AUTH USER: ", authUser);
     const [userData, mtsResponse] = await getfirebaseUser(authUser);
     if (mtsResponse || !userData) {
       // something went wrong
