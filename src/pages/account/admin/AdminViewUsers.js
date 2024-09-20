@@ -32,6 +32,8 @@ import {
   useColorMode,
   AvatarBadge,
   useColorModeValue,
+  Hide,
+  Box,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,6 +50,7 @@ import {
   setUsername,
 } from "../../../redux/userSlice";
 import { formatMoney } from "../../../utilities/Formatter";
+import ColorPicker from "../../../components/tools/ColorPicker";
 
 export default function AdminViewUsers() {
   const user = useSelector((state) => state.data.user.user);
@@ -73,19 +76,6 @@ export default function AdminViewUsers() {
 
   const [color, setColor] = useState("purple");
   const bg = useColorModeValue("gray.100", "gray.700");
-
-  const colors = [
-    "gray",
-    "red",
-    "black",
-    "green",
-    "blue",
-    "teal",
-    "yellow",
-    "orange",
-    "purple",
-    "pink",
-  ];
 
   useEffect(() => {
     initAllUserData();
@@ -143,7 +133,6 @@ export default function AdminViewUsers() {
     try {
       const [res, mtsResponse] = await onPromoteUserToStaff(user, editUser.uid);
       if (mtsResponse) {
-        console.log(mtsResponse);
         showToast(
           "Error",
           mtsResponse.message || "Something went wrong.",
@@ -156,10 +145,10 @@ export default function AdminViewUsers() {
           "success"
         );
         const [updatedUser, mtsResponse] = await getfirebaseUser(editUser);
-        console.log(updatedUser);
         setEditUser(updatedUser);
       }
     } catch (e) {
+      console.log(e);
       showToast("Error", "Something went wrong.", "error");
     } finally {
       setIsLoadingPromote(false);
@@ -284,24 +273,26 @@ export default function AdminViewUsers() {
                   {determinStaffTags(user)}
                 </VStack>
                 <HStack>
-                  {user?.title?.title && (
-                    <Tag
-                      size={"sm"}
-                      key={"sm"}
-                      variant="solid"
-                      colorScheme={user?.title?.color}
-                      m={1}
-                    >
-                      {user?.title?.title}
-                    </Tag>
-                  )}
+                  <Hide below="md">
+                    {user?.title?.title && (
+                      <Tag
+                        size={"sm"}
+                        key={"sm"}
+                        variant="solid"
+                        colorScheme={user?.title?.color}
+                        m={1}
+                      >
+                        {user?.title?.title}
+                      </Tag>
+                    )}
+                  </Hide>
                   <Text noOfLines={1} fontSize="lg">
                     {user?.username ? user?.username : "User"}
                   </Text>
                 </HStack>
               </Flex>
               <HStack alignItems={"center"} justifyContent={"space-between"}>
-                {formatMoney(user?.balance)}
+                <Hide below="md">{formatMoney(user?.balance)}</Hide>
                 <IconButton
                   size={"md"}
                   icon={<SettingsIcon />}
@@ -356,7 +347,7 @@ export default function AdminViewUsers() {
         Back
       </Button>
       <Stack mt={4}>
-        <Card direction={{ base: "column" }} variant="outline">
+        <Card direction={{ base: "column" }} variant="solid">
           <CardHeader>{determinStaffTags(editUser)}</CardHeader>
           <Stack>
             {editUser.photoURL ? (
@@ -464,27 +455,24 @@ export default function AdminViewUsers() {
                 {user?.isHighStaff && (
                   <>
                     <Heading size="md">Custom User Title</Heading>
-                    <VStack>
-                      <Flex
-                        alignItems={"center"}
-                        justifyContent={"space-between"}
-                      >
-                        <Avatar size={"md"} src={editUser?.photoURL} />
-                        {newTitle && (
-                          <Tag
-                            size={"md"}
-                            key={"sm"}
-                            variant="solid"
-                            colorScheme={color}
-                            m={1}
-                          >
-                            {newTitle}
-                          </Tag>
-                        )}
-                        <Text noOfLines={1} fontSize="lg" ml={1}>
-                          {editUser?.username ? editUser?.username : "User"}
-                        </Text>
-                      </Flex>
+                    <Flex alignItems={"center"} justifyContent={"flex-start"}>
+                      <Avatar size={"md"} src={editUser?.photoURL} />
+                      {newTitle && (
+                        <Tag
+                          size={"md"}
+                          key={"sm"}
+                          variant="solid"
+                          colorScheme={color}
+                          m={1}
+                        >
+                          {newTitle}
+                        </Tag>
+                      )}
+                      <Text noOfLines={1} fontSize="lg" ml={1}>
+                        {editUser?.username ? editUser?.username : "User"}
+                      </Text>
+                    </Flex>
+                    <HStack>
                       <Input
                         value={newTitle}
                         onChange={(event) => setNewTitle(event.target.value)}
@@ -492,60 +480,9 @@ export default function AdminViewUsers() {
                         size="md"
                       />
                       <Center>
-                        <Popover variant="picker">
-                          <PopoverTrigger>
-                            <Button
-                              aria-label={color}
-                              background={color}
-                              height="32px"
-                              width="32px"
-                              padding={0}
-                              minWidth="unset"
-                              borderRadius={3}
-                            ></Button>
-                          </PopoverTrigger>
-                          <PopoverContent width="170px">
-                            <PopoverArrow bg={color} />
-                            <PopoverCloseButton color="white" />
-                            <PopoverHeader
-                              height="100px"
-                              backgroundColor={color}
-                              borderTopLeftRadius={5}
-                              borderTopRightRadius={5}
-                              color="white"
-                            >
-                              <Center height="100%">{color}</Center>
-                            </PopoverHeader>
-                            <PopoverBody height="120px">
-                              <SimpleGrid columns={5} spacing={2}>
-                                {colors.map((c) => (
-                                  <Button
-                                    key={c}
-                                    aria-label={c}
-                                    background={c}
-                                    height="22px"
-                                    width="22px"
-                                    padding={0}
-                                    minWidth="unset"
-                                    borderRadius={3}
-                                    _hover={{ background: c }}
-                                    onClick={() => setColor(c)}
-                                  ></Button>
-                                ))}
-                              </SimpleGrid>
-                              <Input
-                                borderRadius={3}
-                                marginTop={3}
-                                placeholder="purple"
-                                size="sm"
-                                value={color}
-                                onChange={(e) => setColor(e.target.value)}
-                              />
-                            </PopoverBody>
-                          </PopoverContent>
-                        </Popover>
+                        <ColorPicker color={color} setColor={setColor} />
                       </Center>
-                    </VStack>
+                    </HStack>
                   </>
                 )}
               </Stack>
@@ -565,26 +502,49 @@ export default function AdminViewUsers() {
                 alignItems={"center"}
                 justifyContent={"space-between"}
               >
-                <div>
-                  <Button
-                    variant="solid"
-                    colorScheme="teal"
-                    onClick={() => onUpdateProfile()}
-                    isLoading={isLoadingSave}
-                    isDisabled={isLoadingSave}
+                <Box
+                  display="flex"
+                  flexDirection={{ base: "column", md: "row" }}
+                  justifyContent={{ base: "flex-start", md: "flex-end" }}
+                  alignItems={{ base: "stretch", md: "center" }}
+                  width="100%"
+                >
+                  <Box
+                    width={{ base: "100%", md: "auto" }}
+                    alignSelf="flex-start"
+                    marginRight={{ base: 0, md: "auto" }}
                   >
-                    Save
-                  </Button>
-                </div>
-                <div>
+                    <Button
+                      variant="solid"
+                      colorScheme="teal"
+                      width="100%"
+                      mb={{ base: 2, md: 0 }}
+                      onClick={() => onUpdateProfile()}
+                      isLoading={isLoadingSave}
+                      isDisabled={isLoadingSave}
+                    >
+                      Save
+                    </Button>
+                  </Box>
+
                   {!user?.isHighStaff && editUser?.isStaff ? (
                     <></>
                   ) : user?.isStaff && editUser?.banned?.isBanned ? (
-                    <Button variant="outline" colorScheme="red">
+                    <Button
+                      variant="outline"
+                      colorScheme="red"
+                      width={{ base: "100%", md: "auto" }}
+                      mb={{ base: 2, md: 0 }}
+                    >
                       Unban
                     </Button>
                   ) : (
-                    <Button variant="outline" colorScheme="red">
+                    <Button
+                      variant="outline"
+                      colorScheme="red"
+                      width={{ base: "100%", md: "auto" }}
+                      mb={{ base: 2, md: 0 }}
+                    >
                       Ban
                     </Button>
                   )}
@@ -595,10 +555,12 @@ export default function AdminViewUsers() {
                           <Button
                             variant="outline"
                             colorScheme="red"
-                            ml={2}
+                            ml={{ base: 0, md: 2 }}
                             onClick={() => demoteToPlayer(editUser)}
                             isLoading={isLoadingDemote}
                             isDisabled={isLoadingDemote}
+                            width={{ base: "100%", md: "auto" }}
+                            mb={{ base: 2, md: 0 }}
                           >
                             Demote To Player
                           </Button>
@@ -607,20 +569,27 @@ export default function AdminViewUsers() {
                         <Button
                           variant="outline"
                           colorScheme="yellow"
-                          ml={2}
+                          ml={{ base: 0, md: 2 }}
                           onClick={() => promoteToStaff(editUser)}
                           isLoading={isLoadingPromote}
                           isDisabled={isLoadingPromote}
+                          width={{ base: "100%", md: "auto" }}
+                          mb={{ base: 2, md: 0 }}
                         >
                           Promote To Staff
                         </Button>
                       )}
-                      <Button variant="ghost" colorScheme="red" ml={2}>
+                      <Button
+                        variant="ghost"
+                        colorScheme="red"
+                        ml={{ base: 0, md: 2 }}
+                        width={{ base: "100%", md: "auto" }}
+                      >
                         Delete User
                       </Button>
                     </>
                   )}
-                </div>
+                </Box>
               </HStack>
             </CardBody>
           </Stack>

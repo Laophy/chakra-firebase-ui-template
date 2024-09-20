@@ -244,7 +244,7 @@ export default function UserProfile() {
                   bg={badgeBgColor}
                   fontWeight={"400"}
                 >
-                  {moment(new Date(Number(profile?.createdAt))).fromNow()}
+                  {moment(new Date(profile?.createdAt)).fromNow()}
                 </Badge>
               </Stack>
               <Stack mt={8} direction={"row"} spacing={4}>

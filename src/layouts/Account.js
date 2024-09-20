@@ -134,13 +134,23 @@ export default function Account({ pageElement, currentPage }) {
                     {currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}
                   </MenuButton>
                   <MenuList>
-                    {categories.map((category, index) => (
-                      <React.Fragment key={category}>
-                        {index > 0 && <MenuDivider />}{" "}
-                        {/* Add divider between categories */}
-                        {menuItems
-                          .filter((item) => item.category === category)
-                          .map((item) => (
+                    {categories.map((category, index) => {
+                      const filteredItems = menuItems.filter(
+                        (item) =>
+                          item.category === category &&
+                          !(
+                            (item.admin && !user?.isStaff) ||
+                            (item.highAdmin && !user?.isHighStaff)
+                          )
+                      );
+
+                      if (filteredItems.length === 0) return null;
+
+                      return (
+                        <React.Fragment key={category}>
+                          {index > 0 && <MenuDivider />}{" "}
+                          {/* Add divider between categories */}
+                          {filteredItems.map((item) => (
                             <MenuItem
                               key={item.label}
                               onClick={() => navigate(item.path)}
@@ -148,8 +158,9 @@ export default function Account({ pageElement, currentPage }) {
                               {item.label}
                             </MenuItem>
                           ))}
-                      </React.Fragment>
-                    ))}
+                        </React.Fragment>
+                      );
+                    })}
                   </MenuList>
                 </Menu>
               ) : (

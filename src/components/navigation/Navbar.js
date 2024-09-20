@@ -101,7 +101,7 @@ export default function Navbar({ websiteContent }) {
       to: "Box Battles",
       path: "battles",
       icon: FaShieldAlt,
-      color: "white",
+      color: "orange",
     },
     {
       to: "Inventory",
@@ -111,22 +111,35 @@ export default function Navbar({ websiteContent }) {
     },
   ];
 
-  const NavLink = ({ children }) => (
-    <Link to={children.path}>
-      <Button
-        variant={"ghost"}
-        size={"sm"}
-        mr={1}
-        leftIcon={<children.icon color={children.color} />}
-      >
-        {children.to}
-      </Button>
-    </Link>
-  );
+  const NavLink = ({ children }) => {
+    const showIcon = useBreakpointValue({
+      base: false,
+      sm: false,
+      md: false,
+      lg: true,
+    });
+    return (
+      <Link to={children.path}>
+        <Button
+          variant={"ghost"}
+          size={"sm"}
+          mr={1}
+          leftIcon={showIcon ? <children.icon color={children.color} /> : null}
+        >
+          {children.to}
+        </Button>
+      </Link>
+    );
+  };
 
   const NavLinkMobile = ({ children }) => (
     <Link to={children.path}>
-      <Button variant={"ghost"} size={"lg"} onClick={() => onClose()}>
+      <Button
+        variant={"ghost"}
+        size={"lg"}
+        onClick={() => onClose()}
+        leftIcon={<children.icon color={children.color} />}
+      >
         {children.to}
       </Button>
     </Link>
