@@ -58,7 +58,7 @@ export default function UserProfile() {
   const attemptSaveChanges = async () => {
     // Simulate a save operation
     try {
-      const [res] = await updateUser(user.uid, profile);
+      const [res] = await updateUser(profile.uid, profile);
       if (res) {
         toast({
           title: "Success",
