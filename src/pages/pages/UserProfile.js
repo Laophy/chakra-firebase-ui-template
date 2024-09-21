@@ -20,7 +20,6 @@ export default function UserProfile() {
   const user = useSelector((state) => state.data.user.user);
   const { uid } = useParams();
   const [profile, setProfile] = useState(null);
-  const { hasCopied, onCopy } = useClipboard(profile?.uid || "");
   const toast = useToast();
   const isMobile = useBreakpointValue({ base: true, md: false });
 
@@ -46,11 +45,6 @@ export default function UserProfile() {
       duration: 2000,
       isClosable: true,
     });
-  };
-
-  const handleCopy = () => {
-    onCopy();
-    showToast("Copied", "User ID copied to clipboard", "success");
   };
 
   const attemptSaveChanges = async (updatedProfile) => {
@@ -92,26 +86,21 @@ export default function UserProfile() {
       alignItems={"center"}
     >
       <Stack alignItems={"center"} justifyContent={"center"} w={"full"}>
-        {profile ? (
-          <Stack
-            w={"full"}
-            direction={isMobile ? "column" : "row"}
-            alignItems="center" // Center the ProfileCard horizontally
-            justifyContent="center" // Center the ProfileCard vertically
-          >
-            <ProfileCard
-              profile={profile}
-              user={user}
-              handleCopy={handleCopy}
-              isMobile={isMobile}
-              attemptSaveChanges={attemptSaveChanges}
-              attemptMute={attemptMute}
-              attemptBan={attemptBan}
-            />
-          </Stack>
-        ) : (
-          <Spinner size="xl" thickness="4px" speed="0.65s" color="blue.500" />
-        )}
+        <Stack
+          w={"full"}
+          direction={isMobile ? "column" : "row"}
+          alignItems="center" // Center the ProfileCard horizontally
+          justifyContent="center" // Center the ProfileCard vertically
+        >
+          <ProfileCard
+            profile={profile}
+            user={user}
+            isMobile={isMobile}
+            attemptSaveChanges={attemptSaveChanges}
+            attemptMute={attemptMute}
+            attemptBan={attemptBan}
+          />
+        </Stack>
       </Stack>
     </Container>
   );

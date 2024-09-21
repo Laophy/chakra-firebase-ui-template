@@ -87,13 +87,13 @@ export default function Navbar({ websiteContent }) {
   const Links = [
     {
       to: "Home",
-      path: "dashboard",
+      path: "/",
       icon: PiHouseBold,
       color: "white",
     },
     {
       to: "Boxes",
-      path: "battles",
+      path: "boxes",
       icon: LuBox,
       color: "white",
     },
@@ -105,7 +105,7 @@ export default function Navbar({ websiteContent }) {
     },
     {
       to: "Inventory",
-      path: "cart",
+      path: "inventory",
       icon: MdOutlineInventory2,
       color: "white",
     },
