@@ -165,7 +165,7 @@ export default function Boxes() {
         const distance = Math.abs(normalizedRotation - prizeAngle);
         const fadeDistance = Math.min(distance, 360 - distance);
         const opacity = Math.max(0.3, 1 - fadeDistance / (segmentSize * 1.5));
-        return { opacity, scale: 1 + (opacity - 0.3) * 0.4 };
+        return { opacity, scale: 1 + (opacity - 0.1) * 0.5 };
       }
     } else if (winningPrize) {
       if (prize === winningPrize) {
