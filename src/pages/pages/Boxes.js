@@ -27,8 +27,16 @@ export default function Boxes() {
   const [isSpinEnding, setIsSpinEnding] = useState(false);
   const [closestPrize, setClosestPrize] = useState(null);
 
-  const wheelSize = useBreakpointValue({ base: "300px", md: "400px" });
-  const prizeSize = useBreakpointValue({ base: "60px", md: "90px" });
+  const wheelSize = useBreakpointValue({
+    base: "300px",
+    md: "400px",
+    lg: "500px",
+  });
+  const prizeSize = useBreakpointValue({
+    base: "75px",
+    md: "90px",
+    lg: "120px",
+  });
   const containerPadding = useBreakpointValue({ base: 4, md: 10 });
 
   useEffect(() => {
@@ -137,10 +145,6 @@ export default function Boxes() {
 
         setRotation(totalRotation);
 
-        console.log("Final rotation:", totalRotation);
-        console.log("Winning index:", closestIndex);
-        console.log("Winning Prize:", closestPrize.name);
-
         setTimeout(() => setShowConfetti(false), 1000);
       }
     }, 1000 / fps);
@@ -153,7 +157,7 @@ export default function Boxes() {
   const getOpacityAndScale = (prize) => {
     if (spinning) {
       if (prize === closestPrize) {
-        return { opacity: 1, scale: 1.2 };
+        return { opacity: 1, scale: 1.35 };
       } else {
         const segmentSize = 360 / prizeList.length;
         const normalizedRotation = ((rotation % 360) + 360) % 360;
@@ -165,9 +169,9 @@ export default function Boxes() {
       }
     } else if (winningPrize) {
       if (prize === winningPrize) {
-        return { opacity: 1, scale: 1.2 };
+        return { opacity: 1, scale: 1.35 };
       } else {
-        return { opacity: 0.3, scale: 1 };
+        return { opacity: 0.1, scale: 1 };
       }
     } else {
       return { opacity: 1, scale: 1 };
@@ -225,7 +229,7 @@ export default function Boxes() {
                 height={prizeSize}
                 alt={prize.name}
                 opacity={opacity}
-                transition="opacity 0.1s, transform 0.1s"
+                transition="opacity 0.1s, transform 0.1s, scale 0.1s"
               />
             );
           })}
