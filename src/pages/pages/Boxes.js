@@ -8,6 +8,10 @@ import {
   Image,
   Center,
   useBreakpointValue,
+  Card,
+  CardBody,
+  CardFooter,
+  Heading,
 } from "@chakra-ui/react";
 import ReactConfetti from "react-confetti";
 import { formatMoney } from "../../utilities/Formatter";
@@ -26,6 +30,7 @@ export default function Boxes() {
   const [winningPrize, setWinningPrize] = useState(null);
   const [isSpinEnding, setIsSpinEnding] = useState(false);
   const [closestPrize, setClosestPrize] = useState(null);
+  const [centeredPrize, setCenteredPrize] = useState(null);
 
   const wheelSize = useBreakpointValue({
     base: "300px",
@@ -52,7 +57,7 @@ export default function Boxes() {
   const fetchRandomPrizes = async () => {
     try {
       const response = await fetch(
-        "https://pokeapi.co/api/v2/pokemon?limit=151"
+        "https://pokeapi.co/api/v2/pokemon?limit=105&offset=1010"
       );
       const data = await response.json();
       const shuffled = data.results.sort(() => 0.5 - Math.random());
@@ -186,7 +191,7 @@ export default function Boxes() {
   };
 
   return (
-    <Container maxW="100%" centerContent p={containerPadding}>
+    <Container maxW="container.xl" centerContent p={containerPadding}>
       {showConfetti && (
         <ReactConfetti
           width={window.innerWidth}
@@ -203,56 +208,63 @@ export default function Boxes() {
         />
       )}
 
-      <VStack spacing={6} mt={4}>
-        <Box
-          w={wheelSize}
-          h={wheelSize}
-          borderRadius="full"
-          borderWidth="4px"
-          borderColor="transparent"
-          position="relative"
-        >
-          {prizeList.map((prize, index) => {
-            const angle = index * (360 / prizeList.length);
-            const radius = parseInt(wheelSize) / 2 - parseInt(prizeSize) / 2;
-            const position = getPosition(angle, radius);
-            const { opacity, scale } = getOpacityAndScale(prize);
-            return (
-              <Image
-                key={prize.id}
-                src={prize.image}
-                position="absolute"
-                top="50%"
-                left="50%"
-                transform={`translate(${position.x}px, ${position.y}px) translate(-50%, -50%) scale(${scale})`}
-                width={prizeSize}
-                height={prizeSize}
-                alt={prize.name}
-                opacity={opacity}
-                transition="opacity 0.1s, transform 0.1s, scale 0.1s"
-              />
-            );
-          })}
-          {countdown !== null && (
-            <Center
-              position="absolute"
-              top="0"
-              left="0"
-              right="0"
-              bottom="0"
-              bg="rgba(0, 0, 0, 0.5)"
-              color="white"
-              fontSize={["4xl", "6xl"]}
-              fontWeight="bold"
+      <Card maxW="100%" boxShadow="xl" borderRadius="lg" overflow="hidden">
+        <CardBody>
+          <VStack spacing={6}>
+            <Heading size="lg" textAlign="center" mb={4}>
+              Prize Wheel
+            </Heading>
+            <Box
+              w={wheelSize}
+              h={wheelSize}
               borderRadius="full"
+              borderWidth="4px"
+              borderColor="transparent"
+              position="relative"
             >
-              {countdown}
-            </Center>
-          )}
-        </Box>
-
-        <VStack mt={4}>
-          <Center>
+              {prizeList.map((prize, index) => {
+                const angle = index * (360 / prizeList.length);
+                const radius =
+                  parseInt(wheelSize) / 2 - parseInt(prizeSize) / 2;
+                const position = getPosition(angle, radius);
+                const { opacity, scale } = getOpacityAndScale(prize);
+                return (
+                  <Image
+                    key={prize.id}
+                    src={prize.image}
+                    position="absolute"
+                    top="50%"
+                    left="50%"
+                    transform={`translate(${position.x}px, ${position.y}px) translate(-50%, -50%) scale(${scale})`}
+                    width={prizeSize}
+                    height={prizeSize}
+                    alt={prize.name}
+                    opacity={opacity}
+                    transition="opacity 0.1s, transform 0.1s, scale 0.1s"
+                  />
+                );
+              })}
+              {countdown !== null && (
+                <Center
+                  position="absolute"
+                  top="0"
+                  left="0"
+                  right="0"
+                  bottom="0"
+                  bg="rgba(0, 0, 0, 0.5)"
+                  color="white"
+                  fontSize={["4xl", "6xl"]}
+                  fontWeight="bold"
+                  borderRadius="full"
+                >
+                  {countdown}
+                </Center>
+              )}
+            </Box>
+          </VStack>
+        </CardBody>
+        <CardFooter>
+          <VStack spacing={4} width="100%">
             <Text fontSize={["lg", "xl"]} fontWeight="bold" textAlign="center">
               {countdown !== null ? (
                 "Get ready..."
@@ -266,23 +278,24 @@ export default function Boxes() {
                 "Spin the wheel!"
               )}
             </Text>
-          </Center>
-          <Button
-            ref={spinButtonRef}
-            colorScheme="blue"
-            onClick={startCountdown}
-            isDisabled={spinning || countdown !== null}
-            isLoading={spinning}
-            size={["md", "lg"]}
-          >
-            {spinning
-              ? ""
-              : countdown !== null
-              ? `Starting in ${countdown}...`
-              : "Spin the Wheel"}
-          </Button>
-        </VStack>
-      </VStack>
+            <Button
+              ref={spinButtonRef}
+              colorScheme="blue"
+              onClick={startCountdown}
+              isDisabled={spinning || countdown !== null}
+              isLoading={spinning}
+              size={["md", "lg"]}
+              width="full"
+            >
+              {spinning
+                ? ""
+                : countdown !== null
+                ? `Starting in ${countdown}...`
+                : "Spin the Wheel"}
+            </Button>
+          </VStack>
+        </CardFooter>
+      </Card>
     </Container>
   );
 }
