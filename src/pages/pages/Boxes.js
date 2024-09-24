@@ -12,6 +12,7 @@ import {
   CardBody,
   CardFooter,
   Heading,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import ReactConfetti from "react-confetti";
 import { formatMoney } from "../../utilities/Formatter";
@@ -31,6 +32,8 @@ export default function Boxes() {
   const [isSpinEnding, setIsSpinEnding] = useState(false);
   const [closestPrize, setClosestPrize] = useState(null);
   const [centeredPrize, setCenteredPrize] = useState(null);
+
+  const bgColor = useColorModeValue("white", "gray.900");
 
   const wheelSize = useBreakpointValue({
     base: "300px",
@@ -208,7 +211,13 @@ export default function Boxes() {
         />
       )}
 
-      <Card maxW="100%" boxShadow="xl" borderRadius="lg" overflow="hidden">
+      <Card
+        maxW="100%"
+        boxShadow="xl"
+        borderRadius="lg"
+        overflow="hidden"
+        bg={bgColor}
+      >
         <CardBody>
           <VStack spacing={6}>
             <Heading size="lg" textAlign="center" mb={4}>
@@ -286,6 +295,18 @@ export default function Boxes() {
               isLoading={spinning}
               size={["md", "lg"]}
               width="full"
+              rounded={"full"}
+              bg={"blue.400"}
+              color={"white"}
+              boxShadow={
+                "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
+              }
+              _hover={{
+                bg: "blue.500",
+              }}
+              _focus={{
+                bg: "blue.500",
+              }}
             >
               {spinning
                 ? ""

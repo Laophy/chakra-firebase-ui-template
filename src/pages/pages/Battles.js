@@ -16,6 +16,7 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   motion,
@@ -80,7 +81,7 @@ const PokemonCarousel = () => {
   const [wonAmount, setWonAmount] = useState(null);
   const containerRef = useRef(null);
 
-  const totalCardsInView = 5;
+  const totalCardsInView = useBreakpointValue({ base: 3, sm: 4, md: 5, lg: 6 });
   const x = useMotionValue(0);
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -159,7 +160,6 @@ const PokemonCarousel = () => {
           return 1;
         })(),
       }));
-      console.log("Fetched cards:", fetchedCards);
 
       // Shuffle the fetched cards
       const shuffledCards = shuffleArray([...fetchedCards]);
@@ -247,15 +247,7 @@ const PokemonCarousel = () => {
 
   return (
     <>
-      <Box width="100%" overflow="hidden">
-        <Button
-          onClick={handleSpin}
-          isLoading={isLoading}
-          mb={4}
-          isDisabled={isFetching}
-        >
-          Spin
-        </Button>
+      <Box overflow="hidden">
         {isFetching ? (
           <Center height="200px">
             <Spinner size="xl" />
@@ -281,6 +273,27 @@ const PokemonCarousel = () => {
           </MotionBox>
         )}
       </Box>
+      <Button
+        onClick={handleSpin}
+        isLoading={isLoading}
+        mb={4}
+        isDisabled={isFetching}
+        size={["md", "lg"]}
+        rounded={"full"}
+        bg={"blue.400"}
+        color={"white"}
+        boxShadow={
+          "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
+        }
+        _hover={{
+          bg: "blue.500",
+        }}
+        _focus={{
+          bg: "blue.500",
+        }}
+      >
+        Spin
+      </Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -356,10 +369,47 @@ const PokemonCarousel = () => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleClaim}>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={handleClaim}
+              size={["md", "lg"]}
+              width="full"
+              rounded={"full"}
+              bg={"blue.400"}
+              color={"white"}
+              boxShadow={
+                "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
+              }
+              _hover={{
+                bg: "blue.500",
+              }}
+              _focus={{
+                bg: "blue.500",
+              }}
+            >
               Sell Card
             </Button>
-            <Button variant="ghost" onClick={onClose}>
+            <Button
+              colorScheme="blue"
+              mr={3}
+              onClick={onClose}
+              size={["md", "lg"]}
+              width="full"
+              rounded={"full"}
+              bg={"green.400"}
+              color={"white"}
+              boxShadow={
+                "0px 1px 25px -5px rgb(39 174 96 / 48%), 0 10px 10px -5px rgb(39 174 96 / 43%)"
+              }
+              _hover={{
+                bg: "green.500",
+              }}
+              _focus={{
+                bg: "green.500",
+              }}
+              l
+            >
               Place in Inventory
             </Button>
           </ModalFooter>
