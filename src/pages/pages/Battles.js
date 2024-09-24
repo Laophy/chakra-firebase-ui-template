@@ -17,7 +17,13 @@ import {
   ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import { motion, useMotionValue, animate } from "framer-motion";
+import {
+  motion,
+  useMotionValue,
+  animate,
+  useTransform,
+  useSpring,
+} from "framer-motion";
 import { formatMoney } from "../../utilities/Formatter";
 import { setBalance } from "../../redux/userSlice";
 
@@ -76,6 +82,35 @@ const PokemonCarousel = () => {
 
   const totalCardsInView = 5;
   const x = useMotionValue(0);
+
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const cardRef = useRef(null);
+
+  const calculateRotation = useCallback((x, y) => {
+    if (!cardRef.current) return { rotateX: 0, rotateY: 0 };
+    const rect = cardRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const rotateY = ((x - centerX) / (rect.width / 2)) * 10;
+    const rotateX = ((centerY - y) / (rect.height / 2)) * 10;
+    return { rotateX, rotateY };
+  }, []);
+
+  const handleMouseMove = useCallback((event) => {
+    setMousePosition({ x: event.clientX, y: event.clientY });
+  }, []);
+
+  const rotateX = useSpring(useMotionValue(0), { stiffness: 300, damping: 30 });
+  const rotateY = useSpring(useMotionValue(0), { stiffness: 300, damping: 30 });
+
+  useEffect(() => {
+    const { rotateX: newRotateX, rotateY: newRotateY } = calculateRotation(
+      mousePosition.x,
+      mousePosition.y
+    );
+    rotateX.set(newRotateX);
+    rotateY.set(newRotateY);
+  }, [mousePosition, calculateRotation, rotateX, rotateY]);
 
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -251,10 +286,66 @@ const PokemonCarousel = () => {
         <ModalContent>
           <ModalHeader>You Won!</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody onMouseMove={handleMouseMove}>
             {wonCard && (
               <VStack spacing={4}>
-                <Image src={wonCard.image} alt={wonCard.name} />
+                <motion.div
+                  ref={cardRef}
+                  style={{
+                    width: "100%",
+                    height: "300px",
+                    perspective: "1000px",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <motion.div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      position: "relative",
+                      transformStyle: "preserve-3d",
+                      rotateX: rotateX,
+                      rotateY: rotateY,
+                    }}
+                  >
+                    <motion.div
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        position: "absolute",
+                        backfaceVisibility: "hidden",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <motion.div
+                        style={{
+                          position: "relative",
+                          width: "auto",
+                          height: "100%",
+                          borderRadius: "5%", // Adjust this value to match your card's corner radius
+                          overflow: "hidden",
+                        }}
+                        whileHover={{
+                          boxShadow: "0 0 15px 5px rgba(255, 215, 0, 0.7)",
+                          transition: { duration: 0.3 },
+                        }}
+                      >
+                        <Image
+                          src={wonCard.image}
+                          alt={wonCard.name}
+                          style={{
+                            height: "100%",
+                            width: "auto",
+                            objectFit: "contain",
+                            borderRadius: "5%", // Match this with the wrapper's borderRadius
+                          }}
+                        />
+                      </motion.div>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
                 <Text fontSize="xl" fontWeight="bold">
                   {wonCard.name}
                 </Text>
