@@ -17,6 +17,7 @@ import {
   ModalCloseButton,
   useDisclosure,
   useBreakpointValue,
+  useToast,
 } from "@chakra-ui/react";
 import {
   motion,
@@ -71,6 +72,7 @@ const PokemonCarousel = () => {
   const user = useSelector((state) => state.data.user.user);
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   const [cards, setCards] = useState([]);
   const [displayCards, setDisplayCards] = useState([]);
@@ -241,9 +243,26 @@ const PokemonCarousel = () => {
   }, [isSpinning, displayCards, x, onOpen]);
 
   const handleClaim = useCallback(() => {
-    dispatch(setBalance(user?.balance + wonAmount));
-    onClose();
-  }, [dispatch, user?.balance, wonAmount, onClose]);
+    if (user) {
+      dispatch(setBalance(user.balance + wonAmount));
+      onClose();
+      toast({
+        title: "Success",
+        description: `You won ${wonAmount} gems!`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "You need to be logged in to claim.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  }, [dispatch, user, wonAmount, onClose, toast]);
 
   return (
     <>

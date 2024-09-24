@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // Starting state of a user
 const initialState = {
   user: null,
+  authHeader: null,
   isLoading: true,
 };
 
@@ -15,6 +16,9 @@ export const userSlice = createSlice({
     },
     logoutUser: (state) => {
       state.user = null;
+    },
+    setAuthHeader: (state, action) => {
+      state.authHeader = action.payload;
     },
     setLoading: (state, action) => {
       state.isLoading = action.payload;
@@ -34,6 +38,7 @@ export const userSlice = createSlice({
 export const {
   loginUser,
   logoutUser,
+  setAuthHeader,
   setLoading,
   setUsername,
   setProfilePicture,

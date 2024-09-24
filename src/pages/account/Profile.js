@@ -16,6 +16,9 @@ import {
   useBreakpointValue,
   useColorModeValue,
   IconButton,
+  Textarea,
+  EditableTextarea,
+  Editable,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +30,7 @@ import { useClipboard } from "@chakra-ui/react"; // Add this import
 export default function Profile() {
   // Grabbing a user from global storage via redux
   const user = useSelector((state) => state.data.user.user);
+  const authHeader = useSelector((state) => state.data.user.authHeader);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
   const bg = useColorModeValue("gray.100", "gray.700");
@@ -35,6 +39,7 @@ export default function Profile() {
   const { onCopy } = useClipboard(user?.uid); // Add this line
 
   const [newUsername, setNewUsername] = useState(user.username);
+  const [newBio, setNewBio] = useState(user.bio);
   const [photoURL, setPhotoURL] = useState(user.photoURL);
   const [isLoading, setIsLoading] = useState(false); // Add this line
 
@@ -45,12 +50,13 @@ export default function Profile() {
   const onUpdateProfile = async () => {
     setIsLoading(true); // Add this line
     const userUpdate = {
+      bio: newBio,
       username: newUsername,
       photoURL: photoURL,
     };
 
     try {
-      const [res, mtsResponse] = await updateUsername(user, userUpdate);
+      const [res, mtsResponse] = await updateUsername(authHeader, userUpdate);
       if (mtsResponse) {
         toast({
           title: "Error",
@@ -71,6 +77,7 @@ export default function Profile() {
         dispatch(setProfilePicture(photoURL));
       }
     } catch (e) {
+      console.log(e);
       toast({
         title: "Error",
         description: "Profile not updated.",
@@ -176,6 +183,15 @@ export default function Profile() {
                   value={photoURL}
                   onChange={(event) => setPhotoURL(event.target.value)}
                   placeholder="Profile Image URL"
+                  size="lg"
+                />
+              </Stack>
+              <Stack mt={5}>
+                <Text mb="8px">Bio</Text>
+                <Textarea
+                  value={newBio}
+                  onChange={(event) => setNewBio(event.target.value)}
+                  placeholder="Bio"
                   size="lg"
                 />
               </Stack>

@@ -13,23 +13,13 @@ import {
   InputGroup,
   InputLeftElement,
   Input,
-  CardFooter,
   CircularProgress,
-  SimpleGrid,
-  PopoverBody,
   Center,
-  PopoverHeader,
-  PopoverCloseButton,
-  PopoverArrow,
-  PopoverContent,
-  PopoverTrigger,
   useToast,
-  Popover,
   Tag,
   IconButton,
   CardHeader,
   VStack,
-  useColorMode,
   AvatarBadge,
   useColorModeValue,
   Hide,
@@ -39,7 +29,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllUserData,
-  getfirebaseUser,
+  getUserByFirebaseAuth,
   onDemoteStaffToPlayer,
   onPromoteUserToStaff,
   updateUser,
@@ -54,7 +44,8 @@ import ColorPicker from "../../../components/tools/ColorPicker";
 
 export default function AdminViewUsers() {
   const user = useSelector((state) => state.data.user.user);
-  const { colorMode, toggleColorMode } = useColorMode();
+  const authHeader = useSelector((state) => state.data.user.authHeader);
+
   const toast = useToast();
   const dispatch = useDispatch();
 
@@ -102,6 +93,7 @@ export default function AdminViewUsers() {
     setIsLoadingDemote(true);
     try {
       const [res, mtsResponse] = await onDemoteStaffToPlayer(
+        authHeader,
         user,
         editUser.uid
       );
@@ -117,7 +109,9 @@ export default function AdminViewUsers() {
           "You have successfully demoted this user to player.",
           "success"
         );
-        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser);
+        const [updatedUser, mtsResponse] = await getUserByFirebaseAuth(
+          editUser
+        );
         console.log(updatedUser);
         setEditUser(updatedUser);
       }
@@ -131,7 +125,10 @@ export default function AdminViewUsers() {
   const promoteToStaff = async () => {
     setIsLoadingPromote(true);
     try {
-      const [res, mtsResponse] = await onPromoteUserToStaff(user, editUser.uid);
+      const [res, mtsResponse] = await onPromoteUserToStaff(
+        authHeader,
+        editUser.uid
+      );
       if (mtsResponse) {
         showToast(
           "Error",
@@ -144,7 +141,9 @@ export default function AdminViewUsers() {
           "You have successfully promoted this user to staff.",
           "success"
         );
-        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser);
+        const [updatedUser, mtsResponse] = await getUserByFirebaseAuth(
+          editUser
+        );
         setEditUser(updatedUser);
       }
     } catch (e) {
@@ -175,6 +174,7 @@ export default function AdminViewUsers() {
 
     try {
       const [res, mtsResponse] = await updateUser(
+        authHeader,
         user,
         editUser.uid,
         userUpdate
@@ -191,7 +191,9 @@ export default function AdminViewUsers() {
           "You have successfully updated the profile.",
           "success"
         );
-        const [updatedUser, mtsResponse] = await getfirebaseUser(editUser);
+        const [updatedUser, mtsResponse] = await getUserByFirebaseAuth(
+          editUser
+        );
         setEditUser(updatedUser);
       }
     } catch (e) {

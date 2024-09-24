@@ -19,13 +19,15 @@ const API = {
   routes: {
     user: "/api/user",
   },
+  baseRoute: "/user.",
   endpoints: {
-    getUser: "/user.getUser",
-    getAllUsers: "/user.getAllUsers",
-    updateUser: "/user.updateUser",
-    updateUsername: "/user.updateUsername",
-    promoteUser: "/user.promoteUser",
-    demoteUser: "/user.demoteUser",
+    getUser: "getUser",
+    createUser: "createUser",
+    getAllUsers: "getAllUsers",
+    updateUser: "updateUser",
+    updateUsername: "updateUsername",
+    promoteUser: "promoteUser",
+    demoteUser: "demoteUser",
   },
 };
 

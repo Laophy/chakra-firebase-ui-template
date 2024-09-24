@@ -14,25 +14,21 @@ import {
   Divider,
   useToast,
 } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../firebase";
 import { useState } from "react";
-import { loginUser } from "../../redux/userSlice";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { isValidEmail } from "../../utilities/validation";
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Grabbing a user from global storage via redux
-  const user = useSelector((state) => state.data.user.user);
   const provider = new GoogleAuthProvider();
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -59,21 +55,52 @@ export default function Register() {
     }
   };
 
+  const validateForm = () => {
+    if (username.length < 3) {
+      toast({
+        title: "Invalid Username",
+        description: "Username must be at least 3 characters long.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return false;
+    }
+
+    if (!isValidEmail(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return false;
+    }
+
+    if (password.length < 8) {
+      toast({
+        title: "Weak Password",
+        description: "Password must be at least 8 characters long.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSignup = async () => {
-    console.log({ username, email, password });
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       await createUserWithEmailAndPassword(auth, email, password).then(
         (userCred) => {
           updateProfile(userCred.user, { displayName: username })
-            .then(
-              dispatch(
-                loginUser({
-                  uid: userCred.user.uid,
-                  username: username,
-                  email: userCred.user.email,
-                })
-              )
-            )
             .then(navigate("/"))
             .then(() => {
               toast({

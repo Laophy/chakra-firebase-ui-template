@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { auth } from "./firebase";
 import { Route, Routes } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, setLoading } from "./redux/userSlice";
+import { loginUser, setAuthHeader, setLoading } from "./redux/userSlice";
 
 import Footer from "./components/navigation/Footer";
 import Navbar from "./components/navigation/Navbar";
@@ -23,7 +23,10 @@ import Register from "./pages/auth/Register";
 import Inventory from "./pages/pages/Inventory";
 import Error from "./pages/auth/Error";
 import Dashboard from "./pages/pages/Dashboard";
-import { getfirebaseUser } from "./services/UserManagement.service";
+import {
+  createNewUser,
+  getUserByFirebaseAuth,
+} from "./services/UserManagement.service";
 import AdminPanel from "./pages/account/admin/AdminPanel";
 import AdminViewUsers from "./pages/account/admin/AdminViewUsers";
 import ExecutivePanel from "./pages/account/admin/ExecutivePanel";
@@ -44,10 +47,18 @@ function App() {
   }, []);
 
   const loadCurrentUser = async (authUser) => {
-    const [userData, mtsResponse] = await getfirebaseUser(authUser);
-    if (mtsResponse || !userData) {
-      console.log("MTS RESPONSE!!");
-    } else {
+    try {
+      let [userData, mtsResponse] = await getUserByFirebaseAuth(authUser);
+      if (mtsResponse || !userData) {
+        console.warn("User not found in MongoDB. Creating new user...");
+        const [newUser, createResponse] = await createNewUser(authUser);
+        if (createResponse || !newUser) {
+          console.warn("Failed to create new user:", createResponse);
+          return;
+        }
+        userData = newUser;
+      }
+
       dispatch(
         loginUser({
           uid: userData?.uid,
@@ -64,6 +75,14 @@ function App() {
           title: userData?.title,
         })
       );
+      dispatch(setLoading(false));
+      console.info("User data loaded: ", userData);
+
+      // Setup the auth header for requests from the logged in user
+      const authHeader = await authUser.getIdToken();
+      dispatch(setAuthHeader(authHeader));
+    } catch (error) {
+      console.error("Error loading current user:", error);
       dispatch(setLoading(false));
     }
   };

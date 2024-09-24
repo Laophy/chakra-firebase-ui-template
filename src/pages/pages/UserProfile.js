@@ -1,16 +1,14 @@
 import {
   Container,
   Stack,
-  Spinner,
   useBreakpointValue,
   useToast,
-  useClipboard,
 } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-  getfirebaseUser,
+  getUserByFirebaseAuth,
   updateUser,
 } from "../../services/UserManagement.service";
 
@@ -18,6 +16,7 @@ import ProfileCard from "../../components/profile/ProfileCard";
 
 export default function UserProfile() {
   const user = useSelector((state) => state.data.user.user);
+  const authHeader = useSelector((state) => state.data.user.authHeader);
   const { uid } = useParams();
   const [profile, setProfile] = useState(null);
   const toast = useToast();
@@ -28,7 +27,7 @@ export default function UserProfile() {
   }, [uid]);
 
   const loadCurrentUser = async () => {
-    const [userData, mtsResponse] = await getfirebaseUser({ uid });
+    const [userData, mtsResponse] = await getUserByFirebaseAuth({ uid });
     console.log(userData);
     if (mtsResponse || !userData) {
       setProfile(null);
@@ -49,7 +48,12 @@ export default function UserProfile() {
 
   const attemptSaveChanges = async (updatedProfile) => {
     try {
-      const [res] = await updateUser(user, profile.uid, updatedProfile);
+      const [res] = await updateUser(
+        authHeader,
+        user,
+        profile.uid,
+        updatedProfile
+      );
       if (res) {
         setProfile(updatedProfile);
         showToast("Success", "Profile changes saved successfully", "success");
