@@ -43,7 +43,7 @@ function App() {
       if (authUser) {
         loadCurrentUser(authUser);
       } else {
-        console.log("User not logged in");
+        //console.log("User not logged in");
       }
     });
   }, []);
@@ -52,11 +52,11 @@ function App() {
     try {
       let [userData, mtsResponse] = await getUserByFirebaseAuth(authUser);
       if (mtsResponse || !userData) {
-        console.warn("User not found in MongoDB. Creating new user...");
+        //console.warn("User not found in MongoDB. Creating new user...");
         const [newUser, createResponse] = await createNewUser(authUser);
-        console.log(createResponse);
+        //console.log(createResponse);
         if (createResponse || !newUser) {
-          console.warn("Failed to create new user:", createResponse);
+          //console.warn("Failed to create new user:", createResponse);
           createResponse.forEach((error) => {
             toast({
               title: "Error",
@@ -88,13 +88,13 @@ function App() {
         })
       );
       dispatch(setLoading(false));
-      console.info("User data loaded: ", userData);
+      //console.info("User data loaded: ", userData);
 
       // Setup the auth header for requests from the logged in user
       const authHeader = await authUser.getIdToken();
       dispatch(setAuthHeader(authHeader));
     } catch (error) {
-      console.error("Error loading current user:", error);
+      //console.error("Error loading current user:", error);
       dispatch(setLoading(false));
     }
   };

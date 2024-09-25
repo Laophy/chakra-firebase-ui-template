@@ -12,11 +12,8 @@ import {
   Container,
   Stack,
   IconButton,
-  Tooltip,
   useToast,
-  Badge,
 } from "@chakra-ui/react";
-import { RiDeleteBack2Line, RiVolumeMuteLine } from "react-icons/ri";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,9 +33,10 @@ import {
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import { firestore } from "../../firebase";
 import { Link } from "react-router-dom";
-import { FaBan } from "react-icons/fa";
 import moment from "moment";
 import { ChatIcon } from "@chakra-ui/icons";
+import { RiDeleteBinLine } from "react-icons/ri"; // Import the trash can icon
+import { Filter } from "bad-words"; // Correct import for the bad-words library
 
 const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
   const toast = useToast();
@@ -77,17 +75,29 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
   useEffect(() => {
     if (user) {
       const userDoc = doc(onlineUsersRef, user.uid);
-      setDoc(userDoc, {
-        uid: user.uid,
-        username: user.username || user.displayName || "User",
-      });
+      const setOnlineStatus = () => {
+        setDoc(userDoc, {
+          uid: user.uid,
+          username: user.username || user.displayName || "User",
+          lastActive: serverTimestamp(),
+        });
+      };
+
+      setOnlineStatus();
+
+      const intervalId = setInterval(setOnlineStatus, 60000); // Update every minute
 
       const unsubscribe = onSnapshot(onlineUsersRef, (snapshot) => {
-        setOnlineUsers(snapshot.size);
+        const now = new Date();
+        const activeUsers = snapshot.docs.filter((doc) => {
+          const lastActive = doc.data().lastActive?.toDate();
+          return lastActive && now - lastActive < 120000; // Consider users active if last update was within 2 minutes
+        });
+        setOnlineUsers(activeUsers.length);
       });
 
       return () => {
-        deleteDoc(userDoc);
+        clearInterval(intervalId);
         unsubscribe();
       };
     }
@@ -144,26 +154,6 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
     }
   };
 
-  const handleMuteUser = () => {
-    toast({
-      title: "Mute User",
-      description: "This would mute the user.",
-      status: "warning",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
-  const handleBanUser = () => {
-    toast({
-      title: "Ban User",
-      description: "This would ban the user.",
-      status: "error",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
   const handleFocus = () => {
     document.body.classList.add("no-scroll");
   };
@@ -190,6 +180,13 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
       }
       navigate(`/user/profile/${uid}`);
     }
+  };
+
+  const filter = new Filter();
+
+  const handleMessageChange = (e) => {
+    const cleanedMessage = filter.clean(e.target.value);
+    setMessageText(cleanedMessage);
   };
 
   return (
@@ -232,11 +229,7 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
               .slice(0)
               .reverse()
               .map((message, index) => (
-                <Box
-                  key={index}
-                  position="relative"
-                  _hover={{ ".icon-buttons": { opacity: 1 } }}
-                >
+                <Box key={index} position="relative">
                   <Flex align="center" m={3}>
                     {isMobile ? (
                       <Avatar
@@ -263,8 +256,29 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
                             {message?.title}
                           </Tag>
                         )}
-                        <Text noOfLines={1} fontSize="lg" as={"b"}>
+                        <Text
+                          noOfLines={1}
+                          fontSize="lg"
+                          as={"b"}
+                          position="relative"
+                        >
                           {message?.username ? message?.username : "User"}
+                        </Text>
+                        <Text fontSize="sm" color="gray.500">
+                          {message?.timestamp}
+                          {user?.isStaff && (
+                            <IconButton
+                              className="delete-icon"
+                              icon={<RiDeleteBinLine />}
+                              variant={"ghost"}
+                              m={0.5}
+                              aria-label="Delete Message"
+                              transition="opacity 0.2s"
+                              onClick={() =>
+                                handleDeleteMessage(message.createdAt)
+                              }
+                            />
+                          )}
                         </Text>
                       </HStack>
                       <Box
@@ -285,51 +299,6 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
                       </Box>
                     </Box>
                   </Flex>
-                  {user?.isStaff && (
-                    <HStack
-                      className="icon-buttons"
-                      spacing={2}
-                      position="absolute"
-                      right={1}
-                      top={0}
-                      opacity={0}
-                      transition="opacity 0.2s"
-                    >
-                      <Tooltip
-                        label="Delete Message"
-                        aria-label="Delete Message Tooltip"
-                      >
-                        <IconButton
-                          icon={<RiDeleteBack2Line />}
-                          variant={"outline"}
-                          colorScheme="red"
-                          aria-label="Delete Message"
-                          size="sm"
-                          onClick={() => handleDeleteMessage(message.createdAt)}
-                        />
-                      </Tooltip>
-                      <Tooltip label="Mute User" aria-label="Mute User Tooltip">
-                        <IconButton
-                          icon={<RiVolumeMuteLine />}
-                          aria-label="Mute User"
-                          variant={"outline"}
-                          colorScheme="purple"
-                          size="sm"
-                          onClick={handleMuteUser}
-                        />
-                      </Tooltip>
-                      <Tooltip label="Ban User" aria-label="Ban User Tooltip">
-                        <IconButton
-                          icon={<FaBan />}
-                          aria-label="Ban User"
-                          variant={"outline"}
-                          colorScheme="yellow"
-                          size="sm"
-                          onClick={handleBanUser}
-                        />
-                      </Tooltip>
-                    </HStack>
-                  )}
                 </Box>
               ))}
           <div ref={messagesEndRef} />
@@ -340,12 +309,13 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
             <Input
               placeholder="Type your message..."
               value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
+              onChange={handleMessageChange} // Use the new handler
               onKeyPress={(e) => {
                 if (e.key === "Enter") handleSendMessage();
               }}
               onFocus={handleFocus} // Add this line
               onBlur={handleBlur} // Add this line
+              maxLength={500} // Add this line to limit input to 500 characters
             />
             <Button onClick={handleSendMessage} ml={2}>
               Send

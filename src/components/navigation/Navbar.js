@@ -12,7 +12,6 @@ import {
   MenuItem,
   MenuDivider,
   useDisclosure,
-  useColorMode,
   Stack,
   useToast,
   ButtonGroup,
@@ -21,14 +20,7 @@ import {
   Container,
   SimpleGrid,
 } from "@chakra-ui/react";
-import {
-  HamburgerIcon,
-  CloseIcon,
-  MoonIcon,
-  SunIcon,
-  AddIcon,
-  ChatIcon,
-} from "@chakra-ui/icons";
+import { HamburgerIcon, CloseIcon, AddIcon, ChatIcon } from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
@@ -52,7 +44,6 @@ export default function Navbar({ websiteContent }) {
 
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isDepositOpen,
@@ -89,13 +80,13 @@ export default function Navbar({ websiteContent }) {
       to: "Home",
       path: "/",
       icon: PiHouseBold,
-      color: colorMode === "light" ? "black" : "white",
+      color: "white", // Force dark mode color
     },
     {
       to: "Boxes",
       path: "boxes",
       icon: LuBox,
-      color: colorMode === "light" ? "black" : "white",
+      color: "white", // Force dark mode color
     },
     {
       to: "Box Battles",
@@ -107,7 +98,7 @@ export default function Navbar({ websiteContent }) {
       to: "Inventory",
       path: "inventory",
       icon: MdOutlineInventory2,
-      color: colorMode === "light" ? "black" : "white",
+      color: "white", // Force dark mode color
     },
   ];
 
@@ -192,9 +183,6 @@ export default function Navbar({ websiteContent }) {
               </HStack>
             </HStack>
             <Flex alignItems={"center"}>
-              <Button variant={"ghost"} onClick={toggleColorMode} mr={4}>
-                {colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              </Button>
               <Button
                 onClick={toggleChat}
                 variant={"ghost"}
@@ -246,53 +234,56 @@ export default function Navbar({ websiteContent }) {
                     <Avatar size={"sm"} src={user?.photoURL} ml={2} />
                   </MenuButton>
                   <MenuList>
-                    <Link to={"/account/profile"}>
-                      <MenuItem minH="48px">
-                        <Flex
-                          alignItems={"center"}
-                          justifyContent={"space-between"}
-                        >
-                          <Avatar
-                            size={"sm"}
-                            borderRadius="full"
-                            mr="12px"
-                            src={user?.photoURL}
-                          />
-                          <Text noOfLines={1} fontSize="lg">
-                            {user?.username ? user?.username : "User"}
-                          </Text>
-                        </Flex>
-                      </MenuItem>
-                    </Link>
+                    <MenuItem as={Link} to={"/account/profile"} minH="48px">
+                      <Flex
+                        alignItems={"center"}
+                        justifyContent={"space-between"}
+                      >
+                        <Avatar
+                          size={"sm"}
+                          borderRadius="full"
+                          mr="12px"
+                          src={user?.photoURL}
+                        />
+                        <Text noOfLines={1} fontSize="lg">
+                          {user?.username ? user?.username : "User"}
+                        </Text>
+                      </Flex>
+                    </MenuItem>
                     <MenuDivider />
-                    <Link to={"/account/deposits"}>
-                      <MenuItem>Deposits</MenuItem>
-                    </Link>
-                    <Link to={"/account/withdrawls"}>
-                      <MenuItem>Withdrawls</MenuItem>
-                    </Link>
-                    <Link to={"/account/claims"}>
-                      <MenuItem>Claims</MenuItem>
-                    </Link>
-                    <Link to={"/account/sales"}>
-                      <MenuItem>Sales</MenuItem>
-                    </Link>
-                    <Link to={"/account/history"}>
-                      <MenuItem>History</MenuItem>
-                    </Link>
-                    <Link to={"/account/affiliate"}>
-                      <MenuItem>Affiliate</MenuItem>
-                    </Link>
-                    <Link to={"/account/fairness"}>
-                      <MenuItem>Fairness</MenuItem>
-                    </Link>
-                    <Link to={"/account/security"}>
-                      <MenuItem>Security</MenuItem>
-                    </Link>
+                    <MenuItem as={Link} to={"/account/deposits"}>
+                      Deposits
+                    </MenuItem>
+                    <MenuItem as={Link} to={"/account/withdrawls"}>
+                      Withdrawls
+                    </MenuItem>
+                    <MenuItem as={Link} to={"/account/claims"}>
+                      Claims
+                    </MenuItem>
+                    <MenuItem as={Link} to={"/account/sales"}>
+                      Sales
+                    </MenuItem>
+                    <MenuItem as={Link} to={"/account/history"}>
+                      History
+                    </MenuItem>
+                    <MenuItem as={Link} to={"/account/affiliate"}>
+                      Affiliate
+                    </MenuItem>
+                    <MenuItem as={Link} to={"/account/fairness"}>
+                      Fairness
+                    </MenuItem>
+                    <MenuItem as={Link} to={"/account/security"}>
+                      Security
+                    </MenuItem>
                     <MenuDivider />
-                    <Link to={"/"} onClick={() => onLogoutUser()}>
-                      <MenuItem sx={{ fontWeight: "bold" }}>Sign Out</MenuItem>
-                    </Link>
+                    <MenuItem
+                      as={Link}
+                      to={"/"}
+                      onClick={() => onLogoutUser()}
+                      sx={{ fontWeight: "bold" }}
+                    >
+                      Sign Out
+                    </MenuItem>
                   </MenuList>
                 </Menu>
               )}

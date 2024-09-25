@@ -17,6 +17,8 @@ import {
 } from "@chakra-ui/react";
 import ReactConfetti from "react-confetti";
 import { formatMoney } from "../../utilities/Formatter";
+import flipcard from "../../assets/sounds/flipcard.mp3";
+import claimgems from "../../assets/sounds/claimgems.mp3";
 
 export default function Boxes() {
   const [prizeList, setPrizeList] = useState([]);
@@ -32,7 +34,7 @@ export default function Boxes() {
   const [winningPrize, setWinningPrize] = useState(null);
   const [isSpinEnding, setIsSpinEnding] = useState(false);
   const [closestPrize, setClosestPrize] = useState(null);
-  const [centeredPrize, setCenteredPrize] = useState(null);
+  const [lastPlayedPrize, setLastPlayedPrize] = useState(null);
 
   const bgColor = useColorModeValue("white", "gray.900");
 
@@ -152,6 +154,10 @@ export default function Boxes() {
         setWinningPrize(closestPrize);
         setShowConfetti(true);
 
+        // Winner sounds
+        const newAudio = new Audio(claimgems);
+        newAudio.play();
+
         setRotation(totalRotation);
 
         setTimeout(() => setShowConfetti(false), 1000);
@@ -193,6 +199,16 @@ export default function Boxes() {
     const y = -Math.cos(radian) * radius;
     return { x, y };
   };
+
+  useEffect(() => {
+    if (closestPrize && spinning && closestPrize !== lastPlayedPrize) {
+      // Create a new Audio instance each time to allow overlapping sounds
+      const newAudio = new Audio(flipcard);
+      newAudio.play();
+      console.log("Card sound played");
+      setLastPlayedPrize(closestPrize);
+    }
+  }, [closestPrize, spinning, lastPlayedPrize]);
 
   return (
     <Container as={Stack} maxW="6xl" centerContent p={containerPadding}>

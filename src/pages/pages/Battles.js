@@ -32,10 +32,16 @@ import {
 } from "framer-motion";
 import { formatMoney } from "../../utilities/Formatter";
 import { setBalance } from "../../redux/userSlice";
+import flipcard from "../../assets/sounds/flipcard.mp3";
+import success from "../../assets/sounds/success.mp3";
+import claimgems from "../../assets/sounds/claimgems.mp3";
 
 const MotionBox = motion(Box);
 
-const Card = ({ card, index, x, containerRef, totalCards }) => {
+// Create a single audio instance
+const audio = new Audio(flipcard);
+
+const Card = ({ card, index, x, containerRef, totalCards, isSpinning }) => {
   const [opacity, setOpacity] = useState(0.3);
 
   useEffect(() => {
@@ -62,6 +68,15 @@ const Card = ({ card, index, x, containerRef, totalCards }) => {
       unsubscribeX();
     };
   }, [x, containerRef, index, totalCards]);
+
+  useEffect(() => {
+    if (isSpinning && opacity === 1) {
+      console.log("playing audio");
+      // Create a new Audio instance each time to allow overlapping sounds
+      const newAudio = new Audio(flipcard);
+      newAudio.play();
+    }
+  }, [opacity, isSpinning]);
 
   return (
     <motion.div
@@ -131,14 +146,37 @@ const PokemonCarousel = () => {
     setIsFetching(true);
     let fetchedCards = [];
     try {
-      const response = await fetch(
-        `https://api.pokemontcg.io/v2/cards?random=true&pageSize=80`
+      // Fetch all sets
+      const setsResponse = await fetch("https://api.pokemontcg.io/v2/sets");
+      const setsData = await setsResponse.json();
+      const allSets = setsData.data;
+
+      // Randomly select 5 sets
+      const randomSets = shuffleArray([...allSets]).slice(0, 5);
+
+      // Fetch 20 random cards from each of the 5 random sets
+      const cardPromises = randomSets.map((set) =>
+        fetch(
+          `https://api.pokemontcg.io/v2/cards?q=set.id:${set.id}&pageSize=20&random=true`
+        ).then((res) => res.json())
       );
-      const data = await response.json();
-      fetchedCards = data.data.map((card) => ({
+
+      const cardResponses = await Promise.all(cardPromises);
+      const randomCards = cardResponses.flatMap((response) => response.data);
+      fetchedCards = randomCards.map((card) => ({
         id: card.id,
         name: card.name,
-        image: card.images.small,
+        image: (() => {
+          const images = [
+            card.images.small,
+            card.images.large,
+            card.images.normal,
+            card.imageUrl,
+            card.imageUrlHiRes,
+          ];
+          const frontImage = images.find((img) => img && !img.includes("back"));
+          return frontImage || "";
+        })(),
         value: (() => {
           const tcgplayerPrices = card?.tcgplayer?.prices;
           const cardmarketPrices = card?.cardmarket?.prices;
@@ -167,17 +205,39 @@ const PokemonCarousel = () => {
         })(),
       }));
 
-      // Shuffle the fetched cards
-      const shuffledCards = shuffleArray([...fetchedCards]);
+      // Sort cards by value in descending order
+      fetchedCards.sort((a, b) => b.value - a.value);
 
-      // Create a big list with multiple copies of shuffled cards
-      const bigList = [];
-      for (let i = 0; i < 5; i++) {
-        bigList.push(...shuffleArray([...shuffledCards]));
-      }
+      // Select top 10 most expensive cards
+      const expensiveCards = fetchedCards.slice(0, 10);
 
-      // Shuffle the entire big list again for good measure
-      const finalShuffledList = shuffleArray(bigList);
+      // Calculate the total value of all cards
+      const totalValue = fetchedCards.reduce(
+        (sum, card) => sum + card.value,
+        0
+      );
+
+      // Calculate odds for each card based on its value
+      fetchedCards = fetchedCards.map((card) => ({
+        ...card,
+        odds: 1 - card.value / totalValue,
+      }));
+
+      // Create a weighted list with more copies of cheaper cards
+      const weightedList = fetchedCards.flatMap((card) => {
+        const copies = Math.max(1, Math.floor((1 - card.odds) * 100));
+        return Array(copies).fill(card);
+      });
+
+      // Ensure at least one copy of each expensive card is included
+      expensiveCards.forEach((card) => {
+        if (!weightedList.some((c) => c.id === card.id)) {
+          weightedList.push(card);
+        }
+      });
+
+      // Shuffle the weighted list
+      const finalShuffledList = shuffleArray(weightedList);
 
       setCards(finalShuffledList);
       setDisplayCards(finalShuffledList);
@@ -242,6 +302,8 @@ const PokemonCarousel = () => {
         setWonCard(winningCard);
         setWonAmount(winningCard.value);
         onOpen();
+        const successAudio = new Audio(success);
+        successAudio.play();
       },
     });
   }, [isSpinning, displayCards, x, onOpen]);
@@ -250,6 +312,8 @@ const PokemonCarousel = () => {
     if (user) {
       dispatch(setBalance(user.balance + wonAmount));
       onClose();
+      const successAudio = new Audio(claimgems);
+      successAudio.play();
       toast({
         title: "Success",
         description: `You won ${wonAmount} gems!`,
@@ -295,7 +359,7 @@ const PokemonCarousel = () => {
 
   return (
     <Container as={Stack} maxW="6xl" centerContent>
-      <Box overflow="hidden">
+      <Box overflow="hidden" mt={4}>
         {isFetching ? (
           <Center height="200px">
             <Spinner size="xl" />
@@ -316,6 +380,8 @@ const PokemonCarousel = () => {
                 x={x}
                 containerRef={containerRef}
                 totalCards={totalCardsInView}
+                isSpinning={isSpinning} // Pass isSpinning state
+                audio={audio} // Pass the single audio instance
               />
             ))}
           </MotionBox>
@@ -325,6 +391,7 @@ const PokemonCarousel = () => {
         onClick={handleSpin}
         isLoading={isLoading}
         mb={4}
+        mt={4}
         isDisabled={isFetching}
         size={["md", "lg"]}
         rounded={"full"}
