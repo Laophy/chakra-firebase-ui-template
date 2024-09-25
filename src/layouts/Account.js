@@ -189,8 +189,9 @@ export default function Account({ pageElement, currentPage }) {
                   </MenuItem>
                   {categories.map((category) => {
                     if (
-                      (category === "Admin" && !user?.isStaff) ||
-                      (category === "Admin" && !user?.isHighStaff)
+                      category === "Admin" &&
+                      !user?.isStaff &&
+                      !user?.isHighStaff
                     ) {
                       return null;
                     }
