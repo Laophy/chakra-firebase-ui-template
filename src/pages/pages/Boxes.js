@@ -62,9 +62,15 @@ export default function Boxes() {
 
   const fetchRandomPrizes = async () => {
     try {
-      const response = await fetch(
-        "https://pokeapi.co/api/v2/pokemon?limit=105&offset=1010"
-      );
+      const baseSets = [
+        "https://pokeapi.co/api/v2/pokemon?limit=151", // Base set
+        "https://pokeapi.co/api/v2/pokemon?offset=151&limit=100", // Fossil
+        "https://pokeapi.co/api/v2/pokemon?offset=251&limit=100", // Base set 2
+        "https://pokeapi.co/api/v2/pokemon?offset=251&limit=100", // Neo
+      ];
+      const randomSetUrl =
+        baseSets[Math.floor(Math.random() * baseSets.length)];
+      const response = await fetch(randomSetUrl);
       const data = await response.json();
       const shuffled = data.results.sort(() => 0.5 - Math.random());
       const selected = shuffled.slice(0, 10);
