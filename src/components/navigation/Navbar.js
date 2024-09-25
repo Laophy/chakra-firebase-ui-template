@@ -89,13 +89,13 @@ export default function Navbar({ websiteContent }) {
       to: "Home",
       path: "/",
       icon: PiHouseBold,
-      color: "white",
+      color: colorMode === "light" ? "black" : "white",
     },
     {
       to: "Boxes",
       path: "boxes",
       icon: LuBox,
-      color: "white",
+      color: colorMode === "light" ? "black" : "white",
     },
     {
       to: "Box Battles",
@@ -107,7 +107,7 @@ export default function Navbar({ websiteContent }) {
       to: "Inventory",
       path: "inventory",
       icon: MdOutlineInventory2,
-      color: "white",
+      color: colorMode === "light" ? "black" : "white",
     },
   ];
 
