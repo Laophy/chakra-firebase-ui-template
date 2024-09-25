@@ -205,25 +205,21 @@ export default function Boxes() {
     const y = -Math.cos(radian) * radius;
     return { x, y };
   };
+  const [lastSoundPlayedTime, setLastSoundPlayedTime] = useState(0);
+  const soundBufferTime = 50; // Minimum time between sounds in milliseconds
 
   useEffect(() => {
     if (closestPrize && spinning && closestPrize !== lastPlayedPrize) {
-      // Create a new Audio instance each time to allow overlapping sounds
-      const audioBufferTime = 10000; // 100ms buffer
-
       const currentTime = Date.now();
-      if (
-        !lastPlayedPrize ||
-        currentTime - lastPlayedPrize.time > audioBufferTime
-      ) {
+      if (currentTime - lastSoundPlayedTime > soundBufferTime) {
         const newAudio = new Audio(flipcard);
         newAudio.play();
         console.log("Card sound played");
-        setLastPlayedPrize({ prize: closestPrize, time: currentTime });
+        setLastPlayedPrize(closestPrize);
+        setLastSoundPlayedTime(currentTime);
       }
-      setLastPlayedPrize(closestPrize);
     }
-  }, [closestPrize, spinning, lastPlayedPrize]);
+  }, [closestPrize, spinning, lastPlayedPrize, lastSoundPlayedTime]);
 
   return (
     <Container as={Stack} maxW="6xl" centerContent p={containerPadding}>

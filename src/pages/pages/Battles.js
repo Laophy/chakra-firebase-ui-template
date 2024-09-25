@@ -38,10 +38,17 @@ import claimgems from "../../assets/sounds/claimgems.mp3";
 
 const MotionBox = motion(Box);
 
-// Create a single audio instance
-const audio = new Audio(flipcard);
-
-const Card = ({ card, index, x, containerRef, totalCards, isSpinning }) => {
+const Card = ({
+  card,
+  index,
+  x,
+  containerRef,
+  totalCards,
+  isSpinning,
+  lastSoundPlayedTime,
+  setLastSoundPlayedTime,
+  soundBufferTime,
+}) => {
   const [opacity, setOpacity] = useState(0.3);
 
   useEffect(() => {
@@ -70,11 +77,14 @@ const Card = ({ card, index, x, containerRef, totalCards, isSpinning }) => {
   }, [x, containerRef, index, totalCards]);
 
   useEffect(() => {
-    if (isSpinning && opacity === 1) {
-      console.log("playing audio");
-      // Create a new Audio instance each time to allow overlapping sounds
-      const newAudio = new Audio(flipcard);
-      newAudio.play();
+    if (opacity === 1 && isSpinning) {
+      const currentTime = Date.now();
+      if (currentTime - lastSoundPlayedTime > soundBufferTime) {
+        console.log("playing audio");
+        const newAudio = new Audio(flipcard);
+        newAudio.play();
+        setLastSoundPlayedTime(currentTime);
+      }
     }
   }, [opacity, isSpinning]);
 
@@ -107,6 +117,9 @@ const PokemonCarousel = () => {
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const cardRef = useRef(null);
+
+  const [lastSoundPlayedTime, setLastSoundPlayedTime] = useState(0);
+  const soundBufferTime = 120; // Minimum time between sounds in milliseconds
 
   const calculateRotation = useCallback((x, y) => {
     if (!cardRef.current) return { rotateX: 0, rotateY: 0 };
@@ -381,7 +394,9 @@ const PokemonCarousel = () => {
                 containerRef={containerRef}
                 totalCards={totalCardsInView}
                 isSpinning={isSpinning} // Pass isSpinning state
-                audio={audio} // Pass the single audio instance
+                lastSoundPlayedTime={lastSoundPlayedTime} // Pass lastSoundPlayedTime state
+                setLastSoundPlayedTime={setLastSoundPlayedTime} // Pass setLastSoundPlayedTime function
+                soundBufferTime={soundBufferTime} // Pass soundBufferTime
               />
             ))}
           </MotionBox>
