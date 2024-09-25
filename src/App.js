@@ -32,9 +32,11 @@ import AdminViewUsers from "./pages/account/admin/AdminViewUsers";
 import ExecutivePanel from "./pages/account/admin/ExecutivePanel";
 import UserProfile from "./pages/pages/UserProfile";
 import Boxes from "./pages/pages/Boxes";
+import { useToast } from "@chakra-ui/react";
 
 function App() {
   const dispatch = useDispatch();
+  const toast = useToast();
 
   useEffect(() => {
     auth.onAuthStateChanged((authUser) => {
@@ -52,8 +54,18 @@ function App() {
       if (mtsResponse || !userData) {
         console.warn("User not found in MongoDB. Creating new user...");
         const [newUser, createResponse] = await createNewUser(authUser);
+        console.log(createResponse);
         if (createResponse || !newUser) {
           console.warn("Failed to create new user:", createResponse);
+          createResponse.forEach((error) => {
+            toast({
+              title: "Error",
+              description: error.message,
+              status: "error",
+              duration: 2000,
+              isClosable: true,
+            });
+          });
           return;
         }
         userData = newUser;

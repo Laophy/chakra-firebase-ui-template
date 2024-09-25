@@ -267,8 +267,16 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
                           {message?.username ? message?.username : "User"}
                         </Text>
                       </HStack>
-                      <Box bg={bgReverse} p={1.5} borderRadius="xl">
-                        <Text fontSize={"md"}>{message.content}</Text>
+                      <Box
+                        bg={bgReverse}
+                        p={1.5}
+                        borderRadius="xl"
+                        maxWidth="100%"
+                        overflowWrap="break-word"
+                      >
+                        <Text fontSize={"md"} wordBreak="break-word">
+                          {message.content}
+                        </Text>
                         <Text fontSize={"xs"} mt={3} color={timeStamp}>
                           {message?.createdAt
                             ? moment(message.createdAt.toDate()).fromNow()

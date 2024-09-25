@@ -20,6 +20,8 @@ import {
   useToast,
   HStack,
   SimpleGrid,
+  Container,
+  Stack,
 } from "@chakra-ui/react";
 import {
   motion,
@@ -292,7 +294,7 @@ const PokemonCarousel = () => {
   const aggregatedCards = aggregateCards(cards);
 
   return (
-    <>
+    <Container as={Stack} maxW="6xl" centerContent>
       <Box overflow="hidden">
         {isFetching ? (
           <Center height="200px">
@@ -501,7 +503,7 @@ const PokemonCarousel = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </>
+    </Container>
   );
 };
 

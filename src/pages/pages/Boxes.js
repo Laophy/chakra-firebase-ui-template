@@ -13,6 +13,7 @@ import {
   CardFooter,
   Heading,
   useColorModeValue,
+  Stack,
 } from "@chakra-ui/react";
 import ReactConfetti from "react-confetti";
 import { formatMoney } from "../../utilities/Formatter";
@@ -45,7 +46,7 @@ export default function Boxes() {
     md: "90px",
     lg: "120px",
   });
-  const containerPadding = useBreakpointValue({ base: 4, md: 10 });
+  const containerPadding = useBreakpointValue({ base: 2, md: 5 });
 
   useEffect(() => {
     fetchRandomPrizes();
@@ -194,7 +195,7 @@ export default function Boxes() {
   };
 
   return (
-    <Container maxW="container.xl" centerContent p={containerPadding}>
+    <Container as={Stack} maxW="6xl" centerContent p={containerPadding}>
       {showConfetti && (
         <ReactConfetti
           width={window.innerWidth}
@@ -211,13 +212,7 @@ export default function Boxes() {
         />
       )}
 
-      <Card
-        maxW="100%"
-        boxShadow="xl"
-        borderRadius="lg"
-        overflow="hidden"
-        bg={bgColor}
-      >
+      <Card boxShadow="xl" borderRadius="lg" overflow="hidden" bg={bgColor}>
         <CardBody>
           <VStack spacing={6}>
             <Heading size="lg" textAlign="center" mb={4}>
