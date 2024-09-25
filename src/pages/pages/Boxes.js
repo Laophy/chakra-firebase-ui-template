@@ -209,9 +209,18 @@ export default function Boxes() {
   useEffect(() => {
     if (closestPrize && spinning && closestPrize !== lastPlayedPrize) {
       // Create a new Audio instance each time to allow overlapping sounds
-      const newAudio = new Audio(flipcard);
-      newAudio.play();
-      console.log("Card sound played");
+      const audioBufferTime = 10000; // 100ms buffer
+
+      const currentTime = Date.now();
+      if (
+        !lastPlayedPrize ||
+        currentTime - lastPlayedPrize.time > audioBufferTime
+      ) {
+        const newAudio = new Audio(flipcard);
+        newAudio.play();
+        console.log("Card sound played");
+        setLastPlayedPrize({ prize: closestPrize, time: currentTime });
+      }
       setLastPlayedPrize(closestPrize);
     }
   }, [closestPrize, spinning, lastPlayedPrize]);

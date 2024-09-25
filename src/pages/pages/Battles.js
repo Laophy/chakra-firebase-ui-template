@@ -441,8 +441,8 @@ const PokemonCarousel = () => {
                 </motion.div>
                 <VStack align="start">
                   <Text fontWeight="bold">{card.name}</Text>
-                  <Text>Value: {formatMoney(card.value)}</Text>
-                  <Text>Odds: {card.odds.toFixed(2)}%</Text>
+                  <Text>Value: {formatMoney(card?.value)}</Text>
+                  <Text>Odds: {card?.odds?.toFixed(2)}%</Text>
                 </VStack>
               </HStack>
             </Box>

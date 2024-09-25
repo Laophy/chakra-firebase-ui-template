@@ -103,13 +103,19 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
     }
   }, [user]);
 
+  const filter = new Filter();
+
   const handleSendMessage = async () => {
     const { uid, photoURL, title } = user;
-    if (messageText.trim()) {
+    const sanitizedMessage = messageText.trim().replace(/[<>&'"]/g, "");
+    const cleanedMessage = filter.clean(sanitizedMessage);
+    const safeMessage = cleanedMessage.substring(0, 500); // Limit message length
+
+    if (safeMessage.trim()) {
       await addDoc(messagesRef, {
         title: title?.title ? title?.title : "",
         color: title?.color ? title?.color : "",
-        content: messageText,
+        content: safeMessage,
         username: user?.username
           ? user?.username
           : user?.displayName
@@ -182,11 +188,8 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
     }
   };
 
-  const filter = new Filter();
-
   const handleMessageChange = (e) => {
-    const cleanedMessage = filter.clean(e.target.value);
-    setMessageText(cleanedMessage);
+    setMessageText(e.target.value);
   };
 
   return (
