@@ -18,6 +18,8 @@ import {
   useDisclosure,
   useBreakpointValue,
   useToast,
+  HStack,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import {
   motion,
@@ -264,6 +266,31 @@ const PokemonCarousel = () => {
     }
   }, [dispatch, user, wonAmount, onClose, toast]);
 
+  const calculateOdds = (cardId) => {
+    const totalCards = displayCards.length;
+    const cardCount = displayCards.filter((card) => card.id === cardId).length;
+    return ((cardCount / totalCards) * 100).toFixed(2);
+  };
+
+  const aggregateCards = (cards) => {
+    const cardMap = new Map();
+
+    cards.forEach((card) => {
+      if (cardMap.has(card.id)) {
+        cardMap.get(card.id).odds += parseFloat(calculateOdds(card.id));
+      } else {
+        cardMap.set(card.id, {
+          ...card,
+          odds: parseFloat(calculateOdds(card.id)),
+        });
+      }
+    });
+
+    return Array.from(cardMap.values());
+  };
+
+  const aggregatedCards = aggregateCards(cards);
+
   return (
     <>
       <Box overflow="hidden">
@@ -313,6 +340,46 @@ const PokemonCarousel = () => {
       >
         Spin
       </Button>
+      <Box
+        mt={8}
+        p={4}
+        borderWidth="1px"
+        borderRadius="lg"
+        overflow="hidden"
+        width="100%"
+      >
+        <Text fontSize="2xl" mb={4}>
+          Possible Cards
+        </Text>
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
+          {aggregatedCards.map((card) => (
+            <Box key={card.id} p={4} borderWidth="1px" borderRadius="lg">
+              <HStack>
+                <motion.div
+                  style={{
+                    position: "relative",
+                    width: "auto",
+                    height: "100%",
+                    borderRadius: "5%", // Adjust this value to match your card's corner radius
+                    overflow: "hidden",
+                  }}
+                  whileHover={{
+                    boxShadow: "0 0 15px 5px rgba(255, 215, 0, 0.7)",
+                    transition: { duration: 0.3 },
+                  }}
+                >
+                  <Image src={card.image} alt={card.name} w={130} h={160} />
+                </motion.div>
+                <VStack align="start">
+                  <Text fontWeight="bold">{card.name}</Text>
+                  <Text>Value: {formatMoney(card.value)}</Text>
+                  <Text>Odds: {card.odds.toFixed(2)}%</Text>
+                </VStack>
+              </HStack>
+            </Box>
+          ))}
+        </SimpleGrid>
+      </Box>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

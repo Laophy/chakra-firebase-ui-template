@@ -98,11 +98,9 @@ export default function AdminViewUsers() {
         editUser.uid
       );
       if (mtsResponse) {
-        showToast(
-          "Error",
-          mtsResponse.message || "Something went wrong.",
-          "error"
-        );
+        mtsResponse.forEach((error) => {
+          showToast("Error", error.message, "error");
+        });
       } else {
         showToast(
           "Success",
@@ -130,11 +128,9 @@ export default function AdminViewUsers() {
         editUser.uid
       );
       if (mtsResponse) {
-        showToast(
-          "Error",
-          mtsResponse.message || "Something went wrong.",
-          "error"
-        );
+        mtsResponse.forEach((error) => {
+          showToast("Error", error.message, "error");
+        });
       } else {
         showToast(
           "Success",
@@ -180,11 +176,9 @@ export default function AdminViewUsers() {
         userUpdate
       );
       if (mtsResponse) {
-        showToast(
-          "Error",
-          mtsResponse.message || "Something went wrong.",
-          "error"
-        );
+        mtsResponse.forEach((error) => {
+          showToast("Error", error.message, "error");
+        });
       } else {
         showToast(
           "Success",

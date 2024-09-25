@@ -30,6 +30,15 @@ export default function UserProfile() {
     const [userData, mtsResponse] = await getUserByFirebaseAuth({ uid });
     console.log(userData);
     if (mtsResponse || !userData) {
+      mtsResponse.forEach((error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      });
       setProfile(null);
     } else {
       setProfile(userData);

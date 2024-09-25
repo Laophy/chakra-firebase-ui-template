@@ -25,33 +25,89 @@ const decrypt = (text) => {
   }
 };
 
-export async function handleResponse(response, authHeader, refId) {
+export async function handleResponse(response) {
   try {
-    // Check for error codes
-    //const errorCodeList = findErrors(response);
-
-    // Format response so all responses are understood the same within the application
-
-    // Return a response or some sort of valid alert we can display via 2nd param [null, errorResponse]
-
     const responseData = _get(response, "data", {});
+    const statusCode = _get(responseData, "request.status", 500);
     const encryptedDataResponse = _get(responseData, "result.data.json", {});
 
-    const decryptedData = JSON.parse(decrypt(encryptedDataResponse));
+    // Decrypt data if available
+    let decryptedData = null;
+    if (encryptedDataResponse) {
+      try {
+        decryptedData = JSON.parse(decrypt(encryptedDataResponse));
+      } catch (decryptError) {
+        console.warn("Failed to decrypt data:", decryptError);
+      }
+    }
 
-    if (responseData.request.status === 400) {
-      return [
-        null,
-        {
-          request: responseData.request,
-          message: responseData.message,
-        },
-      ];
-    } else {
+    // Check if status code indicates success
+    if (successStatusCodes.includes(statusCode)) {
       return [decryptedData, null];
+    } else {
+      // Handle error cases
+      const errorMessage =
+        _get(responseData, "message") || getDefaultErrorMessage(statusCode);
+
+      const errorObject = {
+        type: "error",
+        code: statusCode,
+        message: errorMessage,
+        details: [],
+      };
+
+      // Add request message if available
+      const requestMessage = _get(responseData, "request.message");
+      if (requestMessage) {
+        errorObject.details.push({
+          type: "request",
+          message: requestMessage,
+        });
+      }
+
+      // Add any additional errors from the response
+      const additionalErrors = _get(responseData, "request.errors", []);
+      additionalErrors.forEach((error) => {
+        errorObject.details.push({
+          type: "additional",
+          ...error,
+        });
+      });
+
+      return [null, [errorObject]];
     }
   } catch (e) {
-    console.warn(e);
+    console.warn("Error in handleResponse:", e);
+    return [
+      null,
+      [
+        {
+          type: "internal",
+          code: 500,
+          message:
+            "An unexpected error occurred while processing the response.",
+          details: [],
+        },
+      ],
+    ];
+  }
+}
+
+// Helper function to get a default error message based on status code
+function getDefaultErrorMessage(statusCode) {
+  switch (statusCode) {
+    case 400:
+      return "Bad request. Please check your input.";
+    case 401:
+      return "Unauthorized. Please log in and try again.";
+    case 403:
+      return "Forbidden. You don't have permission to access this resource.";
+    case 404:
+      return "Not found. The requested resource doesn't exist.";
+    case 500:
+      return "Internal server error. Please try again later.";
+    default:
+      return `An error occurred (Status code: ${statusCode})`;
   }
 }
 

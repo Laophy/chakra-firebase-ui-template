@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import { RiDeleteBack2Line, RiVolumeMuteLine } from "react-icons/ri";
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   collection,
   query,
@@ -37,11 +38,13 @@ import { firestore } from "../../firebase";
 import { Link } from "react-router-dom";
 import { FaBan } from "react-icons/fa";
 import moment from "moment";
-import { ChatIcon, CheckCircleIcon } from "@chakra-ui/icons";
+import { ChatIcon } from "@chakra-ui/icons";
 
-const ChatBox = ({ user }) => {
+const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
   const toast = useToast();
   const [onlineUsers, setOnlineUsers] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const navigate = useNavigate();
 
   const messagesRef = collection(firestore, "messages");
   const onlineUsersRef = collection(firestore, "onlineUsers");
@@ -169,6 +172,26 @@ const ChatBox = ({ user }) => {
     document.body.classList.remove("no-scroll");
   };
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768); // Adjust this breakpoint as needed
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const handleAvatarClick = (uid) => {
+    if (isMobile) {
+      if (isChatOpen) {
+        setIsChatOpen(false);
+      }
+      navigate(`/user/profile/${uid}`);
+    }
+  };
+
   return (
     <Container
       as={Stack}
@@ -215,9 +238,19 @@ const ChatBox = ({ user }) => {
                   _hover={{ ".icon-buttons": { opacity: 1 } }}
                 >
                   <Flex align="center" m={3}>
-                    <Link to={`/user/profile/${message.uid}`}>
-                      <Avatar size="lg" src={message.photoURL} m={1} />
-                    </Link>
+                    {isMobile ? (
+                      <Avatar
+                        size="lg"
+                        src={message.photoURL}
+                        m={1}
+                        onClick={() => handleAvatarClick(message.uid)}
+                        cursor="pointer"
+                      />
+                    ) : (
+                      <Link to={`/user/profile/${message.uid}`}>
+                        <Avatar size="lg" src={message.photoURL} m={1} />
+                      </Link>
+                    )}
                     <Box>
                       <HStack>
                         {message?.title && (

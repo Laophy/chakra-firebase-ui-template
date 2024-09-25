@@ -312,21 +312,27 @@ export default function Navbar({ websiteContent }) {
       </Box>
       <Container maxW={"7xl"} alignItems={"center"} justifyContent={"center"}>
         <SimpleGrid
-          templateColumns={{ base: "4fr", md: isChatOpen ? "4fr 1fr" : "1fr" }}
+          templateColumns={{ base: "1fr", md: isChatOpen ? "4fr 1fr" : "1fr" }}
         >
-          {isChatOpen && isMobile ? null : (
-            <Container
-              as={Stack}
-              minHeight={"75vh"}
-              maxW={isChatOpen ? "3xl" : "7xl"}
-              py={2}
-            >
-              {websiteContent}
-            </Container>
-          )}
+          <Container
+            as={Stack}
+            minHeight={"75vh"}
+            maxW={isChatOpen ? "3xl" : "7xl"}
+            py={2}
+            display={{
+              base: isChatOpen ? "none" : "block",
+              md: "block",
+            }}
+          >
+            {websiteContent}
+          </Container>
           {isChatOpen && (
             <Container as={Stack} minHeight={"75vh"} maxW={"md"} py={2}>
-              <ChatBox user={user} />
+              <ChatBox
+                user={user}
+                isChatOpen={isChatOpen}
+                setIsChatOpen={setIsChatOpen}
+              />
             </Container>
           )}
         </SimpleGrid>

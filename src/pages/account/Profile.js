@@ -58,12 +58,14 @@ export default function Profile() {
     try {
       const [res, mtsResponse] = await updateUsername(authHeader, userUpdate);
       if (mtsResponse) {
-        toast({
-          title: "Error",
-          description: mtsResponse.message,
-          status: "error",
-          duration: 2000,
-          isClosable: true,
+        mtsResponse.forEach((error) => {
+          toast({
+            title: "Error",
+            description: error.message,
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+          });
         });
       } else {
         toast({
