@@ -421,32 +421,47 @@ const PokemonCarousel = () => {
           Possible Cards
         </Text>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
-          {aggregatedCards.map((card) => (
-            <Box key={card.id} p={4} borderWidth="1px" borderRadius="lg">
-              <HStack>
-                <motion.div
-                  style={{
-                    position: "relative",
-                    width: "auto",
-                    height: "100%",
-                    borderRadius: "5%", // Adjust this value to match your card's corner radius
-                    overflow: "hidden",
-                  }}
-                  whileHover={{
-                    boxShadow: "0 0 15px 5px rgba(255, 215, 0, 0.7)",
-                    transition: { duration: 0.3 },
-                  }}
-                >
-                  <Image src={card.image} alt={card.name} w={130} h={160} />
-                </motion.div>
-                <VStack align="start">
-                  <Text fontWeight="bold">{card.name}</Text>
-                  <Text>Value: {formatMoney(card?.value)}</Text>
-                  <Text>Odds: {card?.odds?.toFixed(2)}%</Text>
+          {aggregatedCards
+            .filter((card) => card.value !== undefined)
+            .sort((a, b) => b.value - a.value)
+            .map((card) => (
+              <Box key={card.id} p={4} borderWidth="1px" borderRadius="lg">
+                <VStack spacing={4} align="stretch">
+                  <motion.div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      paddingBottom: "139%", // Aspect ratio for Pokemon cards (2.5" x 3.5")
+                      borderRadius: "5%",
+                      overflow: "hidden",
+                    }}
+                    whileHover={{
+                      boxShadow: "0 0 15px 5px rgba(255, 215, 0, 0.7)",
+                      transition: { duration: 0.3 },
+                    }}
+                  >
+                    <Image
+                      src={card.image}
+                      alt={card.name}
+                      objectFit="contain"
+                      layout="fill"
+                      position="absolute"
+                      top={0}
+                      left={0}
+                      width="100%"
+                      height="100%"
+                    />
+                  </motion.div>
+                  <VStack align="start" spacing={1}>
+                    <Text fontWeight="bold" fontSize="lg" noOfLines={1}>
+                      {card.name}
+                    </Text>
+                    <Text fontSize="md">Value: {formatMoney(card?.value)}</Text>
+                    <Text fontSize="sm">Odds: {card?.odds?.toFixed(2)}%</Text>
+                  </VStack>
                 </VStack>
-              </HStack>
-            </Box>
-          ))}
+              </Box>
+            ))}
         </SimpleGrid>
       </Box>
       <Modal isOpen={isOpen} onClose={onClose}>
