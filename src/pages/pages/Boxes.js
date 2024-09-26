@@ -12,7 +12,6 @@ import {
   CardBody,
   CardFooter,
   Heading,
-  useColorModeValue,
   Stack,
 } from "@chakra-ui/react";
 import ReactConfetti from "react-confetti";
@@ -35,8 +34,6 @@ export default function Boxes() {
   const [isSpinEnding, setIsSpinEnding] = useState(false);
   const [closestPrize, setClosestPrize] = useState(null);
   const [lastPlayedPrize, setLastPlayedPrize] = useState(null);
-
-  const bgColor = useColorModeValue("white", "gray.900");
 
   const wheelSize = useBreakpointValue({
     base: "300px",
@@ -121,13 +118,13 @@ export default function Boxes() {
 
     const segmentSize = 360 / currentPrizeList.length;
 
-    const minSpins = 5;
-    const maxSpins = 10;
+    const minSpins = 3;
+    const maxSpins = 4;
     const extraSpins = minSpins + Math.random() * (maxSpins - minSpins);
     const totalRotation = extraSpins * 360 + Math.random() * 360;
 
-    const duration = 5000;
-    const fps = 60;
+    const duration = 4500;
+    const fps = 120;
     const frames = duration / (1000 / fps);
     let currentFrame = 0;
 
@@ -162,6 +159,7 @@ export default function Boxes() {
 
         // Winner sounds
         const newAudio = new Audio(claimgems);
+        newAudio.volume = 0.25;
         newAudio.play();
 
         setRotation(totalRotation);
@@ -213,6 +211,7 @@ export default function Boxes() {
       const currentTime = Date.now();
       if (currentTime - lastSoundPlayedTime > soundBufferTime) {
         const newAudio = new Audio(flipcard);
+        newAudio.volume = 0.25;
         newAudio.play();
         console.log("Card sound played");
         setLastPlayedPrize(closestPrize);

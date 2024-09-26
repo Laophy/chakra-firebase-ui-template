@@ -313,13 +313,27 @@ export default function Navbar({ websiteContent }) {
       <HStack maxW="full" px={0} alignItems="top">
         <Container
           w="xs"
+          maxH={`calc(100vh - 100px)`}
           alignItems="top"
           justifyContent="center"
           px={0}
           borderRadius="md"
-          display={{ base: "none", xl: "flex" }}
         >
-          <VStack spacing={4} overflowY="auto" width="100%" p={4}>
+          <VStack
+            spacing={4}
+            overflowY="auto"
+            width="100%"
+            p={4}
+            overflowX="hidden"
+            borderRadius="lg"
+            maxH={`calc(100vh - 100px)`}
+            display={{ base: "none", xl: "flex" }}
+            css={{
+              "&::-webkit-scrollbar": { display: "none" },
+              "-ms-overflow-style": "none",
+              "scrollbar-width": "none",
+            }}
+          >
             {[...Array(5)].map((_, index) => {
               const randomPokemonId = Math.floor(Math.random() * 102) + 1;
               const randomName = ["Alice", "Bob", "Charlie", "David", "Emma"][

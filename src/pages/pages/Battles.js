@@ -71,17 +71,25 @@ const PokemonCard = ({
     };
   }, [x, containerRef, index, totalCards]);
 
+  const audioRef = useRef(null);
+
   useEffect(() => {
     if (opacity === 1 && isSpinning) {
       const currentTime = Date.now();
       if (currentTime - lastSoundPlayedTime > soundBufferTime) {
+        if (!audioRef.current) {
+          audioRef.current = new Audio(flipcard);
+        }
         console.log("playing audio");
-        const newAudio = new Audio(flipcard);
-        newAudio.play();
+        audioRef.current.currentTime = 0; // Reset audio to start
+        audioRef.current.volume = 0.25; // Set volume to 50%
+        audioRef.current
+          .play()
+          .catch((error) => console.error("Audio playback failed:", error));
         setLastSoundPlayedTime(currentTime);
       }
     }
-  }, [opacity, isSpinning]);
+  }, [opacity, isSpinning, lastSoundPlayedTime, soundBufferTime]);
 
   return (
     <motion.div
@@ -311,6 +319,7 @@ const PokemonCarousel = () => {
         setWonAmount(winningCard.value);
         onOpen();
         const successAudio = new Audio(success);
+        successAudio.volume = 0.25;
         successAudio.play();
       },
     });
@@ -321,6 +330,7 @@ const PokemonCarousel = () => {
       dispatch(setBalance(user.balance + wonAmount));
       onClose();
       const successAudio = new Audio(claimgems);
+      successAudio.volume = 0.25;
       successAudio.play();
       toast({
         title: "Success",
@@ -450,7 +460,7 @@ const PokemonCarousel = () => {
         >
           Possible Cards
         </Text>
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
+        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
           {aggregatedCards
             .filter((card) => card.value !== undefined)
             .sort((a, b) => b.value - a.value)
@@ -504,17 +514,20 @@ const PokemonCarousel = () => {
                             perspective: "1000px",
                           }}
                         >
-                          <Image
+                          <motion.img
                             src={card.image}
                             alt={card.name}
-                            objectFit="contain"
-                            layout="fill"
                             style={{
                               width: "100%",
                               height: "100%",
-                              transformStyle: "preserve-3d",
-                              transform: "rotateX(20deg)",
+                              objectFit: "contain",
+                              borderRadius: "5%",
                             }}
+                            whileHover={{
+                              scale: 1.05,
+                              transition: { duration: 0.1 },
+                            }}
+                            initial={{ scale: 1 }}
                           />
                         </motion.div>
                       </motion.div>

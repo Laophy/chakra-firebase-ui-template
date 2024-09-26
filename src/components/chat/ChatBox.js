@@ -211,7 +211,7 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
         <Box
           ref={chatContainerRef}
           overflowY="auto"
-          maxH={"85vh"}
+          maxH={`calc(100vh - 150px)`}
           w={"100%"}
           bg={bg}
           borderRadius="md"
