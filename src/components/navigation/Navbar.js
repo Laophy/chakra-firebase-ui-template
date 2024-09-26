@@ -419,7 +419,7 @@ export default function Navbar({ websiteContent }) {
           justifyContent="center"
           px={0}
           borderRadius="md"
-          display={{ base: "none", xl: "flex" }}
+          display={{ base: "none", md: "flex", xl: "flex" }}
         >
           {isChatOpen && (
             <Box
