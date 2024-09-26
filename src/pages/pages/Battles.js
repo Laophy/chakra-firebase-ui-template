@@ -27,7 +27,7 @@ import {
 import { motion, useMotionValue, animate, useSpring } from "framer-motion";
 import { formatMoney } from "../../utilities/Formatter";
 import { setBalance } from "../../redux/userSlice";
-import flipcard from "../../assets/sounds/flipcard.mp3";
+import flipcard from "../../assets/sounds/flipcard_compressed.mp3";
 import success from "../../assets/sounds/success.mp3";
 import claimgems from "../../assets/sounds/claimgems.mp3";
 import { volume } from "../../utilities/constants";

@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import ReactConfetti from "react-confetti";
 import { formatMoney } from "../../utilities/Formatter";
-import flipcard from "../../assets/sounds/flipcard.mp3";
+import flipcard from "../../assets/sounds/flipcard_compressed.mp3";
 import claimgems from "../../assets/sounds/claimgems.mp3";
 import { volume } from "../../utilities/constants";
 
