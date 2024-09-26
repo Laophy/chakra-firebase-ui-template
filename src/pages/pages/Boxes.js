@@ -222,7 +222,7 @@ export default function Boxes() {
   }, [closestPrize, spinning, lastPlayedPrize, lastSoundPlayedTime]);
 
   return (
-    <Container as={Stack} maxW="6xl" centerContent p={containerPadding}>
+    <Container as={Stack} maxW="7xl" centerContent p={containerPadding}>
       {showConfetti && (
         <ReactConfetti
           width={window.innerWidth}

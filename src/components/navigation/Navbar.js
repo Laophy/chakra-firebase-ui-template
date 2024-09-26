@@ -19,6 +19,15 @@ import {
   useColorModeValue,
   Container,
   SimpleGrid,
+  VStack,
+  Card,
+  CardBody,
+  Image,
+  Heading,
+  Divider,
+  CardFooter,
+  Tag,
+  Icon,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon, AddIcon, ChatIcon } from "@chakra-ui/icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,12 +39,12 @@ import { applicationDetails } from "../../utilities/constants";
 import DepositFundsModal from "../modal/DepositFundsModal";
 import CartModal from "../modal/CartModal";
 import { formatMoney } from "../../utilities/Formatter";
-import { LuBox } from "react-icons/lu";
+import { LuBox, LuSword } from "react-icons/lu";
 import { MdOutlineInventory2 } from "react-icons/md";
 import { PiHouseBold } from "react-icons/pi";
 import { useState } from "react";
 import ChatBox from "../chat/ChatBox";
-import { FaHouse, FaShieldAlt } from "react-icons/fa";
+import { FaBoxOpen, FaHouse, FaShieldAlt } from "react-icons/fa";
 
 export default function Navbar({ websiteContent }) {
   const user = useSelector((state) => state.data.user.user);
@@ -158,7 +167,7 @@ export default function Navbar({ websiteContent }) {
   return (
     <>
       <Box color={useColorModeValue("gray.700", "gray.200")}>
-        <Container as={Stack} maxW={"6xl"} py={8}>
+        <Container as={Stack} maxW={"7xl"} py={8}>
           <Flex h={1} alignItems={"center"} justifyContent={"space-between"}>
             <IconButton
               size={"md"}
@@ -301,33 +310,135 @@ export default function Navbar({ websiteContent }) {
           )}
         </Container>
       </Box>
-      <Container maxW={"7xl"} alignItems={"center"} justifyContent={"center"}>
-        <SimpleGrid
-          templateColumns={{ base: "1fr", md: isChatOpen ? "4fr 1fr" : "1fr" }}
+      <HStack maxW="full" px={0} alignItems="top">
+        <Container
+          w="xs"
+          alignItems="top"
+          justifyContent="center"
+          px={0}
+          borderRadius="md"
+          display={{ base: "none", xl: "flex" }}
         >
-          <Container
-            as={Stack}
-            minHeight={"75vh"}
-            maxW={isChatOpen ? "3xl" : "7xl"}
-            py={2}
-            display={{
-              base: isChatOpen ? "none" : "block",
-              md: "block",
-            }}
-          >
-            {websiteContent}
-          </Container>
+          <VStack spacing={4} overflowY="auto" width="100%" p={4}>
+            {[...Array(5)].map((_, index) => {
+              const randomPokemonId = Math.floor(Math.random() * 102) + 1;
+              const randomName = ["Alice", "Bob", "Charlie", "David", "Emma"][
+                Math.floor(Math.random() * 5)
+              ];
+
+              return (
+                <Card key={index} maxW="sm" width="100%" position="relative">
+                  <Box position="absolute" top={2} left={2} zIndex={1}>
+                    <Tag size="md" variant="solid" colorScheme="red">
+                      🔥 Fire
+                    </Tag>
+                  </Box>
+                  <CardBody>
+                    <Flex justifyContent="center" alignItems="center">
+                      <Image
+                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomPokemonId}.png`}
+                        alt={`Pokémon #${randomPokemonId}`}
+                        borderRadius="lg"
+                        boxSize="200px"
+                        objectFit="contain"
+                      />
+                    </Flex>
+                    <Stack mt="4" spacing="3">
+                      <Flex justifyContent="space-between" alignItems="center">
+                        <Heading size="md">{`Pokémon #${randomPokemonId}`}</Heading>
+                        <Text fontWeight="bold" color="gray.500">
+                          {randomName}
+                        </Text>
+                      </Flex>
+                      <Text>
+                        Congratulations! They have won a rare Base Set Pokémon
+                        card!
+                      </Text>
+                    </Stack>
+                  </CardBody>
+                  <CardFooter>
+                    {(() => {
+                      const isViewBattle = Math.random() < 0.5;
+                      return (
+                        <Button
+                          variant="solid"
+                          colorScheme={isViewBattle ? "blue" : "yellow"}
+                          width="100%"
+                          leftIcon={
+                            isViewBattle ? (
+                              <Icon as={LuSword} />
+                            ) : (
+                              <Icon as={FaBoxOpen} />
+                            )
+                          }
+                        >
+                          {isViewBattle ? "View Battle" : "Open Box"}
+                        </Button>
+                      );
+                    })()}
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </VStack>
+        </Container>
+        <Container maxW="7xl" alignItems="top" justifyContent="center" px={0}>
+          <Flex direction={{ base: "column", md: "row" }} width="100%">
+            <Box
+              flex={isChatOpen ? { base: "1", md: "3" } : "1"}
+              minHeight="75vh"
+              py={2}
+              display={{
+                base: isChatOpen ? "none" : "block",
+                md: "block",
+              }}
+            >
+              {websiteContent}
+            </Box>
+            {isChatOpen && isMobile && (
+              <Box
+                top={{ base: "0", md: "0" }}
+                right={{ base: "0", md: "0" }}
+                height={{ base: "auto", md: "100vh" }}
+                width={{ base: "100%", md: "300px" }}
+                display="flex"
+                flexDirection="column"
+              >
+                <ChatBox
+                  user={user}
+                  isChatOpen={isChatOpen}
+                  setIsChatOpen={setIsChatOpen}
+                />
+              </Box>
+            )}
+          </Flex>
+        </Container>
+        <Container
+          w="xs"
+          alignItems="top"
+          justifyContent="center"
+          px={0}
+          borderRadius="md"
+          display={{ base: "none", xl: "flex" }}
+        >
           {isChatOpen && (
-            <Container as={Stack} minHeight={"75vh"} maxW={"md"} py={2}>
+            <Box
+              top={{ base: "0", md: "0" }}
+              right={{ base: "0", md: "0" }}
+              height={{ base: "auto", md: "100vh" }}
+              width={{ base: "100%", md: "300px" }}
+              display="flex"
+              flexDirection="column"
+            >
               <ChatBox
                 user={user}
                 isChatOpen={isChatOpen}
                 setIsChatOpen={setIsChatOpen}
               />
-            </Container>
+            </Box>
           )}
-        </SimpleGrid>
-      </Container>
+        </Container>
+      </HStack>
       <DepositFundsModal
         isDepositOpen={isDepositOpen}
         onDepositOpen={onDepositOpen}

@@ -48,7 +48,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Container as={Stack} maxW={"6xl"}>
+    <Container as={Stack} maxW={"7xl"}>
       <Stack
         align={"center"}
         spacing={{ base: 8, md: 10 }}

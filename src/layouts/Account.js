@@ -116,7 +116,7 @@ export default function Account({ pageElement, currentPage }) {
 
   return (
     <div>
-      <Container as={Stack} maxW={"6xl"}>
+      <Container as={Stack} maxW={"7xl"}>
         <Stack>
           <SimpleGrid
             templateColumns={{ base: "1fr", md: "1fr 4fr" }}

@@ -193,13 +193,7 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
   };
 
   return (
-    <Container
-      as={Stack}
-      minHeight={"75vh"}
-      maxW={"sm"}
-      py={2}
-      position="relative"
-    >
+    <Container as={Stack} py={2} position="relative">
       <Box position="absolute" top={2} right={2}>
         <Tag
           colorScheme="blue"
@@ -213,12 +207,12 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
           {onlineUsers}
         </Tag>
       </Box>
-      <VStack h={"75vh"}>
+      <VStack>
         <Box
           ref={chatContainerRef}
           overflowY="auto"
-          w={"sm"}
-          maxH={"70vh"}
+          maxH={"85vh"}
+          w={"100%"}
           bg={bg}
           borderRadius="md"
           css={{
@@ -232,8 +226,8 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
               .slice(0)
               .reverse()
               .map((message, index) => (
-                <Box key={index} position="relative">
-                  <Flex align="center" m={3}>
+                <Box key={index} position="relative" m={1} bgColor={""}>
+                  <Flex align="center">
                     {isMobile ? (
                       <Avatar
                         size="lg"
@@ -308,21 +302,20 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
         </Box>
 
         {user ? (
-          <HStack w={"sm"}>
+          <HStack width="full" justifyContent="space-between">
             <Input
+              flex="1"
               placeholder="Type your message..."
               value={messageText}
-              onChange={handleMessageChange} // Use the new handler
+              onChange={handleMessageChange}
               onKeyPress={(e) => {
                 if (e.key === "Enter") handleSendMessage();
               }}
-              onFocus={handleFocus} // Add this line
-              onBlur={handleBlur} // Add this line
-              maxLength={500} // Add this line to limit input to 500 characters
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              maxLength={500}
             />
-            <Button onClick={handleSendMessage} ml={2}>
-              Send
-            </Button>
+            <Button onClick={handleSendMessage}>Send</Button>
           </HStack>
         ) : (
           <Box

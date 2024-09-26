@@ -93,7 +93,7 @@ export default function UserProfile() {
   return (
     <Container
       as={Stack}
-      maxW={"6xl"}
+      maxW={"7xl"}
       py={10}
       justifyContent={"center"}
       alignItems={"center"}

@@ -18,18 +18,16 @@ export default function Inventory() {
   const user = useSelector((state) => state.data.user.user);
 
   return (
-    <Container as={Stack} maxW={"6xl"}>
+    <Container as={Stack} maxW={"7xl"}>
       <Stack
         alignItems={"center"}
         justifyContent={"space-between"}
         flexWrap={"wrap"}
         flexDirection={"row"}
       >
-        <Flex>
-          <Heading as="h3" size="lg">
-            Inventory
-          </Heading>
-        </Flex>
+        <Heading as="h3" size="lg">
+          Inventory
+        </Heading>
         <Flex>
           <InputGroup>
             <InputLeftElement pointerEvents="none">

@@ -1,13 +1,13 @@
 const applicationDetails = {
   name: "Lake Country Games",
   shortName: "LCG",
-  description: "A custom game platfrom created by Lake Country Games!",
+  description: "Gamified Shopping Experience",
   links: {
     discord: "https://discord.gg/FZ5qF2dnrV",
     twitter: "https://x.com/ChadMasterr",
   },
   contact: {
-    email: "support@LakecountryGames.com",
+    email: "support@lcgames.com",
   },
   copywrite: "Copyright © Lake Country Games 2024",
 };

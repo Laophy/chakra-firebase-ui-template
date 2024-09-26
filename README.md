@@ -1,70 +1,52 @@
-# Getting Started with Create React App
+# React Chakra UI Application with MongoDB and Firebase
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This README provides instructions on how to set up and run the React application that uses Chakra UI, MongoDB, and Firebase.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+- Node.js and npm installed
+- MongoDB instance running
+- Firebase project set up
 
-### `npm start`
+## Setup
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Clone the repository:
+   ```
+   git clone <repository-url>
+   cd <project-directory>
+   ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-### `npm test`
+3. Create a `.env` file in the root directory and add the following environment variables:
+   ```
+   REACT_APP_IN_DEV=true
+   REACT_APP_API_ENDPOINT=http://localhost:8080
+   REACT_APP_ENCRYPTION_KEY=<your-encryption-key>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+   REACT_APP_FIREBASE_APIKEY=<your-firebase-api-key>
+   REACT_APP_FIREBASE_AUTHDOMAIN=<your-firebase-auth-domain>
+   REACT_APP_FIREBASE_PROJECTID=<your-firebase-project-id>
+   REACT_APP_FIREBASE_STORAGEBUCKET=<your-firebase-storage-bucket>
+   REACT_APP_FIREBASE_MESSAGEINGSENDERID=<your-firebase-messaging-sender-id>
+   REACT_APP_FIREBASE_APPID=<your-firebase-app-id>
+   REACT_APP_FIREBASE_MESURMENTID=<your-firebase-measurement-id>
 
-### `npm run build`
+   REACT_APP_AUTHORIZATION_HEADER_NAME=<your-auth-header-name>
+   REACT_APP_X_AMZ_TRACE_ID=<your-amz-trace-id>
+   REACT_APP_X_B3_SPANID_ID=<your-b3-spanid>
+   REACT_APP_X_B3_TRACE_ID=<your-b3-traceid>
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+   Replace the placeholder values with your actual configuration details.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. Ensure your MongoDB instance is running and accessible.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+5. Configure your Firebase project and update the Firebase configuration in the app if necessary.
 
-### `npm run eject`
+## Running the Application
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+To start the development server:

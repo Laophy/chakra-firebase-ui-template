@@ -18,18 +18,11 @@ import {
   useDisclosure,
   useBreakpointValue,
   useToast,
-  HStack,
   SimpleGrid,
   Container,
   Stack,
 } from "@chakra-ui/react";
-import {
-  motion,
-  useMotionValue,
-  animate,
-  useTransform,
-  useSpring,
-} from "framer-motion";
+import { motion, useMotionValue, animate, useSpring } from "framer-motion";
 import { formatMoney } from "../../utilities/Formatter";
 import { setBalance } from "../../redux/userSlice";
 import flipcard from "../../assets/sounds/flipcard.mp3";
@@ -233,12 +226,12 @@ const PokemonCarousel = () => {
       // Calculate odds for each card based on its value
       fetchedCards = fetchedCards.map((card) => ({
         ...card,
-        odds: 1 - card.value / totalValue,
+        odds: card.value / totalValue,
       }));
 
       // Create a weighted list with more copies of cheaper cards
       const weightedList = fetchedCards.flatMap((card) => {
-        const copies = Math.max(1, Math.floor((1 - card.odds) * 100));
+        const copies = Math.max(1, Math.floor(card.odds * 100));
         return Array(copies).fill(card);
       });
 
@@ -371,7 +364,7 @@ const PokemonCarousel = () => {
   const aggregatedCards = aggregateCards(cards);
 
   return (
-    <Container as={Stack} maxW="6xl" centerContent>
+    <Container as={Stack} maxW="7xl" centerContent>
       <Box overflow="hidden" mt={4}>
         {isFetching ? (
           <Center height="200px">
