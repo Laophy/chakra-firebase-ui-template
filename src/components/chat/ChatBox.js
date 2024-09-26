@@ -72,36 +72,36 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    if (user) {
-      const userDoc = doc(onlineUsersRef, user.uid);
-      const setOnlineStatus = () => {
-        setDoc(userDoc, {
-          uid: user.uid,
-          username: user.username || user.displayName || "User",
-          lastActive: serverTimestamp(),
-        });
-      };
+  // useEffect(() => {
+  //   if (user) {
+  //     const userDoc = doc(onlineUsersRef, user.uid);
+  //     const setOnlineStatus = () => {
+  //       setDoc(userDoc, {
+  //         uid: user.uid,
+  //         username: user.username || user.displayName || "User",
+  //         lastActive: serverTimestamp(),
+  //       });
+  //     };
 
-      setOnlineStatus();
+  //     setOnlineStatus();
 
-      const intervalId = setInterval(setOnlineStatus, 60000); // Update every minute
+  //     const intervalId = setInterval(setOnlineStatus, 60000); // Update every minute
 
-      const unsubscribe = onSnapshot(onlineUsersRef, (snapshot) => {
-        const now = new Date();
-        const activeUsers = snapshot.docs.filter((doc) => {
-          const lastActive = doc.data().lastActive?.toDate();
-          return lastActive && now - lastActive < 120000; // Consider users active if last update was within 2 minutes
-        });
-        setOnlineUsers(activeUsers.length);
-      });
+  //     const unsubscribe = onSnapshot(onlineUsersRef, (snapshot) => {
+  //       const now = new Date();
+  //       const activeUsers = snapshot.docs.filter((doc) => {
+  //         const lastActive = doc.data().lastActive?.toDate();
+  //         return lastActive && now - lastActive < 120000; // Consider users active if last update was within 2 minutes
+  //       });
+  //       setOnlineUsers(activeUsers.length);
+  //     });
 
-      return () => {
-        clearInterval(intervalId);
-        unsubscribe();
-      };
-    }
-  }, [user]);
+  //     return () => {
+  //       clearInterval(intervalId);
+  //       unsubscribe();
+  //     };
+  //   }
+  // }, [user]);
 
   const filter = new Filter();
 
@@ -193,21 +193,8 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
   };
 
   return (
-    <Container as={Stack} py={2} position="relative">
+    <Container as={Stack} position="relative">
       <VStack>
-        <Box position="absolute" top={2} right={2}>
-          <Tag
-            colorScheme="blue"
-            variant="outline"
-            borderRadius="full"
-            px={2}
-            py={1}
-            m={2}
-          >
-            <ChatIcon mr={1} />
-            {onlineUsers}
-          </Tag>
-        </Box>
         <Box
           ref={chatContainerRef}
           overflowY="auto"
@@ -228,7 +215,7 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
               .slice(0)
               .reverse()
               .map((message, index) => (
-                <Box key={index} position="relative" m={1}>
+                <Box key={index} position="relative" m={1.5}>
                   <Flex align="top">
                     <VStack m={0.5}>
                       {isMobile ? (
