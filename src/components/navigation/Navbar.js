@@ -318,6 +318,7 @@ export default function Navbar({ websiteContent }) {
           justifyContent="center"
           px={0}
           borderRadius="md"
+          display={{ base: "none", xl: "flex" }}
         >
           <VStack
             spacing={4}
@@ -327,7 +328,6 @@ export default function Navbar({ websiteContent }) {
             overflowX="hidden"
             borderRadius="lg"
             maxH={`calc(100vh - 100px)`}
-            display={{ base: "none", xl: "flex" }}
             css={{
               "&::-webkit-scrollbar": { display: "none" },
               "-ms-overflow-style": "none",
@@ -348,10 +348,15 @@ export default function Navbar({ websiteContent }) {
                   position="relative"
                   boxShadow="0 0 10px rgba(66, 153, 225, 0.2)"
                   borderColor="gray.600"
+                  transition="all 0.3s"
+                  _hover={{
+                    boxShadow: "0 0 20px rgba(66, 153, 225, 0.4)",
+                    filter: "brightness(1.1)",
+                  }}
                 >
                   <Box position="absolute" top={2} left={2} zIndex={1}>
-                    <Tag size="md" variant="solid" colorScheme="red">
-                      🔥 Fire
+                    <Tag size="md" variant="solid" colorScheme="blue">
+                      🔥 {formatMoney(Math.random() * 1000000)}
                     </Tag>
                   </Box>
                   <CardBody>
@@ -406,7 +411,7 @@ export default function Navbar({ websiteContent }) {
         <Container maxW="7xl" alignItems="top" justifyContent="center" px={0}>
           <Flex direction={{ base: "column", md: "row" }} width="100%">
             <Box
-              flex={isChatOpen ? { base: "1", md: "3" } : "1"}
+              flex={"1"}
               minHeight="75vh"
               py={2}
               display={{
@@ -435,19 +440,19 @@ export default function Navbar({ websiteContent }) {
           </Flex>
         </Container>
         <Container
-          w="xs"
+          w={"xs"}
           alignItems="top"
           justifyContent="center"
           px={0}
           borderRadius="md"
-          display={{ base: "none", md: "flex", xl: "flex" }}
+          display={{ base: "none", xl: "flex" }}
         >
           {isChatOpen && (
             <Box
-              top={{ base: "0", md: "0" }}
-              right={{ base: "0", md: "0" }}
-              height={{ base: "auto", md: "100vh" }}
-              width={{ base: "100%", md: "300px" }}
+              top="0"
+              right="0"
+              height="100vh"
+              width="300px"
               display="flex"
               flexDirection="column"
             >

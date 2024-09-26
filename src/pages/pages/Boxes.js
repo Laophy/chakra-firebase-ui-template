@@ -81,7 +81,7 @@ export default function Boxes() {
             id: detailData.id,
             name: detailData.name,
             image: detailData.sprites.front_default,
-            value: Math.floor(Math.random() * 1000) + 100, // Store as string
+            value: Math.floor(Math.random() * 1000000) + 100, // Store as string
           };
         })
       );
@@ -222,7 +222,7 @@ export default function Boxes() {
   }, [closestPrize, spinning, lastPlayedPrize, lastSoundPlayedTime]);
 
   return (
-    <Container as={Stack} maxW="7xl" centerContent p={containerPadding}>
+    <Container maxW="7xl" centerContent>
       {showConfetti && (
         <ReactConfetti
           width={window.innerWidth}
@@ -242,7 +242,7 @@ export default function Boxes() {
       <Card
         borderRadius="lg"
         overflow="hidden"
-        w={"100%"}
+        w={"95%"}
         boxShadow="0 0 40px rgba(66, 153, 225, 0.3)"
         borderColor="gray.600"
       >
@@ -344,6 +344,61 @@ export default function Boxes() {
             </Button>
           </VStack>
         </CardFooter>
+      </Card>
+      <Card
+        mt={10}
+        mb={4}
+        p={4}
+        borderRadius="lg"
+        overflow="hidden"
+        width="95%"
+        boxShadow="0 0 40px rgba(66, 153, 225, 0.3)"
+        borderColor="gray.600"
+      >
+        <CardBody>
+          <VStack spacing={4} align="stretch">
+            <Heading size="md" textAlign="center">
+              Pokemon Rewards
+            </Heading>
+            <Box
+              display="grid"
+              gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+              gap={4}
+            >
+              {prizeList.map((prize, index) => (
+                <Card key={index} position="relative" bg="gray.800">
+                  <Box
+                    position="absolute"
+                    top={2}
+                    left={2}
+                    zIndex={1}
+                    bg="blue.600"
+                    color="white"
+                    px={2}
+                    py={1}
+                    borderRadius="md"
+                    fontSize="sm"
+                  >
+                    {formatMoney(prize.value)}
+                  </Box>
+                  <CardBody>
+                    <Image
+                      src={prize.image}
+                      alt={prize.name}
+                      borderRadius="lg"
+                      boxSize="150px"
+                      objectFit="contain"
+                      mx="auto"
+                    />
+                    <Text mt={2} textAlign="center" fontWeight="bold">
+                      {prize.name.charAt(0).toUpperCase() + prize.name.slice(1)}
+                    </Text>
+                  </CardBody>
+                </Card>
+              ))}
+            </Box>
+          </VStack>
+        </CardBody>
       </Card>
     </Container>
   );
