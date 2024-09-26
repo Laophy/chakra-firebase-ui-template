@@ -30,6 +30,7 @@ import { setBalance } from "../../redux/userSlice";
 import flipcard from "../../assets/sounds/flipcard.mp3";
 import success from "../../assets/sounds/success.mp3";
 import claimgems from "../../assets/sounds/claimgems.mp3";
+import { volume } from "../../utilities/constants";
 
 const MotionBox = motion(Box);
 
@@ -82,7 +83,7 @@ const PokemonCard = ({
         }
         console.log("playing audio");
         audioRef.current.currentTime = 0; // Reset audio to start
-        audioRef.current.volume = 0.25; // Set volume to 50%
+        audioRef.current.volume = volume; // Set volume to 50%
         audioRef.current
           .play()
           .catch((error) => console.error("Audio playback failed:", error));
@@ -319,7 +320,7 @@ const PokemonCarousel = () => {
         setWonAmount(winningCard.value);
         onOpen();
         const successAudio = new Audio(success);
-        successAudio.volume = 0.25;
+        successAudio.volume = volume;
         successAudio.play();
       },
     });
@@ -330,7 +331,7 @@ const PokemonCarousel = () => {
       dispatch(setBalance(user.balance + wonAmount));
       onClose();
       const successAudio = new Audio(claimgems);
-      successAudio.volume = 0.25;
+      successAudio.volume = volume;
       successAudio.play();
       toast({
         title: "Success",

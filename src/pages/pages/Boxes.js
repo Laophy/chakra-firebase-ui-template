@@ -18,6 +18,7 @@ import ReactConfetti from "react-confetti";
 import { formatMoney } from "../../utilities/Formatter";
 import flipcard from "../../assets/sounds/flipcard.mp3";
 import claimgems from "../../assets/sounds/claimgems.mp3";
+import { volume } from "../../utilities/constants";
 
 export default function Boxes() {
   const [prizeList, setPrizeList] = useState([]);
@@ -159,7 +160,7 @@ export default function Boxes() {
 
         // Winner sounds
         const newAudio = new Audio(claimgems);
-        newAudio.volume = 0.25;
+        newAudio.volume = volume;
         newAudio.play();
 
         setRotation(totalRotation);
@@ -211,7 +212,7 @@ export default function Boxes() {
       const currentTime = Date.now();
       if (currentTime - lastSoundPlayedTime > soundBufferTime) {
         const newAudio = new Audio(flipcard);
-        newAudio.volume = 0.25;
+        newAudio.volume = volume;
         newAudio.play();
         console.log("Card sound played");
         setLastPlayedPrize(closestPrize);

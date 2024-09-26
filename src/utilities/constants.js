@@ -12,6 +12,8 @@ const applicationDetails = {
   copywrite: "Copyright © Lake Country Games 2024",
 };
 
+const volume = 0.15;
+
 const API = {
   capabilites: {
     userManagement: process.env.REACT_APP_API_ENDPOINT,
@@ -40,4 +42,4 @@ const HTTP = {
   X_B3_TRACEID_HEADER: process.env.REACT_APP_X_B3_TRACE_ID,
 };
 
-export { applicationDetails, API, HTTP };
+export { applicationDetails, API, HTTP, volume };
