@@ -48,7 +48,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Container as={Stack} maxW={"7xl"}>
+    <Container as={Stack} maxW={"7xl"} overflow="hidden">
       <Stack
         align={"center"}
         spacing={{ base: 8, md: 10 }}
@@ -122,10 +122,10 @@ export default function Dashboard() {
           w={"full"}
         >
           <Blob
-            w={"120%"}
-            h={"120%"}
+            w={{ base: "150%", md: "120%" }}
+            h={{ base: "150%", md: "120%" }}
             position={"absolute"}
-            top={"-20%"}
+            top={{ base: "-40%", md: "-20%" }}
             left={0}
             zIndex={-1}
             color={useColorModeValue("teal.50", "teal.400")}
