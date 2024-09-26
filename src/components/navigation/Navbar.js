@@ -421,13 +421,19 @@ export default function Navbar({ websiteContent }) {
             >
               {websiteContent}
             </Box>
-            {isChatOpen && isMobile && (
+            {isChatOpen && (
               <Box
                 top={{ base: "0", md: "0" }}
                 right={{ base: "0", md: "0" }}
                 height={{ base: "auto", md: "100vh" }}
                 width={{ base: "100%", md: "300px" }}
-                display="flex"
+                display={{
+                  base: "flex",
+                  sm: "flex",
+                  md: "flex",
+                  lg: "flex",
+                  xl: "none",
+                }}
                 flexDirection="column"
               >
                 <ChatBox
