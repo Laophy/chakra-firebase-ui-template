@@ -21,6 +21,8 @@ import {
   SimpleGrid,
   Container,
   Stack,
+  CardBody,
+  Card,
 } from "@chakra-ui/react";
 import { motion, useMotionValue, animate, useSpring } from "framer-motion";
 import { formatMoney } from "../../utilities/Formatter";
@@ -31,7 +33,7 @@ import claimgems from "../../assets/sounds/claimgems.mp3";
 
 const MotionBox = motion(Box);
 
-const Card = ({
+const PokemonCard = ({
   card,
   index,
   x,
@@ -365,7 +367,16 @@ const PokemonCarousel = () => {
 
   return (
     <Container as={Stack} maxW="7xl" centerContent>
-      <Box overflow="hidden" mt={4}>
+      <Card
+        mt={4}
+        p={4}
+        borderWidth="2px"
+        borderRadius="lg"
+        overflow="hidden"
+        width="100%"
+        boxShadow="0 0 40px rgba(66, 153, 225, 0.3)"
+        borderColor="gray.600"
+      >
         {isFetching ? (
           <Center height="200px">
             <Spinner size="xl" />
@@ -379,22 +390,22 @@ const PokemonCarousel = () => {
             style={{ x }}
           >
             {displayCards.map((card, index) => (
-              <Card
+              <PokemonCard
                 key={`${card.id}-${index}`}
                 card={card}
                 index={index}
                 x={x}
                 containerRef={containerRef}
                 totalCards={totalCardsInView}
-                isSpinning={isSpinning} // Pass isSpinning state
-                lastSoundPlayedTime={lastSoundPlayedTime} // Pass lastSoundPlayedTime state
-                setLastSoundPlayedTime={setLastSoundPlayedTime} // Pass setLastSoundPlayedTime function
-                soundBufferTime={soundBufferTime} // Pass soundBufferTime
+                isSpinning={isSpinning}
+                lastSoundPlayedTime={lastSoundPlayedTime}
+                setLastSoundPlayedTime={setLastSoundPlayedTime}
+                soundBufferTime={soundBufferTime}
               />
             ))}
           </MotionBox>
         )}
-      </Box>
+      </Card>
       <Button
         onClick={handleSpin}
         isLoading={isLoading}
@@ -417,61 +428,106 @@ const PokemonCarousel = () => {
       >
         Spin
       </Button>
-      <Box
+      <Card
         mt={8}
         p={4}
-        borderWidth="1px"
+        borderWidth="2px"
         borderRadius="lg"
         overflow="hidden"
         width="100%"
+        boxShadow="0 0 40px rgba(66, 153, 225, 0.3)"
+        borderColor="gray.600"
       >
-        <Text fontSize="2xl" mb={4}>
+        <Text
+          fontSize="3xl"
+          fontWeight="bold"
+          mb={6}
+          bgGradient="linear(to-r, blue.400, purple.500)"
+          bgClip="text"
+          textShadow="0 0 20px rgba(66, 153, 225, 0.6)"
+          letterSpacing="wide"
+          textAlign="left"
+        >
           Possible Cards
         </Text>
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={4}>
           {aggregatedCards
             .filter((card) => card.value !== undefined)
             .sort((a, b) => b.value - a.value)
+
             .map((card) => (
-              <Box key={card.id} p={4} borderWidth="1px" borderRadius="lg">
-                <VStack spacing={4} align="stretch">
-                  <motion.div
-                    style={{
-                      position: "relative",
-                      width: "100%",
-                      paddingBottom: "139%", // Aspect ratio for Pokemon cards (2.5" x 3.5")
-                      borderRadius: "5%",
-                      overflow: "hidden",
-                    }}
-                    whileHover={{
-                      boxShadow: "0 0 15px 5px rgba(255, 215, 0, 0.7)",
-                      transition: { duration: 0.3 },
-                    }}
+              <Card key={card.id} p={4} borderRadius="lg" bgColor="gray.800">
+                <CardBody>
+                  <Text
+                    position="absolute"
+                    top={1}
+                    left={1}
+                    bg="rgba(0,0,0,0.7)"
+                    color="white"
+                    px={2}
+                    py={1}
+                    borderRadius="md"
+                    fontSize="sm"
                   >
-                    <Image
-                      src={card.image}
-                      alt={card.name}
-                      objectFit="contain"
-                      layout="fill"
-                      position="absolute"
-                      top={0}
-                      left={0}
-                      width="100%"
-                      height="100%"
-                    />
-                  </motion.div>
-                  <VStack align="start" spacing={1}>
+                    {formatMoney(card?.value)}
+                  </Text>
+                  <Text
+                    position="absolute"
+                    top={1}
+                    right={1}
+                    bg="rgba(0,0,0,0.7)"
+                    color="white"
+                    px={2}
+                    py={1}
+                    borderRadius="md"
+                    fontSize="sm"
+                  >
+                    {card?.odds?.toFixed(2)}%
+                  </Text>
+                  <VStack spacing={4} align="stretch">
+                    <Box position="relative">
+                      <motion.div
+                        style={{
+                          position: "relative",
+                          width: "100%",
+                          paddingBottom: "139%", // Aspect ratio for Pokemon cards (2.5" x 3.5")
+                          borderRadius: "5%",
+                        }}
+                      >
+                        <motion.div
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            perspective: "1000px",
+                          }}
+                        >
+                          <Image
+                            src={card.image}
+                            alt={card.name}
+                            objectFit="contain"
+                            layout="fill"
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              transformStyle: "preserve-3d",
+                              transform: "rotateX(20deg)",
+                            }}
+                          />
+                        </motion.div>
+                      </motion.div>
+                    </Box>
                     <Text fontWeight="bold" fontSize="lg" noOfLines={1}>
                       {card.name}
                     </Text>
-                    <Text fontSize="md">Value: {formatMoney(card?.value)}</Text>
-                    <Text fontSize="sm">Odds: {card?.odds?.toFixed(2)}%</Text>
                   </VStack>
-                </VStack>
-              </Box>
+                </CardBody>
+              </Card>
             ))}
         </SimpleGrid>
-      </Box>
+      </Card>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>

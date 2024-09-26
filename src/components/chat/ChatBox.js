@@ -194,20 +194,20 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
 
   return (
     <Container as={Stack} py={2} position="relative">
-      <Box position="absolute" top={2} right={2}>
-        <Tag
-          colorScheme="blue"
-          variant="outline"
-          borderRadius="full"
-          px={2}
-          py={1}
-          m={2}
-        >
-          <ChatIcon mr={1} />
-          {onlineUsers}
-        </Tag>
-      </Box>
       <VStack>
+        <Box position="absolute" top={2} right={2}>
+          <Tag
+            colorScheme="blue"
+            variant="outline"
+            borderRadius="full"
+            px={2}
+            py={1}
+            m={2}
+          >
+            <ChatIcon mr={1} />
+            {onlineUsers}
+          </Tag>
+        </Box>
         <Box
           ref={chatContainerRef}
           overflowY="auto"
@@ -220,39 +220,50 @@ const ChatBox = ({ user, isChatOpen, setIsChatOpen }) => {
             "-ms-overflow-style": "none",
             "scrollbar-width": "none",
           }}
+          boxShadow="0 0 10px rgba(66, 153, 225, 0.2)"
+          borderColor="gray.600"
         >
           {messages &&
             messages
               .slice(0)
               .reverse()
               .map((message, index) => (
-                <Box key={index} position="relative" m={1} bgColor={""}>
-                  <Flex align="center">
-                    {isMobile ? (
-                      <Avatar
-                        size="lg"
-                        src={message.photoURL}
-                        m={1}
-                        onClick={() => handleAvatarClick(message.uid)}
-                        cursor="pointer"
-                      />
-                    ) : (
-                      <Link to={`/user/profile/${message.uid}`}>
-                        <Avatar size="lg" src={message.photoURL} m={1} />
-                      </Link>
-                    )}
+                <Box key={index} position="relative" m={1}>
+                  <Flex align="top">
+                    <VStack m={0.5}>
+                      {isMobile ? (
+                        <Avatar
+                          size="lg"
+                          src={message.photoURL}
+                          m={1}
+                          onClick={() => handleAvatarClick(message.uid)}
+                          cursor="pointer"
+                        />
+                      ) : (
+                        <Link to={`/user/profile/${message.uid}`}>
+                          <Avatar size="md" src={message.photoURL} m={1} />
+                        </Link>
+                      )}
+                      {message?.title && (
+                        <Tag
+                          size={"md"}
+                          key={"sm"}
+                          variant="solid"
+                          colorScheme={message?.color}
+                          whiteSpace="nowrap"
+                          overflow="hidden"
+                          textOverflow="ellipsis"
+                          maxWidth="200px"
+                        >
+                          {message?.title}
+                        </Tag>
+                      )}
+                    </VStack>
                     <Box>
-                      <HStack>
-                        {message?.title && (
-                          <Tag
-                            size={"md"}
-                            key={"sm"}
-                            variant="solid"
-                            colorScheme={message?.color}
-                          >
-                            {message?.title}
-                          </Tag>
-                        )}
+                      <HStack
+                        alignItems="center"
+                        justifyContent="space-between"
+                      >
                         <Text
                           noOfLines={1}
                           fontSize="lg"

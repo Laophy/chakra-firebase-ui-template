@@ -327,7 +327,14 @@ export default function Navbar({ websiteContent }) {
               ];
 
               return (
-                <Card key={index} maxW="sm" width="100%" position="relative">
+                <Card
+                  key={index}
+                  maxW="sm"
+                  width="100%"
+                  position="relative"
+                  boxShadow="0 0 10px rgba(66, 153, 225, 0.2)"
+                  borderColor="gray.600"
+                >
                   <Box position="absolute" top={2} left={2} zIndex={1}>
                     <Tag size="md" variant="solid" colorScheme="red">
                       🔥 Fire

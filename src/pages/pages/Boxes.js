@@ -239,11 +239,17 @@ export default function Boxes() {
         />
       )}
 
-      <Card boxShadow="xl" borderRadius="lg" overflow="hidden" bg={bgColor}>
+      <Card
+        borderRadius="lg"
+        overflow="hidden"
+        w={"100%"}
+        boxShadow="0 0 40px rgba(66, 153, 225, 0.3)"
+        borderColor="gray.600"
+      >
         <CardBody>
           <VStack spacing={6}>
             <Heading size="lg" textAlign="center" mb={4}>
-              Prize Wheel
+              Daily Reward
             </Heading>
             <Box
               w={wheelSize}
