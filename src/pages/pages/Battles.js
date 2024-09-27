@@ -94,7 +94,13 @@ const PokemonCard = ({
 
   return (
     <motion.div
-      style={{ flex: `0 0 ${100 / totalCards}%`, display: "flex", opacity }}
+      style={{
+        flex: `0 0 ${100 / totalCards}%`,
+        display: "flex",
+        opacity,
+        transform: opacity === 1 ? "scale(1.07)" : "scale(1)",
+        transition: "transform 0.5s",
+      }}
     >
       <Image src={card.image} alt={card.name} width="100%" />
     </motion.div>
@@ -169,7 +175,7 @@ const PokemonCarousel = () => {
       const allSets = setsData.data;
 
       // Randomly select 5 sets
-      const randomSets = shuffleArray([...allSets]).slice(0, 5);
+      const randomSets = shuffleArray([...allSets]).slice(0, 2);
 
       // Fetch 20 random cards from each of the 5 random sets
       const cardPromises = randomSets.map((set) =>
@@ -449,25 +455,16 @@ const PokemonCarousel = () => {
         boxShadow="0 0 40px rgba(66, 153, 225, 0.3)"
         borderColor="gray.600"
       >
-        <Text
-          fontSize="3xl"
-          fontWeight="bold"
-          mb={6}
-          bgGradient="linear(to-r, blue.400, purple.500)"
-          bgClip="text"
-          textShadow="0 0 20px rgba(66, 153, 225, 0.6)"
-          letterSpacing="wide"
-          textAlign="left"
+        <SimpleGrid
+          columns={{ base: 1, sm: 2, md: 3, lg: 5, xl: 6 }}
+          spacing={2}
         >
-          Possible Cards
-        </Text>
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={2}>
           {aggregatedCards
             .filter((card) => card.value !== undefined)
             .sort((a, b) => b.value - a.value)
 
             .map((card) => (
-              <Card key={card.id} p={4} borderRadius="lg" bgColor="gray.800">
+              <Card key={card.id} p={3} borderRadius="lg" bgColor="gray.800">
                 <CardBody>
                   <Text
                     position="absolute"
@@ -495,13 +492,13 @@ const PokemonCarousel = () => {
                   >
                     {card?.odds?.toFixed(2)}%
                   </Text>
-                  <VStack spacing={4} align="stretch">
+                  <VStack spacing={3} align="stretch">
                     <Box position="relative">
                       <motion.div
                         style={{
                           position: "relative",
                           width: "100%",
-                          paddingBottom: "139%", // Aspect ratio for Pokemon cards (2.5" x 3.5")
+                          paddingBottom: "130%", // Aspect ratio for Pokemon cards (2.5" x 3.5")
                           borderRadius: "5%",
                         }}
                       >
@@ -523,9 +520,11 @@ const PokemonCarousel = () => {
                               height: "100%",
                               objectFit: "contain",
                               borderRadius: "5%",
+                              opacity: 0.75,
                             }}
                             whileHover={{
                               scale: 1.05,
+                              opacity: 1,
                               transition: { duration: 0.1 },
                             }}
                             initial={{ scale: 1 }}
@@ -533,7 +532,7 @@ const PokemonCarousel = () => {
                         </motion.div>
                       </motion.div>
                     </Box>
-                    <Text fontWeight="bold" fontSize="lg" noOfLines={1}>
+                    <Text fontWeight="bold" fontSize="md" noOfLines={1}>
                       {card.name}
                     </Text>
                   </VStack>
