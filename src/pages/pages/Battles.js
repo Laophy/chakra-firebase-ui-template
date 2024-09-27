@@ -211,8 +211,7 @@ const PokemonCarousel = () => {
                 tcgplayerPrices[type]?.market ||
                 tcgplayerPrices[type]?.mid ||
                 tcgplayerPrices[type]?.low;
-              if (price && price > 0)
-                return Math.max(1, Math.round(price * 100));
+              if (price && price > 0) return price;
             }
           }
 
@@ -221,7 +220,7 @@ const PokemonCarousel = () => {
               cardmarketPrices.averageSellPrice ||
               cardmarketPrices.trendPrice ||
               cardmarketPrices.avg1;
-            if (price && price > 0) return Math.max(1, Math.round(price * 100));
+            if (price && price > 0) return price;
           }
 
           return 1;
@@ -232,7 +231,7 @@ const PokemonCarousel = () => {
       fetchedCards.sort((a, b) => b.value - a.value);
 
       // Select top 10 most expensive cards
-      const expensiveCards = fetchedCards.slice(0, 10);
+      const expensiveCards = fetchedCards.slice(0, 5);
 
       // Calculate the total value of all cards
       const totalValue = fetchedCards.reduce(
@@ -285,7 +284,7 @@ const PokemonCarousel = () => {
       const centerPosition = containerWidth / 2 - cardWidth / 2;
       const initialX = -targetPosition + centerPosition;
 
-      x.set(initialX);
+      x.set(0);
     }
   }, []);
 
@@ -294,23 +293,32 @@ const PokemonCarousel = () => {
     setIsLoading(true);
     setIsSpinning(true);
 
+    setInitialPosition(displayCards);
+
     const containerWidth = containerRef.current.offsetWidth;
     const cardWidth = containerWidth / totalCardsInView;
     const centerPosition = containerWidth / 2 - cardWidth / 2;
-    const currentX = x.get();
-    const currentIndex = Math.round((-currentX + centerPosition) / cardWidth);
 
-    const minSpinCards = 40;
-    const maxSpinCards = 55;
-    const randomOffset =
-      Math.floor(Math.random() * (maxSpinCards - minSpinCards)) + minSpinCards;
-    let targetIndex = currentIndex + randomOffset;
+    // Calculate cumulative odds
+    const totalOdds = displayCards.reduce((sum, card) => sum + card.odds, 0);
+    let cumulativeOdds = 0;
+    const cumulativeOddsArray = displayCards.map((card) => {
+      cumulativeOdds += card.odds;
+      return cumulativeOdds;
+    });
 
-    if (targetIndex >= displayCards.length) {
-      targetIndex = targetIndex % displayCards.length;
-    }
+    // Generate a random number and select the winning card based on odds
+    const randomValue = Math.random() * totalOdds;
+    const winningIndex = cumulativeOddsArray.findIndex(
+      (cumulativeOdd) => randomValue <= cumulativeOdd
+    );
 
-    const targetPosition = targetIndex * cardWidth;
+    const winningCard = displayCards[winningIndex];
+    setWonCard(winningCard);
+    setWonAmount(winningCard.value);
+
+    // Calculate the target position to land on the winning card
+    const targetPosition = winningIndex * cardWidth;
     const calculatedTargetX = -targetPosition + centerPosition;
 
     x.stop();
@@ -320,10 +328,6 @@ const PokemonCarousel = () => {
       onComplete: () => {
         setIsLoading(false);
         setIsSpinning(false);
-
-        const winningCard = displayCards[targetIndex % displayCards.length];
-        setWonCard(winningCard);
-        setWonAmount(winningCard.value);
         onOpen();
         const successAudio = new Audio(success);
         successAudio.volume = volume;
@@ -357,10 +361,16 @@ const PokemonCarousel = () => {
     }
   }, [dispatch, user, wonAmount, onClose, toast]);
 
-  const calculateOdds = (cardId) => {
-    const totalCards = displayCards.length;
-    const cardCount = displayCards.filter((card) => card.id === cardId).length;
-    return ((cardCount / totalCards) * 100).toFixed(2);
+  const calculateOdds = (cards) => {
+    const totalValue = cards.reduce((sum, card) => sum + card.value, 0);
+    const maxValue = Math.max(...cards.map((card) => card.value));
+    const minValue = Math.min(...cards.map((card) => card.value));
+    const range = maxValue - minValue;
+
+    return cards.map((card) => ({
+      ...card,
+      odds: ((maxValue - card.value + minValue) / totalValue) * 100,
+    }));
   };
 
   const aggregateCards = (cards) => {
@@ -368,16 +378,14 @@ const PokemonCarousel = () => {
 
     cards.forEach((card) => {
       if (cardMap.has(card.id)) {
-        cardMap.get(card.id).odds += parseFloat(calculateOdds(card.id));
+        cardMap.get(card.id).count += 1;
       } else {
-        cardMap.set(card.id, {
-          ...card,
-          odds: parseFloat(calculateOdds(card.id)),
-        });
+        cardMap.set(card.id, { ...card, count: 1 });
       }
     });
 
-    return Array.from(cardMap.values());
+    const aggregatedCards = Array.from(cardMap.values());
+    return calculateOdds(aggregatedCards);
   };
 
   const aggregatedCards = aggregateCards(cards);
