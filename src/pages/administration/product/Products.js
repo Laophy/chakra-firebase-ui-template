@@ -27,6 +27,7 @@ import {
   Skeleton,
   Switch,
   IconButton,
+  useToast,
 } from "@chakra-ui/react";
 import {
   createProduct,
@@ -43,6 +44,18 @@ import { useSelector } from "react-redux";
 const ProductEditor = ({ onBack, product }) => {
   const user = useSelector((state) => state.data.user.user);
   const authHeader = useSelector((state) => state.data.user.authHeader);
+
+  const toast = useToast();
+
+  const showToast = (title, description, status) => {
+    toast({
+      title,
+      description,
+      status,
+      duration: 2000,
+      isClosable: true,
+    });
+  };
 
   const [newProduct, setNewProduct] = useState(
     product || {
@@ -82,17 +95,24 @@ const ProductEditor = ({ onBack, product }) => {
       let response, errorResponse;
       if (product) {
         [response, errorResponse] = await updateProduct(authHeader, newProduct);
+        if (errorResponse) {
+          showToast("Error", errorResponse.message, "error");
+        } else {
+          showToast("Success", "Product updated successfully", "success");
+        }
       } else {
         [response, errorResponse] = await createProduct(authHeader, newProduct);
+        if (errorResponse) {
+          showToast("Error", errorResponse.message, "error");
+        } else {
+          showToast("Success", "Product added successfully", "success");
+        }
       }
-      if (errorResponse) {
-        console.log(errorResponse);
-      } else {
-        console.log(response);
+      if (!errorResponse) {
         onBack(); // Call onBack after saving or updating
       }
     } catch (error) {
-      console.log(error);
+      showToast("Error", "Failed to save product changes", "error");
     }
   };
 
@@ -103,9 +123,13 @@ const ProductEditor = ({ onBack, product }) => {
         newProduct.productId
       );
       if (errorResponse) {
-        console.log(errorResponse);
+        showToast(
+          "Error",
+          errorResponse.message || "Failed to delete product",
+          "error"
+        );
       } else {
-        console.log(response);
+        showToast("Success", "Product deleted successfully", "warning");
         onBack(); // Call onBack after deleting
       }
     } catch (error) {
@@ -265,15 +289,17 @@ const ProductEditor = ({ onBack, product }) => {
               >
                 Save
               </Button>
-              <Button
-                onClick={handleDelete}
-                variant={"solid"}
-                colorScheme={"red"}
-                size={"md"}
-                leftIcon={<FaTrash />}
-              >
-                Delete
-              </Button>
+              {product && (
+                <Button
+                  onClick={handleDelete}
+                  variant={"solid"}
+                  colorScheme={"red"}
+                  size={"md"}
+                  leftIcon={<FaTrash />}
+                >
+                  Delete
+                </Button>
+              )}
             </HStack>
           </FormControl>
         </Box>
@@ -319,22 +345,6 @@ const renderProductCard = (product) => (
         >
           {product.visibility}
         </Tag>
-        <HStack
-          alignItems={"center"}
-          justifyContent={"flex-end"}
-          position="absolute"
-          top="2"
-          right="2"
-        >
-          <Text isReadOnly size="xs" mr={2} fontSize="xs" color="gray.500">
-            {product.productId}
-          </Text>
-          <IconButton
-            icon={<FaCopy />}
-            size="sm"
-            onClick={() => navigator.clipboard.writeText(product.productId)}
-          />
-        </HStack>
         <HStack alignItems={"center"} justifyContent={"space-between"}>
           <Tag
             colorScheme="blue"
