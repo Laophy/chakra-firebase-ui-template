@@ -33,6 +33,11 @@ import ExecutivePanel from "./pages/account/admin/ExecutivePanel";
 import UserProfile from "./pages/pages/UserProfile";
 import Boxes from "./pages/pages/Boxes";
 import { useToast } from "@chakra-ui/react";
+import {
+  getAllProducts,
+  getProductById,
+} from "./services/ProductManagement.service";
+import Products from "./pages/administration/product/Products";
 
 function App() {
   const dispatch = useDispatch();
@@ -70,6 +75,11 @@ function App() {
         }
         userData = newUser;
       }
+
+      // TEMP DELETE LATER
+      const [products, failedProductsResponse] = await getProductById(1);
+      console.log(products);
+      // TEMP DELETE LATER
 
       dispatch(
         loginUser({
@@ -111,6 +121,7 @@ function App() {
       <Route path={"/boxes"} element={<Boxes />} />
       <Route path={"/battles"} element={<Battles />} />
       <Route path={"/inventory"} element={<Inventory />} />
+      <Route path={"/admin/products"} element={<Products />} />
 
       <Route path={"/rewards"} element={<Rewards />} />
       <Route

@@ -48,6 +48,8 @@ export default function Boxes() {
   });
   const containerPadding = useBreakpointValue({ base: 2, md: 5 });
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   useEffect(() => {
     fetchRandomPrizes();
     return () => {
@@ -160,7 +162,7 @@ export default function Boxes() {
 
         // Winner sounds
         const newAudio = new Audio(claimgems);
-        newAudio.volume = volume;
+        newAudio.volume = isMobile ? 0 : volume; // Disable audio on mobile
         newAudio.play();
 
         setRotation(totalRotation);
@@ -212,14 +214,14 @@ export default function Boxes() {
       const currentTime = Date.now();
       if (currentTime - lastSoundPlayedTime > soundBufferTime) {
         const newAudio = new Audio(flipcard);
-        newAudio.volume = volume;
+        newAudio.volume = isMobile ? 0 : volume; // Disable audio on mobile
         newAudio.play();
         console.log("Card sound played");
         setLastPlayedPrize(closestPrize);
         setLastSoundPlayedTime(currentTime);
       }
     }
-  }, [closestPrize, spinning, lastPlayedPrize, lastSoundPlayedTime]);
+  }, [closestPrize, spinning, lastPlayedPrize, lastSoundPlayedTime, isMobile]);
 
   return (
     <Container maxW="7xl" centerContent>

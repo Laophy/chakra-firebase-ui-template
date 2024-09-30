@@ -46,6 +46,7 @@ const PokemonCard = ({
   soundBufferTime,
 }) => {
   const [opacity, setOpacity] = useState(0.3);
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
     const updateOpacity = () => {
@@ -75,7 +76,7 @@ const PokemonCard = ({
   const audioRef = useRef(null);
 
   useEffect(() => {
-    if (opacity === 1 && isSpinning) {
+    if (opacity === 1 && isSpinning && !isMobile) {
       const currentTime = Date.now();
       if (currentTime - lastSoundPlayedTime > soundBufferTime) {
         if (!audioRef.current) {
@@ -90,7 +91,7 @@ const PokemonCard = ({
         setLastSoundPlayedTime(currentTime);
       }
     }
-  }, [opacity, isSpinning, lastSoundPlayedTime, soundBufferTime]);
+  }, [opacity, isSpinning, lastSoundPlayedTime, soundBufferTime, isMobile]);
 
   return (
     <motion.div
@@ -112,6 +113,7 @@ const PokemonCarousel = () => {
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const [cards, setCards] = useState([]);
   const [displayCards, setDisplayCards] = useState([]);
@@ -329,20 +331,24 @@ const PokemonCarousel = () => {
         setIsLoading(false);
         setIsSpinning(false);
         onOpen();
-        const successAudio = new Audio(success);
-        successAudio.volume = volume;
-        successAudio.play();
+        if (!isMobile) {
+          const successAudio = new Audio(success);
+          successAudio.volume = volume;
+          successAudio.play();
+        }
       },
     });
-  }, [isSpinning, displayCards, x, onOpen]);
+  }, [isSpinning, displayCards, x, onOpen, isMobile]);
 
   const handleClaim = useCallback(() => {
     if (user) {
       dispatch(setBalance(user.balance + wonAmount));
       onClose();
-      const successAudio = new Audio(claimgems);
-      successAudio.volume = volume;
-      successAudio.play();
+      if (!isMobile) {
+        const successAudio = new Audio(claimgems);
+        successAudio.volume = volume;
+        successAudio.play();
+      }
       toast({
         title: "Success",
         description: `You won ${wonAmount} gems!`,
@@ -359,7 +365,7 @@ const PokemonCarousel = () => {
         isClosable: true,
       });
     }
-  }, [dispatch, user, wonAmount, onClose, toast]);
+  }, [dispatch, user, wonAmount, onClose, toast, isMobile]);
 
   const calculateOdds = (cards) => {
     const totalValue = cards.reduce((sum, card) => sum + card.value, 0);

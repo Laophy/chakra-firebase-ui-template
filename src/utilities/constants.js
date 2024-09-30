@@ -20,8 +20,10 @@ const API = {
   },
   routes: {
     user: "/api/user",
+    product: "/api/product",
   },
   baseRoute: "/user.",
+  productBaseRoute: "/product.",
   endpoints: {
     getUser: "getUser",
     createUser: "createUser",
@@ -30,6 +32,13 @@ const API = {
     updateUsername: "updateUsername",
     promoteUser: "promoteUser",
     demoteUser: "demoteUser",
+    product: {
+      getProducts: "getProducts",
+      getProductById: "getProductById/",
+      createProduct: "createProduct",
+      updateProduct: "updateProduct",
+      deleteProduct: "deleteProduct",
+    },
   },
 };
 

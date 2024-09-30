@@ -49,6 +49,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navbar({ websiteContent }) {
   const user = useSelector((state) => state.data.user.user);
+  const isAdmin = user?.isStaff;
   const toast = useToast();
   const dispatch = useDispatch();
 
@@ -116,7 +117,16 @@ export default function Navbar({ websiteContent }) {
     });
   };
 
-  const Links = [
+  const adminLinks = [
+    {
+      to: "Products",
+      path: "/admin/products",
+      icon: FaBoxOpen,
+      color: "red",
+    },
+  ];
+
+  const userLinks = [
     {
       to: "Home",
       path: "/",
@@ -142,6 +152,8 @@ export default function Navbar({ websiteContent }) {
       color: "white", // Force dark mode color
     },
   ];
+
+  const Links = isAdmin ? [...userLinks, ...adminLinks] : userLinks;
 
   const NavLink = ({ children }) => {
     const showIcon = useBreakpointValue({
