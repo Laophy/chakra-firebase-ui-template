@@ -37,7 +37,7 @@ const API = {
       getProductById: "getProductById/",
       createProduct: "createProduct",
       updateProduct: "updateProduct",
-      deleteProduct: "deleteProduct",
+      deleteProduct: "deleteProduct/",
     },
   },
 };

@@ -25,15 +25,18 @@ import {
   Textarea,
   Select,
   Skeleton,
+  Switch,
+  IconButton,
 } from "@chakra-ui/react";
 import {
   createProduct,
   getAllProducts,
   updateProduct,
+  deleteProductById, // Import the delete function
 } from "../../../services/ProductManagement.service";
 import { ArrowBackIcon, Search2Icon } from "@chakra-ui/icons";
 import { formatMoney } from "../../../utilities/Formatter";
-import { FaPlus, FaSave } from "react-icons/fa";
+import { FaCopy, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { LuPlus } from "react-icons/lu";
 import { useSelector } from "react-redux";
 
@@ -55,6 +58,8 @@ const ProductEditor = ({ onBack, product }) => {
       attributes: {
         rarity: "common",
       },
+      canBeShipped: false,
+      purchaseUrl: "",
     }
   );
 
@@ -85,6 +90,23 @@ const ProductEditor = ({ onBack, product }) => {
       } else {
         console.log(response);
         onBack(); // Call onBack after saving or updating
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const [response, errorResponse] = await deleteProductById(
+        authHeader,
+        newProduct.productId
+      );
+      if (errorResponse) {
+        console.log(errorResponse);
+      } else {
+        console.log(response);
+        onBack(); // Call onBack after deleting
       }
     } catch (error) {
       console.log(error);
@@ -142,7 +164,7 @@ const ProductEditor = ({ onBack, product }) => {
               name="description"
               value={newProduct.description}
               onChange={handleChange}
-              height="150px"
+              height="100px"
             />
           </FormControl>
           <HStack spacing={4} mb={4}>
@@ -175,14 +197,38 @@ const ProductEditor = ({ onBack, product }) => {
                 onChange={handleChange}
               />
               <Box boxSize="40px">
-                <Image
-                  src={newProduct.imageUrl || "https://via.placeholder.com/40"}
-                  alt="Product Image"
-                  boxSize="100%"
-                  objectFit="cover"
-                  borderRadius="md"
-                />
+                {newProduct.imageUrl ? (
+                  <Image
+                    src={newProduct.imageUrl}
+                    alt="Product Image"
+                    boxSize="100%"
+                    objectFit="cover"
+                    borderRadius="md"
+                  />
+                ) : (
+                  <Skeleton boxSize="100%" borderRadius="md" />
+                )}
               </Box>
+            </HStack>
+          </FormControl>
+          <FormControl id="canBeShipped" mb={4}>
+            <FormLabel>Shipable</FormLabel>
+            <HStack>
+              <Switch
+                defaultChecked={newProduct.canBeShipped}
+                onChange={(e) =>
+                  handleChange({
+                    target: { name: "canBeShipped", value: e.target.checked },
+                  })
+                }
+              />
+              <Input
+                type="text"
+                name="purchaseUrl"
+                placeholder="Purchase URL"
+                value={newProduct.purchaseUrl}
+                onChange={handleChange}
+              />
             </HStack>
           </FormControl>
           <FormControl id="rarity" mb={4}>
@@ -209,21 +255,30 @@ const ProductEditor = ({ onBack, product }) => {
                 </Radio>
               </Stack>
             </RadioGroup>
+            <HStack justifyContent="space-between" mt={4}>
+              <Button
+                onClick={handleSave}
+                variant={"solid"}
+                colorScheme={"teal"}
+                size={"md"}
+                leftIcon={<FaSave />}
+              >
+                Save
+              </Button>
+              <Button
+                onClick={handleDelete}
+                variant={"solid"}
+                colorScheme={"red"}
+                size={"md"}
+                leftIcon={<FaTrash />}
+              >
+                Delete
+              </Button>
+            </HStack>
           </FormControl>
         </Box>
         <Box flex={1}>{renderProductCard(newProduct)}</Box>
       </HStack>
-      <Button
-        onClick={handleSave}
-        variant={"solid"}
-        colorScheme={"teal"}
-        size={"md"}
-        mt={4}
-        alignSelf={"flex-start"}
-        leftIcon={<FaSave />}
-      >
-        Save
-      </Button>
     </Container>
   );
 };
@@ -243,8 +298,8 @@ const renderProductCard = (product) => (
           src={product.imageUrl}
           alt={product.name}
           borderRadius="lg"
-          height="300px"
-          objectFit="contain"
+          height="200px"
+          objectFit="cover"
           mx="auto"
           mt={5}
           fallback={<Skeleton height="300px" />}
@@ -264,9 +319,26 @@ const renderProductCard = (product) => (
         >
           {product.visibility}
         </Tag>
+        <HStack
+          alignItems={"center"}
+          justifyContent={"flex-end"}
+          position="absolute"
+          top="2"
+          right="2"
+        >
+          <Text isReadOnly size="xs" mr={2} fontSize="xs" color="gray.500">
+            {product.productId}
+          </Text>
+          <IconButton
+            icon={<FaCopy />}
+            size="sm"
+            onClick={() => navigator.clipboard.writeText(product.productId)}
+          />
+        </HStack>
         <HStack alignItems={"center"} justifyContent={"space-between"}>
           <Tag
-            colorScheme="red"
+            colorScheme="blue"
+            variant={"solid"}
             fontWeight="semibold"
             letterSpacing="wide"
             fontSize="xs"
@@ -342,8 +414,18 @@ const Products = () => {
       setFilteredProducts(products);
     } else {
       setFilteredProducts(
-        products.filter((product) =>
-          product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        products.filter(
+          (product) =>
+            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.description
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            product.category
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase()) ||
+            product.attributes.rarity
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())
         )
       );
     }

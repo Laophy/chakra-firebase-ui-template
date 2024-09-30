@@ -60,8 +60,6 @@ export default function AdminViewUsers() {
   const [newUsername, setNewUsername] = useState(null);
   const [newPhotoURL, setNewPhotoURL] = useState(null);
   const [newEmail, setNewEmail] = useState(null);
-  const [newReferralCode, setNewReferralCode] = useState(null);
-  const [newAffiliateCode, setNewAffiliateCode] = useState(null);
   const [newBalance, setNewBalance] = useState(null);
   const [newTitle, setNewTitle] = useState(null);
 
@@ -152,10 +150,6 @@ export default function AdminViewUsers() {
 
   const onUpdateProfile = async () => {
     setIsLoadingSave(true);
-    const copyAffiliate = {
-      code: newAffiliateCode,
-      lastChanged: new Date(),
-    };
 
     const userUpdate = {
       uid: editUser?.uid,
@@ -163,8 +157,6 @@ export default function AdminViewUsers() {
       photoURL: newPhotoURL,
       email: newEmail,
       title: { title: newTitle, color: color },
-      referralCode: newReferralCode,
-      affiliate: copyAffiliate,
       balance: newBalance,
     };
 
@@ -313,8 +305,6 @@ export default function AdminViewUsers() {
     setNewEmail(user?.email);
     setNewBalance(user?.balance);
     setNewTitle(user?.title?.title);
-    setNewReferralCode(user?.referralCode);
-    setNewAffiliateCode(user?.affiliate?.code);
   };
 
   const determinSearch = () => (
@@ -426,24 +416,6 @@ export default function AdminViewUsers() {
                   value={newEmail}
                   onChange={(event) => setNewEmail(event.target.value)}
                   placeholder="Email"
-                  size="lg"
-                />
-              </Stack>
-              <Stack mt={5}>
-                <Text mb="8px">Referral Code</Text>
-                <Input
-                  value={newReferralCode}
-                  onChange={(event) => setNewReferralCode(event.target.value)}
-                  placeholder="Referral Code"
-                  size="lg"
-                />
-              </Stack>
-              <Stack mt={5}>
-                <Text mb="8px">Affiliate Code</Text>
-                <Input
-                  value={newAffiliateCode}
-                  onChange={(event) => setNewAffiliateCode(event.target.value)}
-                  placeholder="Affiliate Code"
                   size="lg"
                 />
               </Stack>

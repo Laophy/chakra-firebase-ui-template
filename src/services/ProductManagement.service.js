@@ -127,3 +127,32 @@ export async function updateProduct(authHeader, product) {
     return await handleResponse(e.response, AUTH_HEADER, refId);
   }
 }
+
+export async function deleteProductById(authHeader, productId) {
+  const refId = ReferenceId();
+  const obfuscatedEndpoint = btoa(
+    API.endpoints.product.deleteProduct + productId
+  );
+  try {
+    let response = await axios.delete(
+      API.capabilites.userManagement +
+        API.routes.product +
+        API.productBaseRoute +
+        obfuscatedEndpoint,
+      {
+        headers: {
+          [CONTENT_TYPE]: APP_JSON,
+          [AUTH_HEADER]: authHeader,
+          [X_AMZ_TRACE_ID_HEADER]: refId,
+          [X_B3_SPANID_ID_HEADER]: refId,
+          [X_B3_TRACEID_HEADER]: refId,
+        },
+      }
+    );
+
+    return await handleResponse(response, AUTH_HEADER, refId);
+  } catch (e) {
+    console.log("request failed??: ", e.response);
+    return await handleResponse(e.response, AUTH_HEADER, refId);
+  }
+}
