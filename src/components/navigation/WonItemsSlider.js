@@ -15,6 +15,7 @@ import {
   Card,
   VStack,
   Badge,
+  HStack,
 } from "@chakra-ui/react";
 import { LuSword } from "react-icons/lu";
 import { FaBoxOpen } from "react-icons/fa";
@@ -72,12 +73,19 @@ const WonItemsSlider = () => {
       overflowX="hidden"
       borderRadius="lg"
       maxH={`calc(100vh - 100px)`}
+      alignItems="flex-start" // Align items to the left
       css={{
         "&::-webkit-scrollbar": { display: "none" },
         "-ms-overflow-style": "none",
         "scrollbar-width": "none",
       }}
     >
+      <HStack alignItems="center" spacing={2}>
+        <Box boxSize={2} bg="red.500" borderRadius="full" />
+        <Text fontSize="sm" fontWeight="bold">
+          Live Drops
+        </Text>
+      </HStack>
       <AnimatePresence>
         {wonProducts.map((product, index) => (
           <motion.div
@@ -110,7 +118,7 @@ const WonItemsSlider = () => {
                     src={product.imageUrl}
                     alt={product.name}
                     borderRadius="lg"
-                    boxSize="200px"
+                    boxSize="250px"
                     objectFit="contain"
                   />
                 </Flex>
