@@ -137,6 +137,20 @@ const ProductEditor = ({ onBack, product }) => {
     }
   };
 
+  const handleJsonChange = (e) => {
+    try {
+      const updatedProduct = JSON.parse(e.target.value);
+      setNewProduct(updatedProduct);
+    } catch (error) {
+      console.error("Invalid JSON format");
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(JSON.stringify(newProduct, null, 2));
+    showToast("Copied", "Product JSON copied to clipboard", "success");
+  };
+
   return (
     <Container as={Stack} maxW={"7xl"}>
       <Button
@@ -149,6 +163,15 @@ const ProductEditor = ({ onBack, product }) => {
       >
         Back
       </Button>
+      <IconButton
+        icon={<FaCopy />}
+        onClick={copyToClipboard}
+        position="fixed"
+        top="10px"
+        left="10px"
+        colorScheme="teal"
+        aria-label="Copy JSON"
+      />
       <HStack alignItems={"flex-start"} spacing={8}>
         <Box flex={1}>
           <HStack spacing={4} mb={4}>
@@ -303,7 +326,20 @@ const ProductEditor = ({ onBack, product }) => {
             </HStack>
           </FormControl>
         </Box>
-        <Box flex={1}>{renderProductCard(newProduct)}</Box>
+        <Box flex={1}>
+          {renderProductCard(newProduct)}
+          <FormControl id="productJson" mt={4}>
+            <FormLabel>Product JSON</FormLabel>
+            <Textarea
+              value={JSON.stringify(newProduct, null, 2)}
+              onChange={handleJsonChange}
+              height="300px"
+              fontFamily="monospace"
+              whiteSpace="pre"
+              overflow="auto"
+            />
+          </FormControl>
+        </Box>
       </HStack>
     </Container>
   );

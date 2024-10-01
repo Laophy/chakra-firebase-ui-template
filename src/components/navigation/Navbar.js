@@ -46,7 +46,7 @@ import { useState, useEffect } from "react";
 import ChatBox from "../chat/ChatBox";
 import { FaBoxOpen, FaHouse, FaShieldAlt } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-
+import WonItemsSlider from "../navigation/WonItemsSlider";
 export default function Navbar({ websiteContent }) {
   const user = useSelector((state) => state.data.user.user);
   const isAdmin = user?.isStaff;
@@ -66,37 +66,6 @@ export default function Navbar({ websiteContent }) {
     onOpen: onCartOpen,
     onClose: onCartClose,
   } = useDisclosure();
-
-  const generateRandomCard = () => {
-    const randomPokemonId = Math.floor(Math.random() * 102) + 1;
-    const randomName = ["Alice", "Bob", "Charlie", "David", "Emma"][
-      Math.floor(Math.random() * 5)
-    ];
-    return {
-      id: randomPokemonId,
-      name: randomName,
-      value: Math.random() * 1000000,
-    };
-  };
-
-  const [cards, setCards] = useState(
-    Array.from({ length: 5 }, generateRandomCard)
-  );
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCards((prevCards) => {
-        const newCard = generateRandomCard();
-        const updatedCards = [newCard, ...prevCards.slice(0, -1)];
-        if (JSON.stringify(updatedCards) === JSON.stringify(prevCards)) {
-          return [...updatedCards.slice(1), generateRandomCard()];
-        }
-        return updatedCards;
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const displayName = useBreakpointValue({
     base: "",
@@ -364,94 +333,7 @@ export default function Navbar({ websiteContent }) {
           borderRadius="md"
           display={{ base: "none", xl: "flex" }}
         >
-          <VStack
-            spacing={4}
-            overflowY="auto"
-            width="100%"
-            p={4}
-            overflowX="hidden"
-            borderRadius="lg"
-            maxH={`calc(100vh - 100px)`}
-            css={{
-              "&::-webkit-scrollbar": { display: "none" },
-              "-ms-overflow-style": "none",
-              "scrollbar-width": "none",
-            }}
-          >
-            <AnimatePresence>
-              {cards.map((card, index) => (
-                <motion.div
-                  key={Math.random().toString(36).substr(2, 9)}
-                  initial={{ y: -50, opacity: 0.5 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 0, opacity: 1 }}
-                  transition={{ duration: 1 }}
-                >
-                  <Card
-                    maxW="sm"
-                    width="100%"
-                    position="relative"
-                    boxShadow="0 0 10px rgba(66, 153, 225, 0.2)"
-                    borderColor="gray.600"
-                    transition="all 0.3s"
-                    _hover={{
-                      boxShadow: "0 0 20px rgba(66, 153, 225, 0.4)",
-                      filter: "brightness(1.1)",
-                    }}
-                  >
-                    <Box position="absolute" top={2} left={2} zIndex={1}>
-                      <Tag size="md" variant="solid" bg="blue.600">
-                        {formatMoney(card.value)}
-                      </Tag>
-                    </Box>
-                    <CardBody>
-                      <Flex justifyContent="center" alignItems="center">
-                        <Image
-                          src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${card.id}.png`}
-                          alt={`Pokémon #${card.id}`}
-                          borderRadius="lg"
-                          boxSize="200px"
-                          objectFit="contain"
-                        />
-                      </Flex>
-                      <Stack mt="4" spacing="3">
-                        <Flex
-                          justifyContent="space-between"
-                          alignItems="center"
-                        >
-                          <Heading size="md">{`Pokémon #${card.id}`}</Heading>
-                          <Text fontWeight="bold" color="gray.500">
-                            {card.name}
-                          </Text>
-                        </Flex>
-                      </Stack>
-                    </CardBody>
-                    <CardFooter>
-                      {(() => {
-                        const isViewBattle = Math.random() < 0.5;
-                        return (
-                          <Button
-                            variant="solid"
-                            colorScheme={isViewBattle ? "blue" : "yellow"}
-                            width="100%"
-                            leftIcon={
-                              isViewBattle ? (
-                                <Icon as={LuSword} />
-                              ) : (
-                                <Icon as={FaBoxOpen} />
-                              )
-                            }
-                          >
-                            {isViewBattle ? "View Battle" : "Open Box"}
-                          </Button>
-                        );
-                      })()}
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </VStack>
+          <WonItemsSlider />
         </Container>
         <Container maxW="7xl" alignItems="top" justifyContent="center" px={0}>
           <Flex direction={{ base: "column", md: "row" }} width="100%">
