@@ -429,14 +429,14 @@ const renderProductCard = (product) => (
         borderRadius="xl"
         bgColor={
           product.attributes.rarity === "legendary"
-            ? "rgba(255, 255, 0, 0.1)" // yellow with 0.3 opacity
+            ? "rgba(250, 240, 137, 0.3)" // yellow with 0.1 opacity
             : product.attributes.rarity === "rare"
-            ? "rgba(128, 0, 128, 0.1)" // purple with 0.3 opacity
+            ? "rgba(214, 188, 250, 0.3)" // purple with 0.1 opacity
             : product.attributes.rarity === "uncommon"
-            ? "rgba(0, 0, 255, 0.1)" // blue with 0.3 opacity
+            ? "rgba(144, 205, 244, 0.3)" // blue with 0.3 opacity
             : product.attributes.rarity === "none"
-            ? "rgba(128, 128, 128, 0.1)" // gray with 0.3 opacity
-            : "rgba(0, 128, 0, 0.1)" // green with 0.3 opacity
+            ? "rgba(226, 232, 240, 0.3)" // gray with 0.3 opacity
+            : "rgba(154, 230, 180, 0.3)" // green with 0.3 opacity
         }
       >
         <HStack alignItems={"center"} justifyContent={"space-between"}>
@@ -484,6 +484,7 @@ const renderProductCard = (product) => (
             height="100%"
             width="100%"
             objectFit="contain"
+            p={5}
             fallback={<Skeleton height="100%" width="100%" />}
           />
         </Box>
@@ -620,7 +621,7 @@ const Products = () => {
           </InputGroup>
         </Box>
       </HStack>
-      <SimpleGrid columns={{ sm: 2, md: 3, lg: 4 }} spacing="16px">
+      <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="16px">
         {filteredProducts.map((product) => (
           <Box
             key={product.productId}
