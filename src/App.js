@@ -38,6 +38,7 @@ import {
   getProductById,
 } from "./services/ProductManagement.service";
 import Products from "./pages/administration/product/Products";
+import Crates from "./pages/administration/product/Crate";
 
 function App() {
   const dispatch = useDispatch();
@@ -122,6 +123,7 @@ function App() {
       <Route path={"/battles"} element={<Battles />} />
       <Route path={"/inventory"} element={<Inventory />} />
       <Route path={"/admin/products"} element={<Products />} />
+      <Route path={"/admin/crates"} element={<Crates />} />
 
       <Route path={"/rewards"} element={<Rewards />} />
       <Route

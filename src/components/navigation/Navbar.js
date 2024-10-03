@@ -93,6 +93,12 @@ export default function Navbar({ websiteContent }) {
       icon: FaBoxOpen,
       color: "red",
     },
+    {
+      to: "Crates",
+      path: "/admin/crates",
+      icon: LuBox,
+      color: "red",
+    },
   ];
 
   const userLinks = [

@@ -21,9 +21,11 @@ const API = {
   routes: {
     user: "/api/user",
     product: "/api/product",
+    crate: "/api/crate",
   },
   baseRoute: "/user.",
   productBaseRoute: "/product.",
+  crateBaseRoute: "/crate.",
   endpoints: {
     getUser: "getUser",
     createUser: "createUser",
@@ -38,6 +40,13 @@ const API = {
       createProduct: "createProduct",
       updateProduct: "updateProduct",
       deleteProduct: "deleteProduct/",
+    },
+    crate: {
+      getCrates: "getCrates",
+      getCrateById: "getCrateById/",
+      createCrate: "createCrate",
+      updateCrate: "updateCrate",
+      deleteCrate: "deleteCrate/",
     },
   },
 };

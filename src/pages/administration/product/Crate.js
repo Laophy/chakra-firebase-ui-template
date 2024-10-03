@@ -6,7 +6,6 @@ import {
   Spinner,
   Center,
   Image,
-  Badge,
   CardBody,
   Card,
   Stack,
@@ -20,22 +19,13 @@ import {
   InputLeftElement,
   FormControl,
   FormLabel,
-  RadioGroup,
-  Radio,
   Textarea,
   Select,
   Skeleton,
-  Switch,
   IconButton,
   useToast,
   Icon,
 } from "@chakra-ui/react";
-import {
-  createProduct,
-  getAllProducts,
-  updateProduct,
-  deleteProductById, // Import the delete function
-} from "../../../services/ProductManagement.service";
 import {
   ArrowBackIcon,
   InfoIcon,
@@ -43,11 +33,18 @@ import {
   Search2Icon,
 } from "@chakra-ui/icons";
 import { formatMoney } from "../../../utilities/Formatter";
-import { FaCopy, FaPlus, FaSave, FaTrash } from "react-icons/fa";
+import { FaSave, FaTrash } from "react-icons/fa";
 import { LuPlus } from "react-icons/lu";
 import { useSelector } from "react-redux";
+import {
+  getAllCrates,
+  updateCrate,
+  createCrate,
+  deleteCrateById,
+} from "../../../services/CrateManagement.service";
+import ProductManager from "./ProductManager"; // Import the new component
 
-const ProductEditor = ({ onBack, product }) => {
+const ProductEditor = ({ onBack, crate }) => {
   const user = useSelector((state) => state.data.user.user);
   const authHeader = useSelector((state) => state.data.user.authHeader);
 
@@ -63,22 +60,19 @@ const ProductEditor = ({ onBack, product }) => {
     });
   };
 
-  const [newProduct, setNewProduct] = useState(
-    product || {
+  const [newCrate, setNewCrate] = useState(
+    crate || {
       visibility: "private",
-      productId: crypto.randomUUID(),
-      name: "Lorem Ipsum Product",
+      crateId: crypto.randomUUID(),
+      name: "Mystery Crate",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      price: 19.99,
-      category: "uncategorized",
+      price: 100,
+      category: "mix",
+      tag: "new",
       imageUrl:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Product_sample_icon_picture.png/640px-Product_sample_icon_picture.png",
-      attributes: {
-        rarity: "common",
-      },
-      canBeShipped: false,
-      purchaseUrl: "",
+        "https://imgix.hypedrop.com/images/HypeDrop_Blaze_Box_Design_Export.png?auto=format",
+      products: [], // Initialize products array
     }
   );
 
@@ -86,47 +80,48 @@ const ProductEditor = ({ onBack, product }) => {
     const { name, value } = e.target;
     if (name.includes("attributes.")) {
       const attrName = name.split(".")[1];
-      setNewProduct((prev) => ({
+      setNewCrate((prev) => ({
         ...prev,
         attributes: { ...prev.attributes, [attrName]: value },
       }));
     } else {
-      setNewProduct((prev) => ({ ...prev, [name]: value }));
+      setNewCrate((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSave = async () => {
-    console.log(newProduct);
     try {
       let response, errorResponse;
-      if (product) {
-        [response, errorResponse] = await updateProduct(authHeader, newProduct);
+      if (crate) {
+        console.log("updating the crate");
+        [response, errorResponse] = await updateCrate(authHeader, newCrate);
         if (errorResponse) {
           showToast("Error", errorResponse.message, "error");
         } else {
-          showToast("Success", "Product updated successfully", "success");
+          showToast("Success", "Crate updated successfully", "success");
         }
       } else {
-        [response, errorResponse] = await createProduct(authHeader, newProduct);
+        console.log("creating a new crate");
+        [response, errorResponse] = await createCrate(authHeader, newCrate);
         if (errorResponse) {
           showToast("Error", errorResponse.message, "error");
         } else {
-          showToast("Success", "Product added successfully", "success");
+          showToast("Success", "Crate added successfully", "success");
         }
       }
       if (!errorResponse) {
         onBack(); // Call onBack after saving or updating
       }
     } catch (error) {
-      showToast("Error", "Failed to save product changes", "error");
+      showToast("Error", "Failed to save crate changes", "error");
     }
   };
 
   const handleDelete = async () => {
     try {
-      const [response, errorResponse] = await deleteProductById(
+      const [response, errorResponse] = await deleteCrateById(
         authHeader,
-        newProduct.productId
+        newCrate.crateId
       );
       if (errorResponse) {
         showToast(
@@ -141,20 +136,6 @@ const ProductEditor = ({ onBack, product }) => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleJsonChange = (e) => {
-    try {
-      const updatedProduct = JSON.parse(e.target.value);
-      setNewProduct(updatedProduct);
-    } catch (error) {
-      console.error("Invalid JSON format");
-    }
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(JSON.stringify(newProduct, null, 2));
-    showToast("Copied", "Product JSON copied to clipboard", "success");
   };
 
   return (
@@ -188,31 +169,31 @@ const ProductEditor = ({ onBack, product }) => {
               <FormLabel>Visibility</FormLabel>
               <Select
                 name="visibility"
-                value={newProduct.visibility}
+                value={newCrate.visibility}
                 onChange={handleChange}
               >
                 <option value="public">Public</option>
                 <option value="private">Private</option>
               </Select>
             </FormControl>
-            <FormControl id="productId" width="100%">
+            <FormControl id="crateId" width="100%">
               {" "}
               {/* Make full width on mobile */}
               <FormLabel>Product ID</FormLabel>
               <HStack>
                 <Input
                   type="text"
-                  name="productId"
-                  value={newProduct.productId}
+                  name="crateId"
+                  value={newCrate.crateId}
                   onChange={handleChange}
                 />
                 <IconButton
                   aria-label="Generate new Product ID"
                   icon={<RepeatIcon />}
                   onClick={() =>
-                    setNewProduct({
-                      ...newProduct,
-                      productId: crypto.randomUUID(),
+                    setNewCrate({
+                      ...newCrate,
+                      crateId: crypto.randomUUID(),
                     })
                   }
                 />
@@ -226,7 +207,7 @@ const ProductEditor = ({ onBack, product }) => {
             <Input
               type="text"
               name="name"
-              value={newProduct.name}
+              value={newCrate.name}
               onChange={handleChange}
             />
           </FormControl>
@@ -236,7 +217,7 @@ const ProductEditor = ({ onBack, product }) => {
             <FormLabel>Description</FormLabel>
             <Textarea
               name="description"
-              value={newProduct.description}
+              value={newCrate.description}
               onChange={handleChange}
               height="100px"
             />
@@ -251,7 +232,7 @@ const ProductEditor = ({ onBack, product }) => {
               <Input
                 type="number"
                 name="price"
-                value={newProduct.price}
+                value={newCrate.price}
                 onChange={handleChange}
               />
             </FormControl>
@@ -262,7 +243,18 @@ const ProductEditor = ({ onBack, product }) => {
               <Input
                 type="text"
                 name="category"
-                value={newProduct.category}
+                value={newCrate.category}
+                onChange={handleChange}
+              />
+            </FormControl>
+            <FormControl id="tag" width="100%">
+              {" "}
+              {/* Make full width on mobile */}
+              <FormLabel>Tag</FormLabel>
+              <Input
+                type="text"
+                name="tag"
+                value={newCrate.tag}
                 onChange={handleChange}
               />
             </FormControl>
@@ -275,13 +267,13 @@ const ProductEditor = ({ onBack, product }) => {
               <Input
                 type="text"
                 name="imageUrl"
-                value={newProduct.imageUrl}
+                value={newCrate.imageUrl}
                 onChange={handleChange}
               />
               <Box boxSize="40px">
-                {newProduct.imageUrl ? (
+                {newCrate.imageUrl ? (
                   <Image
-                    src={newProduct.imageUrl}
+                    src={newCrate.imageUrl}
                     alt="Product Image"
                     boxSize="100%"
                     objectFit="cover"
@@ -293,57 +285,7 @@ const ProductEditor = ({ onBack, product }) => {
               </Box>
             </HStack>
           </FormControl>
-          <FormControl id="canBeShipped" mb={4} width="100%">
-            {" "}
-            {/* Make full width on mobile */}
-            <FormLabel>Shipable</FormLabel>
-            <HStack>
-              <Switch
-                defaultChecked={newProduct.canBeShipped}
-                onChange={(e) =>
-                  handleChange({
-                    target: { name: "canBeShipped", value: e.target.checked },
-                  })
-                }
-              />
-              <Input
-                type="text"
-                name="purchaseUrl"
-                placeholder="Purchase URL"
-                value={newProduct.purchaseUrl}
-                onChange={handleChange}
-              />
-            </HStack>
-          </FormControl>
           <FormControl id="rarity" mb={4} width="100%">
-            {" "}
-            {/* Make full width on mobile */}
-            <FormLabel>Rarity</FormLabel>
-            <RadioGroup
-              name="attributes.rarity"
-              value={newProduct.attributes.rarity} // Ensure value is used
-              onChange={(value) =>
-                handleChange({ target: { name: "attributes.rarity", value } })
-              }
-            >
-              <Stack direction="row">
-                <Radio value="none" colorScheme="gray">
-                  None
-                </Radio>
-                <Radio value="common" colorScheme="green">
-                  Common
-                </Radio>
-                <Radio value="uncommon" colorScheme="blue">
-                  Uncommon
-                </Radio>
-                <Radio value="rare" colorScheme="purple">
-                  Rare
-                </Radio>
-                <Radio value="legendary" colorScheme="yellow">
-                  Legendary
-                </Radio>
-              </Stack>
-            </RadioGroup>
             <HStack justifyContent="space-between" mt={4}>
               <Button
                 onClick={handleSave}
@@ -354,7 +296,7 @@ const ProductEditor = ({ onBack, product }) => {
               >
                 Save
               </Button>
-              {product && (
+              {crate && (
                 <Button
                   onClick={handleDelete}
                   variant={"solid"}
@@ -375,112 +317,53 @@ const ProductEditor = ({ onBack, product }) => {
         >
           {" "}
           {/* Make full width on mobile */} {/* Display on top for mobile */}
-          {renderProductCard(newProduct)}
-          <FormControl id="productJson" mt={4} width="100%">
-            {" "}
-            {/* Make full width on mobile */}
-            <HStack
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              m={2}
-            >
-              <Text>JSON</Text>
-              <IconButton
-                onClick={copyToClipboard}
-                variant={"solid"}
-                colorScheme={"teal"}
-                size={"sm"}
-                icon={<FaCopy />}
-              />
-            </HStack>
-            <Textarea
-              value={JSON.stringify(newProduct, null, 2)}
-              onChange={handleJsonChange}
-              height="250px"
-              fontFamily="monospace"
-              whiteSpace="pre"
-              overflowY="auto"
-              fontSize="xs"
-              css={{
-                "&::-webkit-scrollbar": { display: "none" },
-                "-ms-overflow-style": "none",
-                "scrollbar-width": "none",
-              }}
-            />
-          </FormControl>
+          {renderProductCard(newCrate)}
         </Box>
       </HStack>
+      <ProductManager crate={newCrate} setCrate={setNewCrate} />
     </Container>
   );
 };
 
-const renderProductCard = (product) => (
+const renderProductCard = (crate) => (
   <Card
-    key={product.productId}
+    key={crate.crateId}
     borderRadius="lg"
     overflow="hidden"
     boxShadow="0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.5)"
-    height="100%" // Ensure the card takes full height
+    height="100%"
   >
     <CardBody display="flex" flexDirection="column">
-      <Box
-        position="relative"
-        flex="1"
-        borderRadius="xl"
-        bgColor={
-          product.attributes.rarity === "legendary"
-            ? "rgba(250, 240, 137, 0.3)" // yellow with 0.1 opacity
-            : product.attributes.rarity === "rare"
-            ? "rgba(214, 188, 250, 0.3)" // purple with 0.1 opacity
-            : product.attributes.rarity === "uncommon"
-            ? "rgba(144, 205, 244, 0.3)" // blue with 0.3 opacity
-            : product.attributes.rarity === "none"
-            ? "rgba(226, 232, 240, 0.3)" // gray with 0.3 opacity
-            : "rgba(154, 230, 180, 0.3)" // green with 0.3 opacity
-        }
-      >
-        <HStack
-          alignItems={"center"}
-          justifyContent={"space-between"}
-          position="absolute"
-          top="0"
-          left="0"
-          right="0"
-        >
+      <Box position="relative" flex="1" borderRadius="xl">
+        <HStack alignItems={"center"} justifyContent={"space-between"}>
           <Tag
             variant={"solid"}
-            colorScheme={product.visibility === "public" ? "green" : "black"}
+            colorScheme={crate.visibility === "public" ? "green" : "black"}
             fontWeight="semibold"
             letterSpacing="wide"
             fontSize="xs"
             textTransform="uppercase"
             m={2}
           >
-            {product.visibility}
+            {crate.visibility}
           </Tag>
-          <Badge
-            borderRadius="full"
-            px="2"
+          <Tag
+            variant={"solid"}
+            colorScheme={crate.tag === "new" ? "green" : "blue"}
+            fontWeight="semibold"
+            letterSpacing="wide"
+            fontSize="xs"
+            textTransform="uppercase"
             m={2}
-            colorScheme={
-              product.attributes.rarity === "legendary"
-                ? "yellow"
-                : product.attributes.rarity === "rare"
-                ? "purple"
-                : product.attributes.rarity === "uncommon"
-                ? "blue"
-                : product.attributes.rarity === "none"
-                ? "gray"
-                : "green"
-            }
           >
-            {product.attributes.rarity}
-          </Badge>
+            {crate.tag}
+          </Tag>
         </HStack>
         <Box borderRadius="lg" height="200px" mx="auto" overflow="hidden">
           <Image
-            src={product.imageUrl}
-            alt={product.name}
+            src={crate.imageUrl}
+            alt={crate.name}
+            borderRadius="lg"
             height="100%"
             width="100%"
             objectFit="contain"
@@ -490,24 +373,24 @@ const renderProductCard = (product) => (
         </Box>
       </Box>
       <Stack mt="5" spacing="3" flex="1">
+        <Heading size="md" isTruncated>
+          {crate.name}
+        </Heading>
         <HStack alignItems={"center"} justifyContent={"space-between"}>
           <Tag
-            colorScheme="blue"
+            colorScheme="gray"
             variant={"solid"}
             fontWeight="semibold"
             letterSpacing="wide"
             fontSize="xs"
             textTransform="uppercase"
           >
-            {product.category}
+            {crate.category}
           </Tag>
         </HStack>
-        <Heading size="md" isTruncated>
-          {product.name}
-        </Heading>
         <HStack justifyContent="space-between">
           <Text color="blue.600" fontSize="2xl">
-            {formatMoney(product.price)}
+            {formatMoney(crate.price)}
           </Text>
           <Icon icon={InfoIcon} color="blue.600" />
         </HStack>
@@ -516,26 +399,25 @@ const renderProductCard = (product) => (
   </Card>
 );
 
-const Products = () => {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+const Crates = () => {
+  const [crates, setCrates] = useState([]);
+  const [filteredCrates, setFilteredCrates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCrate, setSelectedCrate] = useState(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchedCrates = async () => {
       try {
-        const [fetchedProducts, failedProductsResponse] =
-          await getAllProducts();
-        if (failedProductsResponse) {
-          setError(failedProductsResponse.message);
-          console.log(failedProductsResponse);
+        const [fetchedCrates, failedCratesResponse] = await getAllCrates();
+        if (failedCratesResponse) {
+          setError(failedCratesResponse.message);
+          console.log(failedCratesResponse);
         } else {
-          setProducts(fetchedProducts);
-          setFilteredProducts(fetchedProducts);
+          setCrates(fetchedCrates);
+          setFilteredCrates(fetchedCrates);
         }
       } catch (error) {
         setError(error.message);
@@ -544,37 +426,31 @@ const Products = () => {
       }
     };
 
-    fetchProducts();
-  }, [selectedProduct, isEditing]);
+    fetchedCrates();
+  }, [selectedCrate, isEditing]);
 
   useEffect(() => {
-    let sortedProducts = [...products].sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-
     if (searchQuery === "") {
-      setFilteredProducts(sortedProducts);
+      setFilteredCrates(crates);
     } else {
-      setFilteredProducts(
-        sortedProducts.filter(
-          (product) =>
-            product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            product.description
+      setFilteredCrates(
+        crates.filter(
+          (crate) =>
+            crate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            crate.description
               .toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-            product.category
-              .toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            product.attributes.rarity
+            crate.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            crate.attributes.rarity
               .toLowerCase()
               .includes(searchQuery.toLowerCase())
         )
       );
     }
-  }, [searchQuery, products]);
+  }, [searchQuery, crates]);
 
-  const handleProductClick = (product) => {
-    setSelectedProduct(product);
+  const handleCrateClick = (crate) => {
+    setSelectedCrate(crate);
     setIsEditing(true);
   };
 
@@ -595,9 +471,9 @@ const Products = () => {
     <ProductEditor
       onBack={() => {
         setIsEditing(false);
-        setSelectedProduct(null);
+        setSelectedCrate(null);
       }}
-      product={selectedProduct}
+      crate={selectedCrate}
     />
   ) : (
     <Container as={Stack} maxW={"7xl"}>
@@ -608,7 +484,7 @@ const Products = () => {
           size={"md"}
           leftIcon={<LuPlus />}
         >
-          New Product
+          New Crate
         </Button>
         <Box display={"flex"} alignItems={"center"}>
           <InputGroup>
@@ -625,12 +501,9 @@ const Products = () => {
         </Box>
       </HStack>
       <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="16px">
-        {filteredProducts.map((product) => (
-          <Box
-            key={product.productId}
-            onClick={() => handleProductClick(product)}
-          >
-            {renderProductCard(product)}
+        {filteredCrates.map((crate) => (
+          <Box key={crate.crateId} onClick={() => handleCrateClick(crate)}>
+            {renderProductCard(crate)}
           </Box>
         ))}
       </SimpleGrid>
@@ -638,4 +511,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default Crates;
